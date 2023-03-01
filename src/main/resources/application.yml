@@ -1,0 +1,21 @@
+sejong:
+  student-info.api-path: https://portal.sejong.ac.kr/user/index.do
+  login.api-path: https://portal.sejong.ac.kr/jsp/login/login_action.jsp
+  ssoLogin.api-path: https://portal.sejong.ac.kr/comm/member/user/ssoLoginProc.do
+
+logging:
+  level:
+    root: info
+    org.hibernate:
+      sql: debug
+
+springdoc:
+  packages-to-scan: sejongPromise.backend
+  swagger-ui.path: /api-docs
+  swagger-ui.tags-sorter: alpha
+  swagger-ui.operations-sorter: alpha
+  api-docs.path: /api-docs/json
+  api-docs.groups.enabled: true
+  cache.disabled: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json

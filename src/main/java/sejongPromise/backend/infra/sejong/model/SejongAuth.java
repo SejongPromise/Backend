@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 
 public class SejongAuth {
 
-    private final MultiValueMap<String, String> cookies = new LinkedMultiValueMap<>();
+    public final MultiValueMap<String, String> cookies = new LinkedMultiValueMap<>();
 
     public SejongAuth(MultiValueMap<String, String> cookies){
         this.cookies.addAll(cookies);
