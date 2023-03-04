@@ -28,8 +28,7 @@ public class TestController {
      */
     @GetMapping("/auth")
     public StudentInfo ssoToken(){
-//        SejongAuth login = authenticationService.login("18011552", "20000125");
-        SejongAuth login = authenticationService.login("17011092", "99730567");
+        SejongAuth login = authenticationService.login("학번", "비밀번호");
         StudentInfo studentInfo = crawlerService.crawlStudentInfo(login);
         printData(studentInfo);
         return studentInfo;
@@ -37,7 +36,7 @@ public class TestController {
 
     @GetMapping("/classic/auth")
     public String classicInfo(){
-        SejongAuth login = classicAuthenticationService.login("17011092", "99730567");
+        SejongAuth login = classicAuthenticationService.login("학번", "비밀번호");
         String s = classicCrawlerService.crawlStudentCertificationInfo(login);
         return s;
     }
