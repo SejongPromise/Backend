@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import sejongPromise.backend.infra.sejong.model.SejongAuth;
 import sejongPromise.backend.infra.sejong.model.StudentInfo;
 import sejongPromise.backend.infra.sejong.service.SejongAuthenticationService;
+import sejongPromise.backend.infra.sejong.service.SejongClassicAuthenticationService;
+import sejongPromise.backend.infra.sejong.service.SejongClassicCrawlerService;
 import sejongPromise.backend.infra.sejong.service.SejongCrawlerService;
 
 @Tag(name = "테스트용 컨트롤러", description = "개발하면서 필요한 debug용 Controller")
@@ -16,6 +18,8 @@ import sejongPromise.backend.infra.sejong.service.SejongCrawlerService;
 @RequiredArgsConstructor
 public class TestController {
     private final SejongAuthenticationService authenticationService;
+    private final SejongClassicAuthenticationService classicAuthenticationService;
+    private final SejongClassicCrawlerService classicCrawlerService;
     private final SejongCrawlerService crawlerService;
 
     /**
@@ -24,10 +28,18 @@ public class TestController {
      */
     @GetMapping("/auth")
     public StudentInfo ssoToken(){
-        SejongAuth login = authenticationService.login("학번", "비밀번호");
+//        SejongAuth login = authenticationService.login("18011552", "20000125");
+        SejongAuth login = authenticationService.login("17011092", "99730567");
         StudentInfo studentInfo = crawlerService.crawlStudentInfo(login);
         printData(studentInfo);
         return studentInfo;
+    }
+
+    @GetMapping("/classic/auth")
+    public String classicInfo(){
+        SejongAuth login = classicAuthenticationService.login("17011092", "99730567");
+        String s = classicCrawlerService.crawlStudentCertificationInfo(login);
+        return s;
     }
 
     private static void printData(StudentInfo studentInfo) {
