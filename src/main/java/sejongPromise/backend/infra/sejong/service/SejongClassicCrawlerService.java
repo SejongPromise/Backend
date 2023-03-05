@@ -23,6 +23,9 @@ public class SejongClassicCrawlerService {
     @Value("${sejong.student.schedule-info.api-path}")
     private final String STUDENT_SCHEDULE_API;
 
+    @Value("${sejong.student.register.api-path}")
+    private final String REGISTER_API;
+
     public String crawlStudentCertificationInfo(SejongAuth auth){
         String html = requestStudentCertificationInfo(auth);
         return html;
@@ -37,6 +40,27 @@ public class SejongClassicCrawlerService {
     public String crawlStudentScheduleInfo(SejongAuth auth){
         String html = requestStudentScheduleInfo(auth);
         return html;
+    }
+
+    public String requestRegistration(SejongAuth auth, String registerId){
+        String html = register(auth, registerId);
+        return html;
+    }
+
+    private String register(SejongAuth auth, String registerId) {
+        String result;
+        String param = String.format("menuInfoId=MAIN_02&shInfoId=%s", registerId);
+        try{
+            result = webClient.get()
+                    .uri(REGISTER_API, param)
+                    .cookies(auth.authCookies())
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+        }catch (Throwable t){
+            throw new RuntimeException(t);
+        }
+        return result;
     }
 
     private String requestStudentScheduleInfo(SejongAuth auth) {
