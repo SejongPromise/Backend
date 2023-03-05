@@ -1,4 +1,4 @@
-package sejongPromise.backend.infra.sejong.service;
+package sejongPromise.backend.infra.sejong.service.classic;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

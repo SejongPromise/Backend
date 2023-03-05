@@ -6,10 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import sejongPromise.backend.infra.sejong.model.SejongAuth;
 import sejongPromise.backend.infra.sejong.model.StudentInfo;
-import sejongPromise.backend.infra.sejong.service.SejongAuthenticationService;
-import sejongPromise.backend.infra.sejong.service.SejongClassicAuthenticationService;
-import sejongPromise.backend.infra.sejong.service.SejongClassicCrawlerService;
-import sejongPromise.backend.infra.sejong.service.SejongCrawlerService;
+import sejongPromise.backend.infra.sejong.service.portal.SejongAuthenticationService;
+import sejongPromise.backend.infra.sejong.service.classic.SejongClassicAuthenticationService;
+import sejongPromise.backend.infra.sejong.service.classic.SejongClassicCrawlerService;
+import sejongPromise.backend.infra.sejong.service.portal.SejongCrawlerService;
 
 @Tag(name = "테스트용 컨트롤러", description = "개발하면서 필요한 debug용 Controller")
 @RestController
