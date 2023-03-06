@@ -23,11 +23,11 @@ public class SejongAuthenticationService {
     @ChromeAgentWebClient
     private final WebClient webClient;
 
-    @Value("${sejong.login.api-path}")
-    private final String loginApiPath;
+    @Value("${sejong.portal.login}")
+    private final String LOGIN_URI;
 
-    @Value("${sejong.ssoLogin.api-path}")
-    private final String ssoApiPath;
+    @Value("${sejong.portal.ssoLogin}")
+    private final String SSO_REGISTER_URI;
 
     /**
      * 세종대학교 통합 시스템에 로그인합니다.
@@ -55,7 +55,7 @@ public class SejongAuthenticationService {
 
         try{
             response = webClient.post()
-                    .uri(loginApiPath)
+                    .uri(LOGIN_URI)
                     .header("Origin", "https://portal.sejong.ac.kr")
                     .header("Referer","https://portal.sejong.ac.kr/jsp/login/loginSSL.jsp")
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -78,7 +78,7 @@ public class SejongAuthenticationService {
         ResponseEntity<String> response;
         try{
             response = webClient.get()
-                    .uri(ssoApiPath)
+                    .uri(SSO_REGISTER_URI)
 //                    todo : Cookie String으로 넣지 않으면 인증이 안됨.. why...?
                     .header("Cookie", WebUtil.makeCookieString(cookies))
 //                    .cookies(map -> map.addAll(cookies))
