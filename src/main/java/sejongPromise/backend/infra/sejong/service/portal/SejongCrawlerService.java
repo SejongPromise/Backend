@@ -50,9 +50,10 @@ public class SejongCrawlerService {
 
     private StudentInfo parseHtml(String html) {
         Document doc = Jsoup.parse(html);
-        String name = getElementTextOrNull(doc, "//*[@id=\"baseForm\"]/div/div[1]/div/div[1]/div[2]/div/div[1]/div/div[1]/span[1]");
+
+        String name = getElementTextOrNull(doc, "/html/body/div[2]/div/section/form/div/div[1]/div/div[1]/div[2]/div/div[1]/div/div[1]/span[1]");
         String studentId = getElementTextOrNull(doc, "/html/body/div[2]/div/section/form/div/div[1]/div/div[1]/div[2]/div/div[1]/div/div[1]/span[2]");
-        String major = getElementTextOrNull(doc, "//*[@id=\"baseForm\"]/div/div[1]/div/div[1]/div[2]/div/div[1]/div/div[1]/span[4]");
+        String major = getElementTextOrNull(doc, "/html/body/div[2]/div/section/form/div/div[1]/div/div[1]/div[2]/div/div[1]/div/div[1]/span[4]");
         return new StudentInfo(name, studentId, major);
 
     }

@@ -20,10 +20,10 @@ public class SejongClassicCrawlerService {
     private final String INFO_API;
     @Value("${sejong.classic.schedule-info.api-path}")
     private final String SCHEDULE_API;
-    @Value("${sejong.student.schedule-info.api-path}")
+    @Value("${sejong.classic.student.schedule-info.api-path}")
     private final String STUDENT_SCHEDULE_API;
 
-    @Value("${sejong.student.register.api-path}")
+    @Value("${sejong.classic.student.register.api-path}")
     private final String REGISTER_API;
 
     public String crawlStudentCertificationInfo(SejongAuth auth){
