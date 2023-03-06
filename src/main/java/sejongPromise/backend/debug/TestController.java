@@ -1,0 +1,41 @@
+package sejongPromise.backend.debug;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
+import sejongPromise.backend.infra.sejong.model.SejongAuth;
+import sejongPromise.backend.infra.sejong.model.StudentInfo;
+import sejongPromise.backend.infra.sejong.service.SejongAuthenticationService;
+import sejongPromise.backend.infra.sejong.service.SejongCrawlerService;
+
+@Tag(name = "테스트용 컨트롤러", description = "개발하면서 필요한 debug용 Controller")
+@RestController
+@RequestMapping("/test")
+@Slf4j
+@RequiredArgsConstructor
+public class TestController {
+    private final SejongAuthenticationService authenticationService;
+    private final SejongCrawlerService crawlerService;
+
+    /**
+     * 프로그램 실행 전, 학번과 비밀번호를 넣으면 개인 정보를 알 수 있다.
+     * @return 유저 네임, 학번, 전공
+     */
+    @GetMapping("/auth")
+    public StudentInfo ssoToken(){
+        SejongAuth login = authenticationService.login("학번", "비밀번호");
+        StudentInfo studentInfo = crawlerService.crawlStudentInfo(login);
+        printData(studentInfo);
+        return studentInfo;
+    }
+
+    private static void printData(StudentInfo studentInfo) {
+        String studentName = studentInfo.getStudentName();
+        System.out.println("studentName = " + studentName);
+        String studentId = studentInfo.getStudentId();
+        System.out.println("studentId = " + studentId);
+        String major = studentInfo.getMajor();
+        System.out.println("major = " + major);
+    }
+}
