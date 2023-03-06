@@ -6,7 +6,6 @@ import org.springframework.util.MultiValueMap;
 import java.util.function.Consumer;
 
 public class SejongAuth {
-
     public final MultiValueMap<String, String> cookies = new LinkedMultiValueMap<>();
 
     public SejongAuth(MultiValueMap<String, String> cookies){

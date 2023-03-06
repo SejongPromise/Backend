@@ -1,23 +1,18 @@
-package sejongPromise.backend.infra.sejong.service;
+package sejongPromise.backend.infra.sejong.service.portal;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseCookie;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 import sejongPromise.backend.global.config.qualifier.ChromeAgentWebClient;
+import sejongPromise.backend.global.util.WebUtil;
 import sejongPromise.backend.infra.sejong.model.SejongAuth;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 @Service
@@ -43,19 +38,20 @@ public class SejongAuthenticationService {
     public SejongAuth login(String classId, String password) {
         MultiValueMap<String, String> cookies = new LinkedMultiValueMap<>();
 
-        ClientResponse response = tryLogin(classId, password);
-        addMappedCookies(cookies, response.cookies());
+        ResponseEntity<String> response = tryLogin(classId, password);
+
+        WebUtil.addMappedCookies(cookies, WebUtil.extractCookies(response.getHeaders()));
 
         response = trySSOAuth(cookies);
-        addMappedCookies(cookies, response.cookies());
+        WebUtil.addMappedCookies(cookies, WebUtil.extractCookies(response.getHeaders()));
 
         return new SejongAuth(cookies);
     }
 
-    private ClientResponse tryLogin(String classId, String password) {
+    private ResponseEntity<String> tryLogin(String classId, String password) {
         String param = String.format("mainLogin=Y&rtUrl=portal.sejong.ac.kr&ssoLoginProc.do&id=%s&password=%s", classId, password);
 
-        ClientResponse response;
+        ResponseEntity<String> response;
 
         try{
             response = webClient.post()
@@ -64,76 +60,52 @@ public class SejongAuthenticationService {
                     .header("Referer","https://portal.sejong.ac.kr/jsp/login/loginSSL.jsp")
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(BodyInserters.fromValue(param))
-                    .exchangeToMono(Mono::just)
+                    .retrieve()
+                    .toEntity(String.class)
                     .block();
-
         }catch (Throwable t){
             throw new RuntimeException(t);
         }
 
-        checkSSOToken(response);
+        assert response != null : "응답값 존재하지 않음";
+
+        checkSSOToken(response.getHeaders());
 
         return response;
     }
 
-    private ClientResponse trySSOAuth(MultiValueMap<String, String> cookies) {
-        ClientResponse response;
-        String cookieString = makeCookieString(cookies);
+    private ResponseEntity<String> trySSOAuth(MultiValueMap<String, String> cookies) {
+        ResponseEntity<String> response;
         try{
             response = webClient.get()
                     .uri(ssoApiPath)
 //                    todo : Cookie String으로 넣지 않으면 인증이 안됨.. why...?
-                    .header("Cookie", cookieString)
+                    .header("Cookie", WebUtil.makeCookieString(cookies))
 //                    .cookies(map -> map.addAll(cookies))
-                    .exchangeToMono(Mono::just)
+                    .retrieve()
+                    .toEntity(String.class)
                     .block();
         }catch (Throwable t){
             throw new RuntimeException(t);
         }
 
-        validateResponse(response);
-        validateStatusCode(response.statusCode());
+        if(response == null){
+            throw new RuntimeException("응답값 없음");
+        }
+
+        if(!response.getStatusCode().is3xxRedirection()){
+            throw new RuntimeException("리다이렉션 등록 안됨");
+        }
 
         return response;
     }
 
-    private String makeCookieString(MultiValueMap<String, String> cookies) {
-        StringBuilder sb = new StringBuilder();
-        Set<Map.Entry<String, List<String>>> entries = cookies.entrySet();
-        for(Map.Entry<String, List<String>> entry : entries){
-            sb.append(entry.getKey()).append("=");
-            for(String val : entry.getValue()){
-                sb.append(val).append(";");
-            }
-        }
-        return sb.deleteCharAt(sb.lastIndexOf(";")).toString();
-    }
-
-    private void validateStatusCode(HttpStatus statusCode) {
-        if(statusCode != HttpStatus.FOUND){
-            System.out.println("statusCode = " + statusCode);
-            throw new RuntimeException("리다이렉트 안 뜸");
+    private void checkSSOToken(HttpHeaders headers) {
+        List<ResponseCookie> responseCookies = WebUtil.extractCookies(headers);
+        if(responseCookies.stream()
+                .noneMatch(data -> data.getName().contains("ssotoken"))){
+            throw new RuntimeException("ssotoken 존재하지 않음");
         }
     }
 
-    private void validateResponse(ClientResponse response) {
-        if(response == null){
-            throw new RuntimeException("응답값 없음");
-        }
-    }
-
-    private void addMappedCookies(MultiValueMap<String, String> dest, MultiValueMap<String, ResponseCookie> src) {
-        Set<Map.Entry<String, List<ResponseCookie>>> cookies = src.entrySet();
-        for(Map.Entry<String, List<ResponseCookie>> ent : cookies){
-            for (ResponseCookie value : ent.getValue()) {
-                dest.add(ent.getKey(), value.getValue());
-            }
-        }
-    }
-
-    private void checkSSOToken(ClientResponse response) {
-        if(response != null && !response.cookies().containsKey("ssotoken")){
-            throw new RuntimeException("토큰 존재하지 않음");
-        }
-    }
 }

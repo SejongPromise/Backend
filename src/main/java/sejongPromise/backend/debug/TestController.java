@@ -6,8 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import sejongPromise.backend.infra.sejong.model.SejongAuth;
 import sejongPromise.backend.infra.sejong.model.StudentInfo;
-import sejongPromise.backend.infra.sejong.service.SejongAuthenticationService;
-import sejongPromise.backend.infra.sejong.service.SejongCrawlerService;
+import sejongPromise.backend.infra.sejong.service.portal.SejongAuthenticationService;
+import sejongPromise.backend.infra.sejong.service.classic.SejongClassicAuthenticationService;
+import sejongPromise.backend.infra.sejong.service.classic.SejongClassicCrawlerService;
+import sejongPromise.backend.infra.sejong.service.portal.SejongCrawlerService;
 
 @Tag(name = "테스트용 컨트롤러", description = "개발하면서 필요한 debug용 Controller")
 @RestController
@@ -16,6 +18,8 @@ import sejongPromise.backend.infra.sejong.service.SejongCrawlerService;
 @RequiredArgsConstructor
 public class TestController {
     private final SejongAuthenticationService authenticationService;
+    private final SejongClassicAuthenticationService classicAuthenticationService;
+    private final SejongClassicCrawlerService classicCrawlerService;
     private final SejongCrawlerService crawlerService;
 
     /**
@@ -28,6 +32,13 @@ public class TestController {
         StudentInfo studentInfo = crawlerService.crawlStudentInfo(login);
         printData(studentInfo);
         return studentInfo;
+    }
+
+    @GetMapping("/classic/auth")
+    public String classicInfo(){
+        SejongAuth login = classicAuthenticationService.login("학번", "비밀번호");
+        String s = classicCrawlerService.crawlStudentCertificationInfo(login);
+        return s;
     }
 
     private static void printData(StudentInfo studentInfo) {
