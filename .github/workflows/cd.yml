@@ -57,20 +57,3 @@ jobs:
           docker login -u $USERNAME -p $PASSWORD
           docker push $USERNAME/$REPO:${GITHUB_SHA::7}
           docker push $USERNAME/$REPO:latest
-          
-      - name: SSH Remote Commands
-        uses: appleboy/ssh-action@v0.1.8
-        env:
-          REPO: ${{ secrets.DOCKER_REPO }}
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          port: ${{ secrets.SERVER_PORT }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
-          envs: GITHUB_SHA,REPO
-          script: |
-            docker pull ${{ secrets.DOCKER_USERNAME }}/$REPO:${GITHUB_SHA::7}
-            docker tag ${{ secrets.DOCKER_USERNAME }}/$REPO:${GITHUB_SHA::7} $REPO
-            docker stop $REPO
-            docker rm $REPO
-            docker run -d --name $REPO -p 8080:8080 -v ~/app/application.yml:/usr/app/application.yml -e TZ=Asia/Seoul --restart=always $REPO
