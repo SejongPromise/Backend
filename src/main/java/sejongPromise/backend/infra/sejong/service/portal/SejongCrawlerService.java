@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import sejongPromise.backend.global.config.qualifier.ChromeAgentWebClient;
+import sejongPromise.backend.global.error.ErrorCode;
+import sejongPromise.backend.global.error.exception.CustomException;
 import sejongPromise.backend.infra.sejong.model.SejongAuth;
 import sejongPromise.backend.infra.sejong.model.StudentInfo;
 
@@ -66,9 +68,6 @@ public class SejongCrawlerService {
     private String getElementTextOrNull(Document doc, String xPath) {
         return Optional.of(doc.selectXpath(xPath))
                 .map(Elements::text)
-                .orElseThrow(() -> new RuntimeException("찾는 데이터 없음"));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA));
     }
-
-
-
 }

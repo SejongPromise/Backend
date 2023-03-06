@@ -12,6 +12,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import sejongPromise.backend.global.config.qualifier.ChromeAgentWebClient;
+import sejongPromise.backend.global.error.ErrorCode;
+import sejongPromise.backend.global.error.exception.CustomException;
 import sejongPromise.backend.global.util.WebUtil;
 import sejongPromise.backend.infra.sejong.model.SejongAuth;
 
@@ -57,7 +59,7 @@ public class SejongClassicAuthenticationService {
             throw new RuntimeException(t);
         }
 
-        if(response == null) throw new RuntimeException("응답값 존재하지 않음");
+        if(response == null) throw new CustomException(ErrorCode.NO_RESPONSE);
 
         checkJssesionId(response.getHeaders());
 
@@ -68,7 +70,7 @@ public class SejongClassicAuthenticationService {
         List<ResponseCookie> responseCookies = WebUtil.extractCookies(response);
         if(responseCookies.stream()
                 .noneMatch(data -> data.getName().contains("JSEESIONID"))){
-            throw new RuntimeException("JSESSIONID 존재하지 않음");
+            throw new CustomException(ErrorCode.NOT_FOUND_DATA, "JSession 못 찾음");
         }
     }
 }
