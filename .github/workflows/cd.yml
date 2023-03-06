@@ -46,7 +46,7 @@ jobs:
           USERNAME: ${{ secrets.DOCKER_USERNAME }}
           REPO: ${{ secrets.DOCKER_REPO }}
         run: |
-          docker build --platform amd64 --build-arg DEPENDENCY=build/dependency -t $USERNAME/$REPO:${GITHUB_SHA::7}  -t $USERNAME/$REPO:latest . 
+          docker build --platform arm64 -t $USERNAME/$REPO:${GITHUB_SHA::7}  -t $USERNAME/$REPO:latest . 
           
       - name: Docker push
         env:
