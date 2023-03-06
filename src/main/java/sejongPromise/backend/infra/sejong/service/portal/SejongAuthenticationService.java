@@ -9,6 +9,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import sejongPromise.backend.global.config.qualifier.ChromeAgentWebClient;
+import sejongPromise.backend.global.error.ErrorCode;
+import sejongPromise.backend.global.error.exception.CustomException;
 import sejongPromise.backend.global.util.WebUtil;
 import sejongPromise.backend.infra.sejong.model.SejongAuth;
 
@@ -90,11 +92,11 @@ public class SejongAuthenticationService {
         }
 
         if(response == null){
-            throw new RuntimeException("응답값 없음");
+            throw new CustomException(ErrorCode.NO_RESPONSE);
         }
 
         if(!response.getStatusCode().is3xxRedirection()){
-            throw new RuntimeException("리다이렉션 등록 안됨");
+            throw new CustomException(ErrorCode.INVALID_RESPONSE, "Redirection 안 됨.");
         }
 
         return response;
@@ -104,7 +106,7 @@ public class SejongAuthenticationService {
         List<ResponseCookie> responseCookies = WebUtil.extractCookies(headers);
         if(responseCookies.stream()
                 .noneMatch(data -> data.getName().contains("ssotoken"))){
-            throw new RuntimeException("ssotoken 존재하지 않음");
+            throw new CustomException(ErrorCode.NOT_FOUND_DATA, "ssotoken 을 찾을 수 없습니다.");
         }
     }
 
