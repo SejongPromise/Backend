@@ -16,15 +16,14 @@ public class SejongClassicCrawlerService {
     @ChromeAgentWebClient
     private final WebClient webClient;
 
-    @Value("${sejong.classic.student-info.api-path}")
-    private final String INFO_API;
-    @Value("${sejong.classic.schedule-info.api-path}")
-    private final String SCHEDULE_API;
-    @Value("${sejong.classic.student.schedule-info.api-path}")
-    private final String STUDENT_SCHEDULE_API;
-
-    @Value("${sejong.classic.student.register.api-path}")
-    private final String REGISTER_API;
+    @Value("${sejong.classic.student.info}")
+    private final String STUDENT_INFO_URI;
+    @Value("${sejong.classic.book.schedule}")
+    private final String BOOK_SCHEDULE_URI;
+    @Value("${sejong.classic.student.schedule}")
+    private final String STUDENT_SCHEDULE_URI;
+    @Value("${sejong.classic.book.register}")
+    private final String BOOK_REGISTER_URI;
 
     public String crawlStudentCertificationInfo(SejongAuth auth){
         String html = requestStudentCertificationInfo(auth);
@@ -52,7 +51,7 @@ public class SejongClassicCrawlerService {
         String param = String.format("menuInfoId=MAIN_02&shInfoId=%s", registerId);
         try{
             result = webClient.get()
-                    .uri(REGISTER_API, param)
+                    .uri(BOOK_REGISTER_URI, param)
                     .cookies(auth.authCookies())
                     .retrieve()
                     .bodyToMono(String.class)
@@ -67,7 +66,7 @@ public class SejongClassicCrawlerService {
         String result;
         try{
             result = webClient.get()
-                    .uri(STUDENT_SCHEDULE_API)
+                    .uri(STUDENT_SCHEDULE_URI)
                     .cookies(auth.authCookies())
                     .retrieve()
                     .bodyToMono(String.class)
@@ -83,7 +82,7 @@ public class SejongClassicCrawlerService {
         String param = String.format("shDate=%s", date);
         try{
             result = webClient.post()
-                    .uri(SCHEDULE_API)
+                    .uri(BOOK_SCHEDULE_URI)
                     .cookies(auth.authCookies())
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(BodyInserters.fromValue(param))
@@ -100,7 +99,7 @@ public class SejongClassicCrawlerService {
         String result;
         try{
             result = webClient.get()
-                    .uri(INFO_API)
+                    .uri(STUDENT_INFO_URI)
                     .cookies(auth.authCookies())
                     .retrieve()
                     .bodyToMono(String.class)

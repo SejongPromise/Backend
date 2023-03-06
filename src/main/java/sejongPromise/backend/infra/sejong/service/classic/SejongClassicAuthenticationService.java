@@ -24,8 +24,8 @@ public class SejongClassicAuthenticationService {
     @ChromeAgentWebClient
     private final WebClient webClient;
 
-    @Value("${sejong.classic.login.api-path}")
-    private final String loginApiPath;
+    @Value("${sejong.classic.login}")
+    private final String LOGIN_URI;
 
     public SejongAuth login(String classId, String password) {
         MultiValueMap<String, String> cookies = new LinkedMultiValueMap<>();
@@ -44,7 +44,7 @@ public class SejongClassicAuthenticationService {
 
         try{
             response = webClient.post()
-                    .uri(loginApiPath)
+                    .uri(LOGIN_URI)
                     .header("Origin","http://classic.sejong.ac.kr")
                     .header("Host","classic.sejong.ac.kr")
                     .header("Referer", "http://classic.sejong.ac.kr/userLoginPage.do")

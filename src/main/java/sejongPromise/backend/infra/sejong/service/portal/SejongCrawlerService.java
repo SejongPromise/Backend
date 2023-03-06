@@ -23,8 +23,12 @@ public class SejongCrawlerService {
     @ChromeAgentWebClient
     private final WebClient webClient;
 
-    @Value("${sejong.student-info.api-path}")
-    private final String studentInfoApiPath;
+    @Value("${sejong.portal.student.info}")
+    private final String STUDENT_INFO_URI;
+    private final String USER_NAME_XPATH = "/html/body/div[2]/div/section/form/div/div[1]/div/div[1]/div[2]/div/div[1]/div/div[1]/span[1]";
+    private final String USER_STUDENT_ID_XPATH = "/html/body/div[2]/div/section/form/div/div[1]/div/div[1]/div[2]/div/div[1]/div/div[1]/span[2]";
+    private final String USER_MAJOR_XPATH = "/html/body/div[2]/div/section/form/div/div[1]/div/div[1]/div[2]/div/div[1]/div/div[1]/span[4]";
+
 
     public StudentInfo crawlStudentInfo(SejongAuth auth){
         String html = requestStudentInfo(auth);
@@ -35,7 +39,7 @@ public class SejongCrawlerService {
         String result;
         try{
             result = webClient.post()
-                    .uri(studentInfoApiPath)
+                    .uri(STUDENT_INFO_URI)
                     .cookies(auth.authCookies())
                     .retrieve()
                     .bodyToMono(String.class)
@@ -51,9 +55,9 @@ public class SejongCrawlerService {
     private StudentInfo parseHtml(String html) {
         Document doc = Jsoup.parse(html);
 
-        String name = getElementTextOrNull(doc, "/html/body/div[2]/div/section/form/div/div[1]/div/div[1]/div[2]/div/div[1]/div/div[1]/span[1]");
-        String studentId = getElementTextOrNull(doc, "/html/body/div[2]/div/section/form/div/div[1]/div/div[1]/div[2]/div/div[1]/div/div[1]/span[2]");
-        String major = getElementTextOrNull(doc, "/html/body/div[2]/div/section/form/div/div[1]/div/div[1]/div[2]/div/div[1]/div/div[1]/span[4]");
+        String name = getElementTextOrNull(doc, USER_NAME_XPATH);
+        String studentId = getElementTextOrNull(doc, USER_STUDENT_ID_XPATH);
+        String major = getElementTextOrNull(doc, USER_MAJOR_XPATH);
         return new StudentInfo(name, studentId, major);
 
     }
