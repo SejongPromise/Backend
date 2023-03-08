@@ -29,7 +29,7 @@ public class TestController {
      * @return
      */
     @GetMapping("/auth")
-    public StudentInfo ssoToken(@RequestBody requestDto dto){
+    public StudentInfo ssoToken(@RequestBody TestLoginDto dto){
         SejongAuth login = authenticationService.login(dto.getStudentId(), dto.getPassword());
         StudentInfo studentInfo = crawlerService.crawlStudentInfo(login);
         printData(studentInfo);
@@ -52,13 +52,5 @@ public class TestController {
         System.out.println("studentId = " + studentId);
         String major = studentInfo.getMajor();
         System.out.println("major = " + major);
-    }
-
-    @Getter
-    @RequiredArgsConstructor
-    public class requestDto{
-        private final String studentId;
-        private final String password;
-
     }
 }
