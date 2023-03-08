@@ -21,7 +21,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         //학번으로 조회
         Optional<UserInfo> user = userRepository.findByStudentNum(username);
 
-//        Optional<UserInfo> member = memberRepository.findById(Long.parseLong(username));
         if (!user.isPresent()) {
             throw new UsernameNotFoundException("해당하는 user가 없습니다");
         }
