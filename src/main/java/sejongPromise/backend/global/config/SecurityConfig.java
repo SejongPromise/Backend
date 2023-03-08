@@ -16,10 +16,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-<<<<<<< Updated upstream
-import sejongPromise.backend.global.config.auth.CustomUserDetailsService;
-=======
->>>>>>> Stashed changes
 import sejongPromise.backend.global.config.jwt.JwtFilter;
 import sejongPromise.backend.global.config.jwt.JwtTokenProvider;
 

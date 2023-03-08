@@ -30,17 +30,8 @@ public class JwtTokenProvider {
 
     //JWT 토큰 생성
     public String createToken(String userId) {
-<<<<<<< Updated upstream
-        Claims claims = Jwts.claims().setSubject(userId); //JWT payload에 저장되는 정보 단위, user 식별값 넣음
-//        claims.put("roles", roles);
-//        claims.put("name", name);
-//        claims.put("deployment", deployment);
-=======
         Claims claims = Jwts.claims().setSubject(userId); //JWT payload에 저장되는 정보 단위, user 식별값 넣음 (id)
-
 //        claims.put("roles", roles);
-
->>>>>>> Stashed changes
         Date now = new Date();
 
         return Jwts.builder()
@@ -53,11 +44,8 @@ public class JwtTokenProvider {
 
     //JWT 토큰에서 인증 정보 조회
     public Authentication getAuthentication(String token) {
-<<<<<<< Updated upstream
-        UserDetails userDetails = userDetailsService.loadUserByUsername(this.getUserId(token));
-=======
         UserDetails userDetails = userDetailsService.loadUserByUserId(this.getUserId(token));
->>>>>>> Stashed changes
+
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
