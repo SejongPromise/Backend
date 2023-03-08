@@ -40,3 +40,4 @@ out/
 # resources
 application.properties
 application.yml
+application-DB.yml
