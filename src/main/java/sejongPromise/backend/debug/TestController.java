@@ -1,6 +1,7 @@
 package sejongPromise.backend.debug;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -23,16 +24,19 @@ public class TestController {
     private final SejongCrawlerService crawlerService;
 
     /**
-     * 프로그램 실행 전, 학번과 비밀번호를 넣으면 개인 정보를 알 수 있다.
-     * @return 유저 네임, 학번, 전공
+     * 세종대학교 포털 로그인
+     * @param dto 학번 & 비밀번호
+     * @return
      */
     @GetMapping("/auth")
-    public StudentInfo ssoToken(){
-        SejongAuth login = authenticationService.login("학번", "비밀번호");
+    public StudentInfo ssoToken(@RequestBody requestDto dto){
+        SejongAuth login = authenticationService.login(dto.getStdentId(), dto.getPassword());
         StudentInfo studentInfo = crawlerService.crawlStudentInfo(login);
         printData(studentInfo);
         return studentInfo;
     }
+
+
 
     @GetMapping("/classic/auth")
     public String classicInfo(){
@@ -48,5 +52,16 @@ public class TestController {
         System.out.println("studentId = " + studentId);
         String major = studentInfo.getMajor();
         System.out.println("major = " + major);
+    }
+
+    @Getter
+    public class requestDto{
+        private final String stdentId;
+        private final String password;
+
+        public requestDto(String stdentId, String password) {
+            this.stdentId = stdentId;
+            this.password = password;
+        }
     }
 }
