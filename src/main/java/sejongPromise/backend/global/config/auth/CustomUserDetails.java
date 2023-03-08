@@ -55,4 +55,10 @@ public class CustomUserDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+<<<<<<< Updated upstream
+=======
+
+    public Long getUserId(){ return userInfo.getId();}
+
+>>>>>>> Stashed changes
 }

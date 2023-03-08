@@ -9,7 +9,11 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
+<<<<<<< Updated upstream
 @Table(name = "member")
+=======
+@Table(name = "userinfo")
+>>>>>>> Stashed changes
 @ToString
 @Getter
 @NoArgsConstructor
