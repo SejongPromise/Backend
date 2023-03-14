@@ -36,6 +36,8 @@ public class SejongClassicCrawlerService {
     private final String STUDENT_SCHEDULE_URI;
     @Value("${sejong.classic.book.register}")
     private final String BOOK_REGISTER_URI;
+    @Value("${sejong.classic.book.info}")
+    private final String BOOK_INFO_URI;
     private final String BASE_URL = "http://classic.sejong.ac.kr";
 
 
@@ -63,7 +65,7 @@ public class SejongClassicCrawlerService {
     public List<BookInfo> crawlBookInfo(){
         List<BookInfo> bookInfoList = new ArrayList<>();
         try{
-            Document doc = Jsoup.connect("http://classic.sejong.ac.kr/info/MAIN_02_03.do").get();
+            Document doc = Jsoup.connect(BOOK_INFO_URI).get();
             Elements sections = doc.select("div.listTab li");
             sections.forEach(data -> {
                 String section = data.text();

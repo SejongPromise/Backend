@@ -31,7 +31,8 @@ class SejongClassicCrawlerServiceTest {
         String bookSchedule = properties.get("sejong.classic.book.schedule");
         String studentSchedule = properties.get("sejong.classic.student.schedule");
         String bookRegister = properties.get("sejong.classic.book.register");
-        service = new SejongClassicCrawlerService(webClient, studentInfo, bookSchedule, studentSchedule, bookRegister);
+        String bookInfo = properties.get("sejong.classic.book.info");
+        service = new SejongClassicCrawlerService(webClient, studentInfo, bookSchedule, studentSchedule, bookRegister, bookInfo);
     }
 
 
