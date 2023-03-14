@@ -10,30 +10,15 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "userinfo")
-
 @ToString
 @Getter
 @NoArgsConstructor
 public class UserInfo {
     @Id
-    @GeneratedValue
-    private long id; //고유 id
-    private String studentNum; //학번 - 로그인 id //security에서 Id는 String으로 반환돼야 함
-    private String password; //비밀번호
-
-//    private String name; //이름
-//    private String department; //학과
+    private long id; //학번
 
     @Builder
-    public UserInfo(String studentNum, String password) {
-        this.studentNum = studentNum;
-        this.password = password;
-//        this.name = name;
-//        this.department = department;
+    public UserInfo(Long id) {
+        this.id = id;
     }
-
-    public void encryptPassword(PasswordEncoder passwordEncoder) {
-        password = passwordEncoder.encode(password);
-    }
-
 }

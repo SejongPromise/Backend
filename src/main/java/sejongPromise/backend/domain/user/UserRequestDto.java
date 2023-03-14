@@ -2,17 +2,20 @@ package sejongPromise.backend.domain.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 
 /**
  * login, join request
  */
-@AllArgsConstructor
 @Getter
+@NoArgsConstructor
 public class UserRequestDto {
     @NotNull
-    String studentNum;
-    @NotNull
-    String password;
+    Long studentNum;
+
+    public UserRequestDto(Long studentNum) {
+        this.studentNum = studentNum;
+    }
 }

@@ -2,6 +2,8 @@ package sejongPromise.backend.domain.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,56 +22,36 @@ import java.util.Optional;
 public class UserService {
     private final JpaUserRepository userRepository;
 
-    private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final AuthenticationManager authenticationManager;
-
     /**
      * @param userRequestDto
      * @return join 결과
      */
     public boolean join(UserRequestDto userRequestDto) {
-        //크롤링해서 학과 정보, 이름 얻어야 함 //이부분 논의 필요
-        //일단 입력받은 학번과 비밀번호만 저장
+        //토큰 서비스를 위해 임시로 구현한 join -> 추후 user 구현되면 수정 필요
 
         //중복 금지
-        Optional<UserInfo> userByStudentNum = userRepository.findByStudentNum(userRequestDto.getStudentNum());
-        if (userByStudentNum.isPresent()) {
+        Optional<UserInfo> userById = userRepository.findById(userRequestDto.getStudentNum());
+        if (userById.isPresent()) {
             return false;
         }
 
         UserInfo user = UserInfo.builder()
-                .studentNum(userRequestDto.studentNum)
-                .password(userRequestDto.password)
+                .id(userRequestDto.studentNum)
                 .build();
 
-        user.encryptPassword(passwordEncoder);
-        log.info("password: {}",user.getPassword());
         userRepository.save(user);
         return true;
     }
 
-    /**
-     * @param request
-     * @return jwt token
-     */
-    public String login(UserRequestDto request) { //login 하면 jwt 토큰 보내줘야 함
-        Optional<UserInfo> user = userRepository.findByStudentNum(request.studentNum);
-        if (!user.isPresent()) {
-            return "UsernameNotFoundException";
-        }
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getStudentNum(), request.getPassword())
-            );
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            return jwtTokenProvider.createToken(String.valueOf(user.get().getId())); //user Id만 넣음
-        } catch (UsernameNotFoundException e) { //확인을 위해 exception 정보를 리턴
-            return "UsernameNotFoundException";
-        } catch (BadCredentialsException e) {
-            return "BadCredentialsException";
-        }
+    public Optional<UserInfo> findByUserId(Long userId) {
+        return userRepository.findById(userId);
     }
 
+    public void clear() {
+        userRepository.deleteAll();
+    }
+
+    public long count() {
+        return userRepository.count();
+    }
 }

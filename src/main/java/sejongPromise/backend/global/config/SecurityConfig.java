@@ -42,12 +42,14 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
+                .cors().and()
+                .formLogin().disable()
+                .httpBasic().disable()
                 /**exception 핸들링 추가해야 함*/
                 /**HttpServletRequest 사용하는 요청에 대한 접근 제한 설정 (사용권한 체크)*/
                 .authorizeRequests()
-                .antMatchers("/test").authenticated() //jwt test
-                .antMatchers("/user/**").hasRole("USER")
-                .antMatchers("/**").permitAll()
+                .antMatchers("/join**","/token**").permitAll()
+                .anyRequest().authenticated()
                 /**세션 사용 안함*/
                 .and()
                 .sessionManagement()
@@ -55,7 +57,6 @@ public class SecurityConfig {
                 /**jwt 설정*/
                 .and()
                 .addFilterBefore(new JwtFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class); //jwt filter 추가 (커스텀 필터, 그 후에 등록될 필터)
-
 
         return http.build();
     }

@@ -22,11 +22,13 @@ public class JwtFilter extends GenericFilterBean {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         //header 에서 token 추출
-        String token = tokenProvider.resolveToken((HttpServletRequest) request);
+        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+        String token = tokenProvider.resolveToken(httpServletRequest);
 
         if (token != null && tokenProvider.isValidateToken(token)) {
-            Authentication authentication = tokenProvider.getAuthentication(token); //token 에서 user 정보 받아옴
-            SecurityContextHolder.getContext().setAuthentication(authentication); //securityContext에 authentication 객체 저장
+            log.info("token: {}",token);
+            Authentication authentication = tokenProvider.getAuthentication(token); //customAuthentication 반환
+            SecurityContextHolder.getContext().setAuthentication(authentication); //securityContext 에 authentication 객체 저장
             log.info("security context에 학번: {} 인증 정보 저장함, url:{}",authentication.getName(), ((HttpServletRequest) request).getRequestURI());
         }else{
             log.info("유효한 jwt 토큰 없음, url:{}",((HttpServletRequest) request).getRequestURI());
