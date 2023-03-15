@@ -1,6 +1,5 @@
 package sejongPromise.backend.domain.user;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

@@ -1,10 +1,8 @@
 package sejongPromise.backend.domain.user;
 
 import lombok.*;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 

@@ -73,4 +73,5 @@ public class SejongClassicAuthenticationService {
             throw new CustomException(ErrorCode.NOT_FOUND_DATA, "JSession 못 찾음");
         }
     }
+
 }
