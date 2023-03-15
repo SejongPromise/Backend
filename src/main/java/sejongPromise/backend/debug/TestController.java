@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sejongPromise.backend.infra.sejong.model.BookInfo;
 import sejongPromise.backend.infra.sejong.model.SejongAuth;
@@ -48,9 +50,11 @@ public class TestController {
         return s;
     }
 
-    @GetMapping("/classic/book")
-    public List<BookInfo> test(){
-        return classicCrawlerService.crawlBookInfo();
+    @GetMapping("/classic/schedule")
+    public ResponseEntity classicSchedule(@RequestParam("date") String date){
+        //추후 user에 저장된 JSESSIONID 이용하거나 관리자 id, password로 로그인한 세션을 이용할 예정 -> 논의 필요
+        SejongAuth login = classicAuthenticationService.login("18011552", "20000125");
+        return classicCrawlerService.getScheduleInfo(login, date);
     }
 
     private static void printData(StudentInfo studentInfo) {
