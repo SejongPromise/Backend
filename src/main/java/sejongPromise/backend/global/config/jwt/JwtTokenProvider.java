@@ -8,35 +8,30 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import sejongPromise.backend.domain.user.UserInfo;
-import sejongPromise.backend.domain.user.UserService;
+import sejongPromise.backend.debug.user.UserInfo;
+import sejongPromise.backend.debug.user.repository.UserInfoRepository;
 import sejongPromise.backend.global.config.auth.CustomAuthentication;
 import sejongPromise.backend.global.error.ErrorCode;
 import sejongPromise.backend.global.error.exception.CustomException;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Base64;
 import java.util.Date;
 import java.util.Optional;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
+@RequiredArgsConstructor
 public class JwtTokenProvider {
 
+    public static final String AUTHORIZATION = "Authorization";
     @Value("${jwt.password}")
-    private String secretKey;
+    private final String secretKey;
 
     @Value("${jwt.valid-time}")
-    private long tokenValidTime;
+    private final long tokenValidTime;
 
-    private final UserService userService;
-    
-    protected void init() { //객체 초기화, secretKey 인코딩
-        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
-    }
+    private final UserInfoRepository userService;
 
     //JWT 토큰 생성
     public String createToken(Long userId) {
@@ -47,7 +42,7 @@ public class JwtTokenProvider {
                 .setClaims(claims) //정보 저장
                 .setIssuedAt(now) //토큰 발생 시간
                 .setExpiration(new Date(now.getTime() + tokenValidTime)) //만료 기간
-                .signWith(SignatureAlgorithm.HS256, secretKey) //암호화 알고리즘, secret 값
+                .signWith(SignatureAlgorithm.HS256, secretKey.getBytes()) //암호화 알고리즘, secret 값
                 .compact();
     }
 
@@ -57,7 +52,7 @@ public class JwtTokenProvider {
         Long userId = this.getUserId(token);
         String userIdString = String.valueOf(userId);
         log.info("userId: {}",this.getUserId(token));
-        Optional<UserInfo> byUserId = userService.findByUserId(this.getUserId(token));
+        Optional<UserInfo> byUserId = userService.findById(this.getUserId(token));
         CustomAuthentication authentication = new CustomAuthentication(userIdString);
 
         //null 체크
@@ -67,7 +62,7 @@ public class JwtTokenProvider {
 
     //JWT 토큰에서 회원 정보(학번) 추출 -> token을 발급받을 때는 무조건 인증된 사용자만 발급받아서 회원 정보 검증할 필요가 없음
     public Long getUserId(String token) {
-        return Long.parseLong(Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject());
+        return Long.parseLong(Jwts.parser().setSigningKey(secretKey.getBytes()).parseClaimsJws(token).getBody().getSubject());
     }
 
     //request header에서 token 값 가져옴
@@ -78,7 +73,7 @@ public class JwtTokenProvider {
     //token 유효성, 만료일자 확인
     public boolean isValidateToken(String token) {
         try {
-            Jws<Claims> claimsJws = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+            Jws<Claims> claimsJws = Jwts.parser().setSigningKey(secretKey.getBytes()).parseClaimsJws(token);
             return !claimsJws.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
             return false;
