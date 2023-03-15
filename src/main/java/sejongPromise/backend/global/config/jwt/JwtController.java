@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import sejongPromise.backend.domain.user.UserRequestDto;
+import sejongPromise.backend.debug.user.dto.request.UserRequestDto;
 
 import javax.validation.Valid;
 

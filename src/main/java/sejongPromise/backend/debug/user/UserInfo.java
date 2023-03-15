@@ -1,4 +1,4 @@
-package sejongPromise.backend.domain.user;
+package sejongPromise.backend.debug.user;
 
 import lombok.*;
 

@@ -1,11 +1,12 @@
-package sejongPromise.backend.domain.user;
+package sejongPromise.backend.debug.user.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import sejongPromise.backend.debug.user.UserService;
+import sejongPromise.backend.debug.user.dto.request.UserRequestDto;
 
 import javax.validation.Valid;
 
@@ -14,11 +15,10 @@ import javax.validation.Valid;
 public class UserController {
     private final UserService userService;
 
+    // Todo : void 는 성공 응답 요청으로 바꿀 거임.
     @PostMapping("/join")
-    public ResponseEntity join(@Valid @RequestBody UserRequestDto userRequestDto) {
-        if (!userService.join(userRequestDto)) {
-            return new ResponseEntity("이미 존재하는 학번", HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity(HttpStatus.OK);
+    public ResponseEntity<String> join(@Valid @RequestBody UserRequestDto dto) {
+        userService.join(dto);
+        return ResponseEntity.ok("저장");
     }
 }
