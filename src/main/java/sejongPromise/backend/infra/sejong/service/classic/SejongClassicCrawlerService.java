@@ -15,59 +15,29 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import sejongPromise.backend.global.config.qualifier.ChromeAgentWebClient;
-import sejongPromise.backend.global.error.ErrorCode;
 import sejongPromise.backend.global.error.exception.CustomException;
 import sejongPromise.backend.infra.sejong.dto.SejongClassicScheduleResponseDto;
 import sejongPromise.backend.infra.sejong.model.BookInfo;
 import sejongPromise.backend.infra.sejong.model.SejongAuth;
-import sejongPromise.backend.infra.sejong.model.StudentInfo;
 
 import java.util.List;
-import java.util.Optional;
 import java.io.IOException;
 import java.util.ArrayList;
 import static sejongPromise.backend.global.error.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SejongClassicCrawlerService {
 
     @ChromeAgentWebClient
     private final WebClient webClient;
-
-    @Value("${sejong.classic.student.info}")
-    private final String STUDENT_INFO_URI;
     @Value("${sejong.classic.book.schedule}")
     private final String BOOK_SCHEDULE_URI;
-    @Value("${sejong.classic.student.schedule}")
-    private final String STUDENT_SCHEDULE_URI;
-    @Value("${sejong.classic.book.register}")
-    private final String BOOK_REGISTER_URI;
     @Value("${sejong.classic.book.info}")
     private final String BOOK_INFO_URI;
     private final String BASE_URL = "http://classic.sejong.ac.kr";
 
-
-    public String crawlStudentCertificationInfo(SejongAuth auth){
-        String html = requestStudentCertificationInfo(auth);
-        return html;
-    }
-
-    public String crawlScheduleInfo(SejongAuth auth, String date){
-        String html = requestScheduleInfo(auth, date);
-        return html;
-    }
-
-
-    public String crawlStudentScheduleInfo(SejongAuth auth){
-        String html = requestStudentScheduleInfo(auth);
-        return html;
-    }
-
-    public String requestRegistration(SejongAuth auth, String registerId){
-        String html = register(auth, registerId);
-        return html;
-    }
 
     public List<BookInfo> crawlBookInfo(){
         List<BookInfo> bookInfoList = new ArrayList<>();
@@ -95,55 +65,6 @@ public class SejongClassicCrawlerService {
         }
 
         return bookInfoList;
-    }
-
-    private String register(SejongAuth auth, String registerId) {
-        String result;
-        String param = String.format("menuInfoId=MAIN_02&shInfoId=%s", registerId);
-        try{
-            result = webClient.get()
-                    .uri(BOOK_REGISTER_URI, param)
-                    .cookies(auth.authCookies())
-                    .retrieve()
-                    .bodyToMono(String.class)
-                    .block();
-        }catch (Throwable t){
-            throw new RuntimeException(t);
-        }
-        return result;
-    }
-
-    private String requestStudentScheduleInfo(SejongAuth auth) {
-        String result;
-        try{
-            result = webClient.get()
-                    .uri(STUDENT_SCHEDULE_URI)
-                    .cookies(auth.authCookies())
-                    .retrieve()
-                    .bodyToMono(String.class)
-                    .block();
-        }catch (Throwable t){
-            throw new RuntimeException(t);
-        }
-        return result;
-    }
-
-    private String requestScheduleInfo(SejongAuth auth, String date) {
-        String result;
-        String param = String.format("shDate=%s", date);
-        try{
-            result = webClient.post()
-                    .uri(BOOK_SCHEDULE_URI)
-                    .cookies(auth.authCookies())
-                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                    .body(BodyInserters.fromValue(param))
-                    .retrieve()
-                    .bodyToMono(String.class)
-                    .block();
-        }catch (Throwable t){
-            throw new RuntimeException(t);
-        }
-        return result;
     }
 
     /**
@@ -193,27 +114,6 @@ public class SejongClassicCrawlerService {
             }
         }
         return scheduleList;
-    }
-
-    private String requestStudentCertificationInfo(SejongAuth auth) {
-        String result;
-        try{
-            result = webClient.get()
-                    .uri(STUDENT_INFO_URI)
-                    .cookies(auth.authCookies())
-                    .retrieve()
-                    .bodyToMono(String.class)
-                    .block();
-        }catch (Throwable t){
-            throw new RuntimeException(t);
-        }
-        return result;
-    }
-
-    private String getElementTextOrNull(Document doc, String xPath) {
-        return Optional.of(doc.selectXpath(xPath))
-                .map(Elements::text)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA));
     }
 
 }
