@@ -1,6 +1,7 @@
 package sejongPromise.backend.infra.sejong.service.classic;
 
 import lombok.RequiredArgsConstructor;
+
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -17,14 +18,16 @@ import sejongPromise.backend.global.config.qualifier.ChromeAgentWebClient;
 import sejongPromise.backend.global.error.ErrorCode;
 import sejongPromise.backend.global.error.exception.CustomException;
 import sejongPromise.backend.infra.sejong.dto.SejongClassicScheduleResponseDto;
+import sejongPromise.backend.infra.sejong.model.BookInfo;
 import sejongPromise.backend.infra.sejong.model.SejongAuth;
 import sejongPromise.backend.infra.sejong.model.StudentInfo;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.io.IOException;
+import java.util.ArrayList;
+import static sejongPromise.backend.global.error.ErrorCode.*;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SejongClassicCrawlerService {
@@ -40,6 +43,10 @@ public class SejongClassicCrawlerService {
     private final String STUDENT_SCHEDULE_URI;
     @Value("${sejong.classic.book.register}")
     private final String BOOK_REGISTER_URI;
+    @Value("${sejong.classic.book.info}")
+    private final String BOOK_INFO_URI;
+    private final String BASE_URL = "http://classic.sejong.ac.kr";
+
 
     public String crawlStudentCertificationInfo(SejongAuth auth){
         String html = requestStudentCertificationInfo(auth);
@@ -60,6 +67,34 @@ public class SejongClassicCrawlerService {
     public String requestRegistration(SejongAuth auth, String registerId){
         String html = register(auth, registerId);
         return html;
+    }
+
+    public List<BookInfo> crawlBookInfo(){
+        List<BookInfo> bookInfoList = new ArrayList<>();
+        try{
+            Document doc = Jsoup.connect(BOOK_INFO_URI).get();
+            Elements sections = doc.select("div.listTab li");
+            sections.forEach(data -> {
+                String section = data.text();
+                String id = data.id();
+                Elements select = doc.select("#" + id);
+                select.forEach(bookInfo ->{
+                    Elements list = bookInfo.select("ul.book_list li");
+                    list.forEach(bookData -> {
+                        String title = bookData.select("span.book_tit").text();
+                        String writer = bookData.select("span.book_wr").text();
+                        String com = bookData.select("span.book_com").text();
+                        String image = bookData.select("span.book_img img").attr("src");
+                        BookInfo dto = new BookInfo(section, title, writer, com, BASE_URL + image);
+                        bookInfoList.add(dto);
+                    });
+                });
+            });
+        }catch (IOException e){
+            throw new CustomException(NOT_FOUND_DATA, "책 정보를 가져올 수 없습니다.");
+        }
+
+        return bookInfoList;
     }
 
     private String register(SejongAuth auth, String registerId) {
