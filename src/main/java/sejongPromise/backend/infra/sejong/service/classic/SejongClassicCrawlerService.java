@@ -8,9 +8,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -92,8 +90,7 @@ public class SejongClassicCrawlerService {
             throw new RuntimeException(t);
         }
 
-        List<BookScheduleInfo> bookScheduleInfoList = parseScheduleHtml(result);
-        return bookScheduleInfoList;
+        return parseScheduleHtml(result);
     }
 
     private List<BookScheduleInfo> parseScheduleHtml(String html) {
@@ -103,14 +100,17 @@ public class SejongClassicCrawlerService {
 
         for(Element table: tableList){
             Elements rowList = table.select("tr");
-            log.info("rowList size: {}", rowList.size());
 
             for(Element row: rowList){
                 Elements cellList = row.select("td");
                 String time = cellList.get(3).text();
                 String applicant = cellList.get(5).text().substring(0, 2).trim();
+                String button = cellList.get(7).select("button").attr("onclick");
+                int start = button.indexOf("'");
+                int end = button.lastIndexOf("'");
+                String apply = button.substring(start + 1, end);
 
-                scheduleList.add(new BookScheduleInfo(time, Integer.parseInt(applicant)));
+                scheduleList.add(new BookScheduleInfo(time, Integer.parseInt(applicant),apply));
             }
         }
         return scheduleList;

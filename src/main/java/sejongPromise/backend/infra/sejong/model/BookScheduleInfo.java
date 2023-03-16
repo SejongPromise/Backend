@@ -8,4 +8,5 @@ import lombok.RequiredArgsConstructor;
 public class BookScheduleInfo {
     private final String time; //시간
     private final int applicant; //신청자수
+    private final String apply; //버튼
 }
