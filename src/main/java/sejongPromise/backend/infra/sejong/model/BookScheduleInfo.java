@@ -1,14 +1,11 @@
-package sejongPromise.backend.infra.sejong.dto;
+package sejongPromise.backend.infra.sejong.model;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
-public class SejongClassicScheduleResponseDto {
+@RequiredArgsConstructor
+public class BookScheduleInfo {
     private final String time; //시간
     private final int applicant; //신청자수
-
-    public SejongClassicScheduleResponseDto(String time, int applicant) {
-        this.time = time;
-        this.applicant = applicant;
-    }
 }

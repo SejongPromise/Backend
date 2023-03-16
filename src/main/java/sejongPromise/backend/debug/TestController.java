@@ -3,14 +3,16 @@ package sejongPromise.backend.debug;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import sejongPromise.backend.infra.sejong.model.BookScheduleInfo;
 import sejongPromise.backend.infra.sejong.model.SejongAuth;
 import sejongPromise.backend.infra.sejong.model.StudentInfo;
 import sejongPromise.backend.infra.sejong.service.portal.SejongAuthenticationService;
 import sejongPromise.backend.infra.sejong.service.classic.SejongClassicAuthenticationService;
 import sejongPromise.backend.infra.sejong.service.classic.SejongClassicCrawlerService;
 import sejongPromise.backend.infra.sejong.service.portal.SejongCrawlerService;
+
+import java.util.List;
 
 
 @Tag(name = "테스트용 컨트롤러", description = "개발하면서 필요한 debug용 Controller")
@@ -38,9 +40,14 @@ public class TestController {
     }
 
 
+    /**
+     * @param date ("yyyy-mm-dd" 형식)
+     * @return 스케쥴 List
+     */
     @GetMapping("/classic/schedule")
-    public ResponseEntity classicSchedule(@RequestParam("date") String date){
+    public List<BookScheduleInfo> classicSchedule(@RequestParam("date") String date){
         //추후 user에 저장된 JSESSIONID 이용하거나 관리자 id, password로 로그인한 세션을 이용할 예정 -> 논의 필요
+        //이부분은 추후 service 메소드 인자를 JSESSIONID 넣는 등으로 수정할 것임.
         SejongAuth login = classicAuthenticationService.login("18011552", "20000125");
         return classicCrawlerService.getScheduleInfo(login, date);
     }

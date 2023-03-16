@@ -16,7 +16,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import sejongPromise.backend.global.config.qualifier.ChromeAgentWebClient;
 import sejongPromise.backend.global.error.exception.CustomException;
-import sejongPromise.backend.infra.sejong.dto.SejongClassicScheduleResponseDto;
+import sejongPromise.backend.infra.sejong.model.BookScheduleInfo;
 import sejongPromise.backend.infra.sejong.model.BookInfo;
 import sejongPromise.backend.infra.sejong.model.SejongAuth;
 
@@ -72,7 +72,7 @@ public class SejongClassicCrawlerService {
      * @param date
      * @return 해당 날짜 예약 스케쥴 현황 리턴
      */
-    public ResponseEntity getScheduleInfo(SejongAuth auth, String date) {
+    public List<BookScheduleInfo> getScheduleInfo(SejongAuth auth, String date) {
         //User 로그인 구현되면 저장된 JSESSION으로 접근하도록 수정할 예정
         //JSESSION 없을 시 다시 로그인 하거나 관리자 계정으로 schedule 받아오는거까지 하거나 하기
         //일단 login해서 얻은 SejongAuth로 구현함
@@ -92,12 +92,12 @@ public class SejongClassicCrawlerService {
             throw new RuntimeException(t);
         }
 
-        List<SejongClassicScheduleResponseDto> scheduleResponseDtoList = parseScheduleHtml(result);
-        return new ResponseEntity(scheduleResponseDtoList, HttpStatus.OK);
+        List<BookScheduleInfo> bookScheduleInfoList = parseScheduleHtml(result);
+        return bookScheduleInfoList;
     }
 
-    private List<SejongClassicScheduleResponseDto> parseScheduleHtml(String html) {
-        List<SejongClassicScheduleResponseDto> scheduleList = new ArrayList<>();
+    private List<BookScheduleInfo> parseScheduleHtml(String html) {
+        List<BookScheduleInfo> scheduleList = new ArrayList<>();
         Document doc = Jsoup.parse(html);
         Elements tableList = doc.select("table[class=listA]").select("tbody");
 
@@ -110,7 +110,7 @@ public class SejongClassicCrawlerService {
                 String time = cellList.get(3).text();
                 String applicant = cellList.get(5).text().substring(0, 2).trim();
 
-                scheduleList.add(new SejongClassicScheduleResponseDto(time, Integer.parseInt(applicant)));
+                scheduleList.add(new BookScheduleInfo(time, Integer.parseInt(applicant)));
             }
         }
         return scheduleList;
