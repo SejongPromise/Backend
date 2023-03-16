@@ -30,10 +30,7 @@ public class JwtFilter extends GenericFilterBean {
             Authentication authentication = tokenProvider.getAuthentication(token); //customAuthentication 반환
             SecurityContextHolder.getContext().setAuthentication(authentication); //securityContext 에 authentication 객체 저장
             log.info("security context에 학번: {} 인증 정보 저장함, url:{}",authentication.getName(), ((HttpServletRequest) request).getRequestURI());
-        }else{
-            log.info("유효한 jwt 토큰 없음, url:{}",((HttpServletRequest) request).getRequestURI());
         }
-
         chain.doFilter(request, response);
     }
 }
