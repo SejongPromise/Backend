@@ -12,5 +12,4 @@ public class StudentInfo {
     private String studentName;
     private String studentId;
     private String major;
-
 }
