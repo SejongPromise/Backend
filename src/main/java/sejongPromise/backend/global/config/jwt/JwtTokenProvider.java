@@ -50,10 +50,9 @@ public class JwtTokenProvider {
     public Authentication getAuthentication(String token) {
         //발급할 때는 인증이 필요없지만 검증 시에는 user 데이터에 token의 학번과 일치하는 사용자가 있는지 확인 필요함
         Long userId = this.getUserId(token);
-        String userIdString = String.valueOf(userId);
         log.info("userId: {}",this.getUserId(token));
         Optional<UserInfo> byUserId = userService.findById(this.getUserId(token));
-        CustomAuthentication authentication = new CustomAuthentication(userIdString);
+        CustomAuthentication authentication = new CustomAuthentication(userId);
 
         //null 체크
         byUserId.orElseThrow(()->new CustomException(ErrorCode.NOT_FOUND_DATA,"사용자 존재하지 않음")); //되는건지잘;

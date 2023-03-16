@@ -1,7 +1,8 @@
 package sejongPromise.backend.debug.user.dto.request;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 
@@ -9,9 +10,9 @@ import javax.validation.constraints.NotNull;
  * login, join request
  */
 @Getter
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserRequestDto {
-
     @NotNull(message = "학번은 비어 있으면 안됩니다.")
-    private final Long studentNum;
+    private Long studentNum;
 }
