@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import sejongPromise.backend.infra.sejong.model.BookScheduleInfo;
 import sejongPromise.backend.infra.sejong.model.SejongAuth;
-import sejongPromise.backend.infra.sejong.model.StudentInfo;
+import sejongPromise.backend.infra.sejong.model.PotalStudentInfo;
 import sejongPromise.backend.infra.sejong.service.portal.SejongAuthenticationService;
 import sejongPromise.backend.infra.sejong.service.classic.SejongClassicAuthenticationService;
 import sejongPromise.backend.infra.sejong.service.classic.SejongClassicCrawlerService;
@@ -32,11 +32,11 @@ public class TestController {
      * @return
      */
     @GetMapping("/auth")
-    public StudentInfo ssoToken(@RequestBody TestLoginDto dto){
+    public PotalStudentInfo ssoToken(@RequestBody TestLoginDto dto){
         SejongAuth login = authenticationService.login(dto.getStudentId(), dto.getPassword());
-        StudentInfo studentInfo = crawlerService.crawlStudentInfo(login);
-        printData(studentInfo);
-        return studentInfo;
+        PotalStudentInfo potalStudentInfo = crawlerService.crawlStudentInfo(login);
+        printData(potalStudentInfo);
+        return potalStudentInfo;
     }
 
 
@@ -52,12 +52,12 @@ public class TestController {
         return classicCrawlerService.getScheduleInfo(login, date);
     }
 
-    private static void printData(StudentInfo studentInfo) {
-        String studentName = studentInfo.getStudentName();
+    private static void printData(PotalStudentInfo potalStudentInfo) {
+        String studentName = potalStudentInfo.getStudentName();
         System.out.println("studentName = " + studentName);
-        String studentId = studentInfo.getStudentId();
+        String studentId = potalStudentInfo.getStudentId();
         System.out.println("studentId = " + studentId);
-        String major = studentInfo.getMajor();
+        String major = potalStudentInfo.getMajor();
         System.out.println("major = " + major);
     }
 }

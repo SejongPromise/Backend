@@ -15,6 +15,8 @@ import sejongPromise.backend.infra.sejong.service.classic.SejongClassicCrawlerSe
 
 import java.util.Optional;
 
+import static org.jsoup.nodes.Document.OutputSettings.Syntax.html;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -30,6 +32,7 @@ public class StudentService {
      * @param dto 학번, 학과
      * @return 학번, 전공, 이름, 학기
      */
+
     @Transactional
     public ResponseStudentInfoDto save(RequestSignupDto dto){
         SejongAuth auth = sejongClassicAuthenticationService.login(dto.getStudentId(), dto.getPassword());
