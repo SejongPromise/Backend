@@ -2,11 +2,8 @@ package sejongPromise.backend.domain.student.model;
 
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.loader.entity.plan.AbstractLoadPlanBasedEntityLoader;
 import org.springframework.data.domain.Persistable;
-import sejongPromise.backend.domain.student.repository.StudentRepository;
 import sejongPromise.backend.global.model.BaseEntity;
-
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,9 +12,8 @@ import javax.persistence.Id;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-
+@DynamicUpdate //필요한 업데이트만 진행
 public class Student extends BaseEntity implements Persistable<Long> {
-
     @Id
     @Column(name = "student_id")
     private Long id;
@@ -34,8 +30,8 @@ public class Student extends BaseEntity implements Persistable<Long> {
      */
     @Override
     public boolean isNew() {
-
         return getCreate_at() == null;
+
     }
 
     @Builder

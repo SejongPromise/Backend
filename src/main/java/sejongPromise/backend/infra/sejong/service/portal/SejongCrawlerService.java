@@ -12,7 +12,7 @@ import sejongPromise.backend.global.config.qualifier.ChromeAgentWebClient;
 import sejongPromise.backend.global.error.ErrorCode;
 import sejongPromise.backend.global.error.exception.CustomException;
 import sejongPromise.backend.infra.sejong.model.SejongAuth;
-import sejongPromise.backend.infra.sejong.model.PotalStudentInfo;
+import sejongPromise.backend.infra.sejong.model.StudentInfo;
 
 import java.util.Optional;
 
@@ -32,7 +32,7 @@ public class SejongCrawlerService {
     private final String USER_MAJOR_XPATH = "/html/body/div[2]/div/section/form/div/div[1]/div/div[1]/div[2]/div/div[1]/div/div[1]/span[4]";
 
 
-    public PotalStudentInfo crawlStudentInfo(SejongAuth auth){
+    public StudentInfo crawlStudentInfo(SejongAuth auth){
         String html = requestStudentInfo(auth);
         return parseHtml(html);
     }
@@ -54,13 +54,13 @@ public class SejongCrawlerService {
     }
 
 
-    private PotalStudentInfo parseHtml(String html) {
+    private StudentInfo parseHtml(String html) {
         Document doc = Jsoup.parse(html);
 
         String name = getElementTextOrNull(doc, USER_NAME_XPATH);
         String studentId = getElementTextOrNull(doc, USER_STUDENT_ID_XPATH);
         String major = getElementTextOrNull(doc, USER_MAJOR_XPATH);
-        return new PotalStudentInfo(name, studentId, major);
+        return new StudentInfo(name, studentId, major);
 
     }
 
