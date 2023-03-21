@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sejongPromise.backend.domain.student.model.Student;
-import sejongPromise.backend.domain.student.model.dto.request.RequestSingUpDto;
+import sejongPromise.backend.domain.student.model.dto.request.RequestSignupDto;
 import sejongPromise.backend.domain.student.model.dto.response.ResponseStudentInfoDto;
 import sejongPromise.backend.domain.student.repository.StudentRepository;
 import sejongPromise.backend.global.util.WebUtil;
@@ -31,7 +31,7 @@ public class StudentService {
      * @return 학번, 전공, 이름, 학기
      */
     @Transactional
-    public ResponseStudentInfoDto save(RequestSingUpDto dto){
+    public ResponseStudentInfoDto save(RequestSignupDto dto){
         SejongAuth auth = sejongClassicAuthenticationService.login(dto.getStudentId(), dto.getPassword());
         ClassicStudentInfo studentInfo = sejongClassicCrawlerService.getStudentInfo(auth);
         Student student = Student.builder()

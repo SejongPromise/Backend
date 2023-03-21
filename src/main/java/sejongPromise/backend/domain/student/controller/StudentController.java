@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import sejongPromise.backend.domain.student.model.dto.request.RequestSingUpDto;
+import sejongPromise.backend.domain.student.model.dto.request.RequestSignupDto;
 import sejongPromise.backend.domain.student.model.dto.response.ResponseStudentInfoDto;
 import sejongPromise.backend.domain.student.service.StudentService;
 
@@ -30,7 +30,7 @@ public class StudentController {
      * @return 학번, 학과, 이름, 학기
      */
     @PostMapping("/signup")
-    public ResponseStudentInfoDto save(@RequestBody @Valid RequestSingUpDto dto){
+    public ResponseStudentInfoDto save(@RequestBody @Valid RequestSignupDto dto){
         return studentService.save(dto);
     }
 

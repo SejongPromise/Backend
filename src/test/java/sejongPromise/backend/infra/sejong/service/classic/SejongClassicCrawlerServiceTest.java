@@ -45,9 +45,4 @@ class SejongClassicCrawlerServiceTest {
         assertThat(title).isEqualTo("플라톤의 국가");
     }
 
-    @Test
-    public void getStudentInfo(){
-
-    }
-
 }

@@ -28,6 +28,7 @@ public class Student extends BaseEntity implements Persistable<Long> {
     /**
      * Persistable override
      * PK 값이 자동생성이 아닌경우 즉, 직접 PK를 설정해야 하는경우 해당 메소드를 override 해줘야함.
+     * 새로운 객체인지 확인이 필요함.
      */
     @Override
     public boolean isNew() {
