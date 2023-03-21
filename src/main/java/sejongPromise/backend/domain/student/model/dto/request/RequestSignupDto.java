@@ -11,7 +11,7 @@ import javax.validation.constraints.Pattern;
 public class RequestSignupDto {
 
     @NotBlank(message = "학번을 입력해주세요.")
-    @Pattern(regexp = "@25d}", message = "학번을 정확히 입력해주세요.")
+    @Pattern(regexp = "^\\d{8}$", message = "학번을 정확히 입력해주세요.")
     private final String studentId;
 
     @NotBlank(message = "비밀번호를 입력해주세요.")

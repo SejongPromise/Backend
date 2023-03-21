@@ -1,11 +1,14 @@
 package sejongPromise.backend.debug;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class TestLoginDto {
-    private final String studentId;
-    private final String password;
+    private String studentId;
+    private String password;
 }

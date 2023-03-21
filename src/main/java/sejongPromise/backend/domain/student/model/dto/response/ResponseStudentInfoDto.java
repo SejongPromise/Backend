@@ -10,6 +10,4 @@ public class ResponseStudentInfoDto {
     private final String major;
     private final String name;
     private final Integer semester;
-
-
 }

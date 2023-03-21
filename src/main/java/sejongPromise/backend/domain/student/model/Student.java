@@ -12,8 +12,9 @@ import javax.persistence.Id;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@DynamicUpdate //필요한 업데이트만 진행
+@DynamicUpdate // 필요한 필드만 업데이트 시킵니다.
 public class Student extends BaseEntity implements Persistable<Long> {
+
     @Id
     @Column(name = "student_id")
     private Long id;
@@ -26,7 +27,8 @@ public class Student extends BaseEntity implements Persistable<Long> {
 
     /**
      * Persistable override
-     * 직접 PK를 설정해야 하는경우 해당 메소드를 override
+     * PK 값이 자동생성이 아닌경우 즉, 직접 PK를 설정해야 하는경우 해당 메소드를 override 해줘야함.
+     * 새로운 객체인지 확인이 필요함.
      */
     @Override
     public boolean isNew() {
@@ -55,6 +57,5 @@ public class Student extends BaseEntity implements Persistable<Long> {
         this.semester = student.getSemester();
         this.pass = student.isPass();
     }
-
 
 }

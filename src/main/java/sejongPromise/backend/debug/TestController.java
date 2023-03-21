@@ -4,9 +4,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import sejongPromise.backend.domain.student.repository.StudentRepository;
 import sejongPromise.backend.infra.sejong.model.BookScheduleInfo;
 import sejongPromise.backend.infra.sejong.model.SejongAuth;
-import sejongPromise.backend.infra.sejong.model.StudentInfo;
+import sejongPromise.backend.infra.sejong.model.PortalStudentInfo;
 import sejongPromise.backend.infra.sejong.service.portal.SejongAuthenticationService;
 import sejongPromise.backend.infra.sejong.service.classic.SejongClassicAuthenticationService;
 import sejongPromise.backend.infra.sejong.service.classic.SejongClassicCrawlerService;
@@ -32,11 +33,11 @@ public class TestController {
      * @return
      */
     @GetMapping("/auth")
-    public StudentInfo ssoToken(@RequestBody TestLoginDto dto){
+    public PortalStudentInfo ssoToken(@RequestBody TestLoginDto dto){
         SejongAuth login = authenticationService.login(dto.getStudentId(), dto.getPassword());
-        StudentInfo studentInfo = crawlerService.crawlStudentInfo(login);
-        printData(studentInfo);
-        return studentInfo;
+        PortalStudentInfo portalStudentInfo = crawlerService.crawlStudentInfo(login);
+        printData(portalStudentInfo);
+        return portalStudentInfo;
     }
 
 
@@ -52,12 +53,13 @@ public class TestController {
         return classicCrawlerService.getScheduleInfo(login, date);
     }
 
-    private static void printData(StudentInfo studentInfo) {
-        String studentName = studentInfo.getStudentName();
+
+    private static void printData(PortalStudentInfo portalStudentInfo) {
+        String studentName = portalStudentInfo.getStudentName();
         System.out.println("studentName = " + studentName);
-        String studentId = studentInfo.getStudentId();
+        String studentId = portalStudentInfo.getStudentId();
         System.out.println("studentId = " + studentId);
-        String major = studentInfo.getMajor();
+        String major = portalStudentInfo.getMajor();
         System.out.println("major = " + major);
     }
 }
