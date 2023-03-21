@@ -25,7 +25,7 @@ public class StudentController {
     private final SignupService signupService;
 
     /**
-     * 대양휴머니티 칼리지 로그인 및 회원가입 API
+     * 대양휴머니티 칼리지 회원가입 API
      * @param dto 요청 body (학번 : 8자리 , 비번 : 자유형식)
      * @return 학번, 학과, 이름, 학기
      */
@@ -34,9 +34,16 @@ public class StudentController {
         signupService.signup(dto);
     }
 
+    /**
+     * 로그인 API
+     * @param dto 요청 body (학번 : 8자리, 비번 : 자유형식)
+     * @return 토큰, 학번, 학과, 이름, 학기
+     */
     @PostMapping("/login")
     public ResponseLoginDto login(@RequestBody @Valid RequestStudentInfoDto dto){
         return studentService.login(dto);
     }
+
+
 
 }
