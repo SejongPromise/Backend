@@ -32,17 +32,22 @@ class SejongClassicCrawlerServiceTest {
         String studentSchedule = properties.get("sejong.classic.student.schedule");
         String bookRegister = properties.get("sejong.classic.book.register");
         String bookInfo = properties.get("sejong.classic.book.info");
-        service = new SejongClassicCrawlerService(webClient, studentInfo, bookSchedule, studentSchedule, bookRegister, bookInfo);
+        service = new SejongClassicCrawlerService(webClient, bookSchedule, bookInfo, studentInfo);
     }
 
 
     @Test
     @DisplayName("책 정보를 잘 가져오는가?")
-    public void test(){
+    public void getBookInfo(){
         List<BookInfo> bookInfoList = service.crawlBookInfo();
         BookInfo bookInfo = bookInfoList.get(0);
         String title = bookInfo.getTitle();
         assertThat(title).isEqualTo("플라톤의 국가");
+    }
+
+    @Test
+    public void getStudentInfo(){
+
     }
 
 }
