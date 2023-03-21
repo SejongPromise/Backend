@@ -16,6 +16,7 @@ import sejongPromise.backend.global.config.qualifier.ChromeAgentWebClient;
 import sejongPromise.backend.global.error.exception.CustomException;
 import sejongPromise.backend.infra.sejong.model.BookScheduleInfo;
 import sejongPromise.backend.infra.sejong.model.BookInfo;
+import sejongPromise.backend.infra.sejong.model.ClassicStudentInfo;
 import sejongPromise.backend.infra.sejong.model.SejongAuth;
 
 import java.util.List;
@@ -34,6 +35,8 @@ public class SejongClassicCrawlerService {
     private final String BOOK_SCHEDULE_URI;
     @Value("${sejong.classic.book.info}")
     private final String BOOK_INFO_URI;
+    @Value("${sejong.classic.student.info}")
+    private final String STUDENT_INFO_URI;
     private final String BASE_URL = "http://classic.sejong.ac.kr";
 
 
@@ -116,4 +119,26 @@ public class SejongClassicCrawlerService {
         return scheduleList;
     }
 
+    public ClassicStudentInfo getStudentInfo(SejongAuth auth) {
+        String html;
+        try{
+            html = webClient.get()
+                    .uri(STUDENT_INFO_URI)
+                    .cookies(auth.authCookies())
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+        }catch (Throwable t){
+            throw new RuntimeException(t);
+        }
+        return parseStudentInfoHtml(html);
+    }
+
+    private ClassicStudentInfo parseStudentInfoHtml(String html) {
+        Document doc = Jsoup.parse(html);
+        Elements table = doc.select("div.content-section ul.tblA");
+        Elements studentInfo = table.select("dd");
+        // todo : 인증 여부 확인해야함. 현재는 "인증" 텍스트로만 확인.
+        return new ClassicStudentInfo(studentInfo.get(0).text(), studentInfo.get(1).text(), studentInfo.get(2).text(), studentInfo.get(5).text(), studentInfo.get(7).text().contains("인증"));
+    }
 }
