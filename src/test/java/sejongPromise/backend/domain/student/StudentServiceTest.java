@@ -1,4 +1,4 @@
-package sejongPromise.backend.domain.user;
+package sejongPromise.backend.domain.student;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -9,7 +9,7 @@ import sejongPromise.backend.debug.user.UserService;
 import sejongPromise.backend.debug.user.dto.request.UserRequestDto;
 
 @SpringBootTest
-class UserServiceTest {
+class StudentServiceTest {
 
     @Autowired
     UserService userService;
