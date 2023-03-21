@@ -2,12 +2,11 @@ package sejongPromise.backend.domain.student.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import sejongPromise.backend.domain.student.model.dto.request.RequestSignupDto;
+import org.springframework.web.bind.annotation.*;
+import sejongPromise.backend.domain.student.model.dto.request.RequestStudentInfoDto;
+import sejongPromise.backend.domain.student.model.dto.response.ResponseLoginDto;
 import sejongPromise.backend.domain.student.model.dto.response.ResponseStudentInfoDto;
+import sejongPromise.backend.domain.student.service.SignupService;
 import sejongPromise.backend.domain.student.service.StudentService;
 
 import javax.validation.Valid;
@@ -23,6 +22,7 @@ import javax.validation.Valid;
 public class StudentController {
 
     private final StudentService studentService;
+    private final SignupService signupService;
 
     /**
      * 대양휴머니티 칼리지 로그인 및 회원가입 API
@@ -30,8 +30,13 @@ public class StudentController {
      * @return 학번, 학과, 이름, 학기
      */
     @PostMapping("/signup")
-    public ResponseStudentInfoDto save(@RequestBody @Valid RequestSignupDto dto){
-        return studentService.save(dto);
+    public void signup(@RequestBody @Valid RequestStudentInfoDto dto){
+        signupService.signup(dto);
+    }
+
+    @PostMapping("/login")
+    public ResponseLoginDto login(@RequestBody @Valid RequestStudentInfoDto dto){
+        return studentService.login(dto);
     }
 
 }

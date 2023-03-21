@@ -18,6 +18,7 @@ public class Student extends BaseEntity implements Persistable<Long> {
     @Id
     @Column(name = "student_id")
     private Long id;
+    private String password;
     private String ssoToken;
     private String sessionToken;
     private String name;
@@ -40,6 +41,7 @@ public class Student extends BaseEntity implements Persistable<Long> {
     private Student(@NonNull Long studentId,
                     @NonNull String name,
                     @NonNull String major,
+                    @NonNull String encodedPassword,
                     String ssoToken, String sessionToken, Integer semester, boolean pass){
         this.id = studentId;
         this.name = name;
@@ -48,6 +50,7 @@ public class Student extends BaseEntity implements Persistable<Long> {
         this.sessionToken = sessionToken;
         this.semester = semester;
         this.pass = pass;
+        this.password = encodedPassword;
     }
 
     public void update(Student student){
@@ -58,4 +61,7 @@ public class Student extends BaseEntity implements Persistable<Long> {
         this.pass = student.isPass();
     }
 
+    public String getStudentId() {
+        return id.toString();
+    }
 }
