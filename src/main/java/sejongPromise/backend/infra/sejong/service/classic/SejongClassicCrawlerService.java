@@ -12,16 +12,19 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import sejongPromise.backend.domain.exam.model.BookField;
+import sejongPromise.backend.domain.exam.model.Exam;
 import sejongPromise.backend.global.config.qualifier.ChromeAgentWebClient;
 import sejongPromise.backend.global.error.exception.CustomException;
-import sejongPromise.backend.infra.sejong.model.BookScheduleInfo;
-import sejongPromise.backend.infra.sejong.model.BookInfo;
-import sejongPromise.backend.infra.sejong.model.ClassicStudentInfo;
-import sejongPromise.backend.infra.sejong.model.SejongAuth;
+import sejongPromise.backend.infra.sejong.model.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import static sejongPromise.backend.global.error.ErrorCode.*;
 
 @Service
@@ -135,10 +138,37 @@ public class SejongClassicCrawlerService {
     }
 
     private ClassicStudentInfo parseStudentInfoHtml(String html) {
+        List<ExamInfo> examInfos = new ArrayList<>();
         Document doc = Jsoup.parse(html);
-        Elements table = doc.select("div.content-section ul.tblA");
-        Elements studentInfo = table.select("dd");
+        Elements studentTable = doc.select("div.content-section ul.tblA");
+        Elements studentInfo = studentTable.select("dd");
         // todo : 인증 여부 확인해야함. 현재는 "인증" 텍스트로만 확인.
-        return new ClassicStudentInfo(studentInfo.get(0).text(), studentInfo.get(1).text(), studentInfo.get(2).text(), studentInfo.get(5).text(), studentInfo.get(7).text().contains("인증"));
+        // todo : 인증정보 가져오기 함수 수정.. 너무 복잡함.
+        Elements select = doc.select("div.content-section div.table_group tbody tr");
+        for(Element element : select){
+            List<String> fields = Stream.of(BookField.values()).map(BookField::getName).collect(Collectors.toList());
+            for(String field : fields){
+                Elements elementsContainingText = element.getElementsContainingText(field);
+                if(elementsContainingText.hasText()){
+                    Elements td = elementsContainingText.select("td");
+                    String passAt = td.get(0).text();
+                    String fieldName, title;
+                    if(fields.contains(td.get(1).text())){
+                        fieldName = td.get(1).text();
+                        title = td.get(2).text();
+                    }else{
+                        fieldName = td.get(2).text();
+                        title = td.get(3).text();
+                    }
+                    String passText = td.select("span.pass").text();
+                    ExamInfo examInfo = new ExamInfo(passAt, fieldName, title, passText.contains("이수") | passText.contains("합격"));
+                    examInfos.add(examInfo);
+                }
+            }
+        }
+        return new ClassicStudentInfo(studentInfo.get(0).text(), studentInfo.get(1).text(), studentInfo.get(2).text(), studentInfo.get(5).text(), studentInfo.get(7).text().contains("인증"), examInfos);
     }
 }
+
+
+

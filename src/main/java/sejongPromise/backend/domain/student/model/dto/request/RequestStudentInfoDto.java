@@ -8,7 +8,7 @@ import javax.validation.constraints.Pattern;
 
 @Getter
 @RequiredArgsConstructor
-public class RequestSignupDto {
+public class RequestStudentInfoDto {
 
     @NotBlank(message = "학번을 입력해주세요.")
     @Pattern(regexp = "^\\d{8}$", message = "학번을 정확히 입력해주세요.")
@@ -16,5 +16,4 @@ public class RequestSignupDto {
 
     @NotBlank(message = "비밀번호를 입력해주세요.")
     private final String password;
-
 }
