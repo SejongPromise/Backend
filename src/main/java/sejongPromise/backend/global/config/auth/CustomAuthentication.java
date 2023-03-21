@@ -34,7 +34,7 @@ public class CustomAuthentication implements Authentication {
     public boolean isAuthenticated() {  return true; }
 
     @Override
-        public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {    }
+    public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {    }
 
     @Override
     public String getName() {

@@ -3,6 +3,7 @@ package sejongPromise.backend.debug;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import sejongPromise.backend.domain.student.repository.StudentRepository;
 import sejongPromise.backend.infra.sejong.model.BookScheduleInfo;
@@ -51,6 +52,11 @@ public class TestController {
         //이부분은 추후 service 메소드 인자를 JSESSIONID 넣는 등으로 수정할 것임.
         SejongAuth login = classicAuthenticationService.login("18011552", "20000125");
         return classicCrawlerService.getScheduleInfo(login, date);
+    }
+    @GetMapping("/auth/student")
+    public Long getAuth(Authentication auth){
+        Long studentId = (Long) auth.getPrincipal();
+        return studentId;
     }
 
 
