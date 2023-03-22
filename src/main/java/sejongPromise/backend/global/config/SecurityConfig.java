@@ -26,19 +26,12 @@ import sejongPromise.backend.global.config.jwt.JwtTokenProvider;
 public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private String[] ignoredMatcherPattern = {"/", "/img/**", "/lib/**"};
-
     private static final String[] PUBLIC_URI = {
             "/swagger-ui/**", "/api-docs/**", "/", "/img/**", "/lib/**"
     };
     @Bean
     public PasswordEncoder getPasswordEncoder(){
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean
@@ -67,11 +60,5 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer(){
-        return (web) -> web.ignoring()
-                .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
-                .antMatchers(ignoredMatcherPattern);
-    }
 
 }
