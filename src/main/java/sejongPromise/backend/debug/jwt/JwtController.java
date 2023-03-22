@@ -1,4 +1,4 @@
-package sejongPromise.backend.global.config.jwt;
+package sejongPromise.backend.debug.jwt;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +12,6 @@ import javax.validation.Valid;
 @RestController
 @RequiredArgsConstructor
 public class JwtController {
-
     private final JwtService jwtService;
     @PostMapping("/token")
     public ResponseEntity getToken(@Valid @RequestBody UserRequestDto userRequestDto) {
