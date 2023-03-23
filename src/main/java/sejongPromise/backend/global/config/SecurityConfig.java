@@ -26,16 +26,12 @@ import sejongPromise.backend.global.config.jwt.JwtTokenProvider;
 public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private String[] ignoredMatcherPattern = {"/", "/img/**", "/lib/**", "/member/**"};
-
+    private static final String[] PUBLIC_URI = {
+            "/swagger-ui/**", "/api-docs/**", "/", "/img/**", "/lib/**"
+    };
     @Bean
     public PasswordEncoder getPasswordEncoder(){
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean
@@ -49,7 +45,10 @@ public class SecurityConfig {
                 /**HttpServletRequest 사용하는 요청에 대한 접근 제한 설정 (사용권한 체크)*/
                 .authorizeRequests()
                 .antMatchers("/join**","/token**").permitAll()
-                .anyRequest().authenticated()
+                .antMatchers(PUBLIC_URI).permitAll()
+                .antMatchers("/test/auth/student").authenticated()
+                .anyRequest().permitAll()
+//                .anyRequest().authenticated() //개발이 번거로워서 꺼놨습니다. 필요한 경우 윗줄과 주석 바꿔서 사용하시면 됩니다.
                 /**세션 사용 안함*/
                 .and()
                 .sessionManagement()
@@ -61,11 +60,5 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer(){
-        return (web) -> web.ignoring()
-                .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
-                .antMatchers(ignoredMatcherPattern);
-    }
 
 }

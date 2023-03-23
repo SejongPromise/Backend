@@ -8,7 +8,7 @@ import java.util.Collection;
 
 @RequiredArgsConstructor
 public class CustomAuthentication implements Authentication {
-    private final String id;
+    private final Long id;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -34,10 +34,10 @@ public class CustomAuthentication implements Authentication {
     public boolean isAuthenticated() {  return true; }
 
     @Override
-        public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {    }
+    public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {    }
 
     @Override
     public String getName() {
-        return id;
+        return null;
     }
 }

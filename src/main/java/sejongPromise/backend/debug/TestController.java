@@ -3,14 +3,18 @@ package sejongPromise.backend.debug;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import sejongPromise.backend.domain.student.repository.StudentRepository;
+import sejongPromise.backend.infra.sejong.model.BookScheduleInfo;
 import sejongPromise.backend.infra.sejong.model.SejongAuth;
-import sejongPromise.backend.infra.sejong.model.StudentInfo;
+import sejongPromise.backend.infra.sejong.model.PortalStudentInfo;
 import sejongPromise.backend.infra.sejong.service.portal.SejongAuthenticationService;
 import sejongPromise.backend.infra.sejong.service.classic.SejongClassicAuthenticationService;
 import sejongPromise.backend.infra.sejong.service.classic.SejongClassicCrawlerService;
 import sejongPromise.backend.infra.sejong.service.portal.SejongCrawlerService;
+
+import java.util.List;
 
 
 @Tag(name = "테스트용 컨트롤러", description = "개발하면서 필요한 debug용 Controller")
@@ -30,27 +34,38 @@ public class TestController {
      * @return
      */
     @GetMapping("/auth")
-    public StudentInfo ssoToken(@RequestBody TestLoginDto dto){
+    public PortalStudentInfo ssoToken(@RequestBody TestLoginDto dto){
         SejongAuth login = authenticationService.login(dto.getStudentId(), dto.getPassword());
-        StudentInfo studentInfo = crawlerService.crawlStudentInfo(login);
-        printData(studentInfo);
-        return studentInfo;
+        PortalStudentInfo portalStudentInfo = crawlerService.crawlStudentInfo(login);
+        printData(portalStudentInfo);
+        return portalStudentInfo;
     }
 
 
+    /**
+     * @param date ("yyyy-mm-dd" 형식)
+     * @return 스케쥴 List
+     */
     @GetMapping("/classic/schedule")
-    public ResponseEntity classicSchedule(@RequestParam("date") String date){
+    public List<BookScheduleInfo> classicSchedule(@RequestParam("date") String date){
         //추후 user에 저장된 JSESSIONID 이용하거나 관리자 id, password로 로그인한 세션을 이용할 예정 -> 논의 필요
+        //이부분은 추후 service 메소드 인자를 JSESSIONID 넣는 등으로 수정할 것임.
         SejongAuth login = classicAuthenticationService.login("18011552", "20000125");
         return classicCrawlerService.getScheduleInfo(login, date);
     }
+    @GetMapping("/auth/student")
+    public Long getAuth(Authentication auth){
+        Long studentId = (Long) auth.getPrincipal();
+        return studentId;
+    }
 
-    private static void printData(StudentInfo studentInfo) {
-        String studentName = studentInfo.getStudentName();
+
+    private static void printData(PortalStudentInfo portalStudentInfo) {
+        String studentName = portalStudentInfo.getStudentName();
         System.out.println("studentName = " + studentName);
-        String studentId = studentInfo.getStudentId();
+        String studentId = portalStudentInfo.getStudentId();
         System.out.println("studentId = " + studentId);
-        String major = studentInfo.getMajor();
+        String major = portalStudentInfo.getMajor();
         System.out.println("major = " + major);
     }
 }

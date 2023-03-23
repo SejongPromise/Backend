@@ -31,8 +31,6 @@ public class JwtTokenProvider {
     @Value("${jwt.valid-time}")
     private final long tokenValidTime;
 
-    private final UserInfoRepository userService;
-
     //JWT 토큰 생성
     public String createToken(Long userId) {
         Claims claims = Jwts.claims().setSubject(String.valueOf(userId)); //JWT payload에 저장되는 정보 단위, user 식별값 넣음 (id)
@@ -50,14 +48,7 @@ public class JwtTokenProvider {
     public Authentication getAuthentication(String token) {
         //발급할 때는 인증이 필요없지만 검증 시에는 user 데이터에 token의 학번과 일치하는 사용자가 있는지 확인 필요함
         Long userId = this.getUserId(token);
-        String userIdString = String.valueOf(userId);
-        log.info("userId: {}",this.getUserId(token));
-        Optional<UserInfo> byUserId = userService.findById(this.getUserId(token));
-        CustomAuthentication authentication = new CustomAuthentication(userIdString);
-
-        //null 체크
-        byUserId.orElseThrow(()->new CustomException(ErrorCode.NOT_FOUND_DATA,"사용자 존재하지 않음")); //되는건지잘;
-        return authentication;
+        return new CustomAuthentication(userId);
     }
 
     //JWT 토큰에서 회원 정보(학번) 추출 -> token을 발급받을 때는 무조건 인증된 사용자만 발급받아서 회원 정보 검증할 필요가 없음
@@ -67,7 +58,7 @@ public class JwtTokenProvider {
 
     //request header에서 token 값 가져옴
     public String resolveToken(HttpServletRequest request) {
-        return request.getHeader("Authorization");
+        return request.getHeader(AUTHORIZATION);
     }
 
     //token 유효성, 만료일자 확인
