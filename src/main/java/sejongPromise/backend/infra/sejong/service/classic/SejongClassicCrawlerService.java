@@ -147,10 +147,14 @@ public class SejongClassicCrawlerService {
         Elements studentInfo = studentTable.select("dd");
         // todo : 인증 여부 확인해야함. 현재는 "인증" 텍스트로만 확인.
         // todo : 인증정보 가져오기 함수 수정.. 너무 복잡함.
+        String major = studentInfo.get(0).text();
+        String studentId = studentInfo.get(1).text();
+        String name = studentInfo.get(2).text();
+        String semester = studentInfo.get(5).text();
+        boolean isPass = studentInfo.get(7).text().contains("인증");
 
         //시험정보 가져오기
         Elements examInfoList = doc.select("div.content-section div.table_group tbody tr");
-        System.out.println("examInfoList = " + examInfoList);
         for(Element element : examInfoList){
             //filtering -> 도서 인증 영역 텍스트를 가지고 있는 Element 만.
             List<String> fields = Stream.of(BookField.values()).map(BookField::getName).collect(Collectors.toList());
@@ -168,20 +172,18 @@ public class SejongClassicCrawlerService {
                         title = td.get(3).text();
                     }
                     Integer year = Integer.parseInt(passAt.substring(0, 4));
-                    String semester = passAt.substring(7);
-                    boolean pass;
+                    String passSemester = passAt.substring(7);
+                    boolean pass = true;
                     String passText = td.select("span.pass").text();
-                    if(passText.isBlank()){
-                        pass = true;
-                    }else{
+                    if(!passText.isBlank()){
                         pass = passText.contains("이수") | passText.contains("합격");
                     }
-                    ExamInfo examInfo = new ExamInfo(year, semester, fieldName, title, pass);
+                    ExamInfo examInfo = new ExamInfo(year, passSemester, fieldName, title, pass);
                     examInfos.add(examInfo);
                 }
             }
         }
-        return new ClassicStudentInfo(studentInfo.get(0).text(), studentInfo.get(1).text(), studentInfo.get(2).text(), studentInfo.get(5).text(), studentInfo.get(7).text().contains("인증"), examInfos);
+        return new ClassicStudentInfo(major, studentId, name, semester, isPass, examInfos);
     }
 }
 
