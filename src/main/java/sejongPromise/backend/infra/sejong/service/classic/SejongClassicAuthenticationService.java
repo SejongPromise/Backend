@@ -60,7 +60,9 @@ public class SejongClassicAuthenticationService {
         }
 
         if(response == null) throw new CustomException(ErrorCode.NO_RESPONSE);
-
+        if(response.getStatusCode().is2xxSuccessful()){
+            throw new CustomException(ErrorCode.NOT_FOUND_DATA);
+        }
         checkJssesionId(response.getHeaders());
 
         return response;
@@ -69,8 +71,9 @@ public class SejongClassicAuthenticationService {
     private void checkJssesionId(HttpHeaders response) {
         List<ResponseCookie> responseCookies = WebUtil.extractCookies(response);
         if(responseCookies.stream()
-                .noneMatch(data -> data.getName().contains("JSEESIONID"))){
+                .noneMatch(data -> data.getName().contains("JSESSIONID"))){
             throw new CustomException(ErrorCode.NOT_FOUND_DATA, "JSession 못 찾음");
         }
     }
+
 }

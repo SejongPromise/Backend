@@ -8,9 +8,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class StudentInfo {
+public class PortalStudentInfo {
     private String studentName;
     private String studentId;
     private String major;
-
 }
