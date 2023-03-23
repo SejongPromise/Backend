@@ -1,5 +1,6 @@
 package sejongPromise.backend.domain.student.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -11,6 +12,7 @@ import sejongPromise.backend.domain.student.model.dto.response.ResponseRefreshTo
 import sejongPromise.backend.domain.student.model.dto.response.ResponseStudentInfoDto;
 import sejongPromise.backend.domain.student.service.SignupService;
 import sejongPromise.backend.domain.student.service.StudentService;
+import sejongPromise.backend.global.config.jwt.JwtProvider;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -57,6 +59,7 @@ public class StudentController {
      * @return 내 정보
      */
     @GetMapping
+    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
     public ResponseStudentInfoDto getMyInfo(Authentication auth) {
         Long studentId = (Long) auth.getPrincipal();
         return studentService.getStudentInfo(studentId);
@@ -69,6 +72,7 @@ public class StudentController {
      * @return 토큰 재발급
      */
     @PostMapping("/reissue")
+    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
     public ResponseRefreshToken refreshToken(HttpServletRequest request,
                                              @RequestBody @Valid RequestRefreshTokenDto dto){
         return studentService.refreshToken(request, dto);
