@@ -31,7 +31,6 @@ public class SignupService {
     private final SejongClassicAuthenticationService sejongClassicAuthenticationService;
     private final SejongClassicCrawlerService sejongClassicCrawlerService;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
 
     /**
      * 유저 id, pw 로 대양 휴머니티 칼리지 인증 접속을 합니다.
@@ -62,13 +61,15 @@ public class SignupService {
 
         List<ExamInfo> examInfoList = studentInfo.getExamInfoList();
         examInfoList.forEach(data -> {
-            Exam build = Exam.builder().title(data.getTitle())
+            Exam exam = Exam.builder().title(data.getTitle())
                     .isPass(data.isPass())
                     .field(data.getField())
-                    .passAt(data.getPassAt())
+                    .year(data.getYear())
+                    .semester(data.getSemester())
                     .student(saveStudent)
                     .build();
-            examRepository.save(build);
+            examRepository.save(exam);
         });
     }
+
 }

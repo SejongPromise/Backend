@@ -10,12 +10,13 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 @Getter
 public enum BookField {
-    W_HISTORY("서양의 역사와 사상"),
-    E_HISTORY("동양의 역사와 사상"),
-    EW_CULTURE("동서양의 문학"),
-    SCIENCE("과학 사상");
+    W_HISTORY("서양의 역사와 사상", 1000),
+    E_HISTORY("동양의 역사와 사상", 2000),
+    EW_CULTURE("동서양의 문학", 3000),
+    SCIENCE("과학 사상", 4000);
 
     private final String name;
+    private final Integer code;
 
     private static final Map<String, BookField> BY_LABEL =
             Stream.of(values()).collect(Collectors.toMap(BookField::getName, e -> e));

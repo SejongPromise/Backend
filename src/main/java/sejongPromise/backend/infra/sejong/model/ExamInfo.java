@@ -6,7 +6,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public class ExamInfo {
-    private final String passAt;
+    private final Integer year;
+    private final String semester;
     private final String field;
     private final String title;
     private final boolean isPass;

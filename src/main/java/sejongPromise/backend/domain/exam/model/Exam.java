@@ -18,21 +18,25 @@ public class Exam extends BaseEntity {
     @JoinColumn(name = "student_id")
     private Student student;
 
-    private String passAt;
+    private Integer year;
+    private String semester;
+    @Enumerated(EnumType.STRING)
     private BookField field;
     private String title;
     private boolean isPass;
-
     @Builder
     private Exam(@NonNull Student student,
-                    @NonNull String passAt,
+                    @NonNull Integer year,
+                    @NonNull String semester,
                     @NonNull String field,
                     @NonNull String title,
                     @NonNull Boolean isPass){
         this.student = student;
-        this.passAt = passAt;
+        this.year = year;
+        this.semester = semester;
         this.field = BookField.of(field);
         this.title = title;
         this.isPass = isPass;
     }
+
 }
