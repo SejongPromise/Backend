@@ -2,13 +2,17 @@ package sejongPromise.backend.domain.student.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import sejongPromise.backend.domain.student.model.dto.request.RequestRefreshTokenDto;
 import sejongPromise.backend.domain.student.model.dto.request.RequestStudentInfoDto;
 import sejongPromise.backend.domain.student.model.dto.response.ResponseLoginDto;
+import sejongPromise.backend.domain.student.model.dto.response.ResponseRefreshToken;
 import sejongPromise.backend.domain.student.model.dto.response.ResponseStudentInfoDto;
 import sejongPromise.backend.domain.student.service.SignupService;
 import sejongPromise.backend.domain.student.service.StudentService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 /**
@@ -26,24 +30,47 @@ public class StudentController {
 
     /**
      * 대양휴머니티 칼리지 회원가입 API
+     *
      * @param dto 요청 body (학번 : 8자리 , 비번 : 자유형식)
      * @return 학번, 학과, 이름, 학기
      */
     @PostMapping("/signup")
-    public void signup(@RequestBody @Valid RequestStudentInfoDto dto){
+    public void signup(@RequestBody @Valid RequestStudentInfoDto dto) {
         signupService.signup(dto);
     }
 
     /**
      * 로그인 API
+     *
      * @param dto 요청 body (학번 : 8자리, 비번 : 자유형식)
      * @return 토큰, 학번, 학과, 이름, 학기
      */
     @PostMapping("/login")
-    public ResponseLoginDto login(@RequestBody @Valid RequestStudentInfoDto dto){
+    public ResponseLoginDto login(@RequestBody @Valid RequestStudentInfoDto dto) {
         return studentService.login(dto);
     }
 
+    /**
+     * 내정보 조회
+     *
+     * @param auth Header : Authorization
+     * @return 내 정보
+     */
+    @GetMapping
+    public ResponseStudentInfoDto getMyInfo(Authentication auth) {
+        Long studentId = (Long) auth.getPrincipal();
+        return studentService.getStudentInfo(studentId);
+    }
 
-
+    /**
+     * 토큰 재발급
+     * @param request Header : Authorization
+     * @param dto refreshToken
+     * @return 토큰 재발급
+     */
+    @PostMapping("/reissue")
+    public ResponseRefreshToken refreshToken(HttpServletRequest request,
+                                             @RequestBody @Valid RequestRefreshTokenDto dto){
+        return studentService.refreshToken(request, dto);
+    }
 }

@@ -134,6 +134,7 @@ public class SejongClassicCrawlerService {
         }catch (Throwable t){
             throw new RuntimeException(t);
         }
+
         return parseStudentInfoHtml(html);
     }
 
