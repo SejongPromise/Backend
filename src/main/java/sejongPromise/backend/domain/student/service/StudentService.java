@@ -37,4 +37,5 @@ public class StudentService {
             throw new CustomException(ErrorCode.WRONG_PASSWORD);
         }
     }
+
 }

@@ -19,7 +19,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import sejongPromise.backend.global.config.jwt.JwtFilter;
 import sejongPromise.backend.global.config.jwt.JwtTokenProvider;
 
-//@Configuration
 @EnableWebSecurity //security 필터 등록됨
 //@EnableGlobalMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
