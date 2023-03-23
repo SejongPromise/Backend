@@ -9,7 +9,6 @@ import sejongPromise.backend.domain.exam.repository.ExamRepository;
 import sejongPromise.backend.domain.student.model.Student;
 import sejongPromise.backend.domain.student.model.dto.request.RequestStudentInfoDto;
 import sejongPromise.backend.domain.student.repository.StudentRepository;
-import sejongPromise.backend.global.config.jwt.JwtTokenProvider;
 import sejongPromise.backend.global.error.ErrorCode;
 import sejongPromise.backend.global.error.exception.CustomException;
 import sejongPromise.backend.global.util.WebUtil;
