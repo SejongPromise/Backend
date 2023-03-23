@@ -138,14 +138,21 @@ public class SejongClassicCrawlerService {
     }
 
     private ClassicStudentInfo parseStudentInfoHtml(String html) {
+        //시험 인증 리스트 배열 생성.
         List<ExamInfo> examInfos = new ArrayList<>();
+
+        //학생정보 가져오기
         Document doc = Jsoup.parse(html);
         Elements studentTable = doc.select("div.content-section ul.tblA");
         Elements studentInfo = studentTable.select("dd");
         // todo : 인증 여부 확인해야함. 현재는 "인증" 텍스트로만 확인.
         // todo : 인증정보 가져오기 함수 수정.. 너무 복잡함.
-        Elements select = doc.select("div.content-section div.table_group tbody tr");
-        for(Element element : select){
+
+        //시험정보 가져오기
+        Elements examInfoList = doc.select("div.content-section div.table_group tbody tr");
+        System.out.println("examInfoList = " + examInfoList);
+        for(Element element : examInfoList){
+            //filtering -> 도서 인증 영역 텍스트를 가지고 있는 Element 만.
             List<String> fields = Stream.of(BookField.values()).map(BookField::getName).collect(Collectors.toList());
             for(String field : fields){
                 Elements elementsContainingText = element.getElementsContainingText(field);
@@ -160,8 +167,16 @@ public class SejongClassicCrawlerService {
                         fieldName = td.get(2).text();
                         title = td.get(3).text();
                     }
+                    Integer year = Integer.parseInt(passAt.substring(0, 4));
+                    String semester = passAt.substring(7);
+                    boolean pass;
                     String passText = td.select("span.pass").text();
-                    ExamInfo examInfo = new ExamInfo(passAt, fieldName, title, passText.contains("이수") | passText.contains("합격"));
+                    if(passText.isBlank()){
+                        pass = true;
+                    }else{
+                        pass = passText.contains("이수") | passText.contains("합격");
+                    }
+                    ExamInfo examInfo = new ExamInfo(year, semester, fieldName, title, pass);
                     examInfos.add(examInfo);
                 }
             }
