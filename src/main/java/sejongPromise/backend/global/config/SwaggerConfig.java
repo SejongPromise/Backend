@@ -14,10 +14,7 @@ import sejongPromise.backend.global.config.jwt.JwtProvider;
                 title = "세종대학교 예약해줘 API",
                 version = SwaggerConfig.API_VERSION,
                 description = "세종대학교 예약해줘 RESTFUL API 제공"
-        ),
-        servers = {
-        @Server(url = "218.39.191.60:8888", description = "개발 서버"),
-        @Server(url = "/", description = "로컬 서버")
+        )
 }
 )
 
