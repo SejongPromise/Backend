@@ -1,4 +1,4 @@
-package sejongPromise.backend.debug;
+package sejongPromise.backend.debug.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
