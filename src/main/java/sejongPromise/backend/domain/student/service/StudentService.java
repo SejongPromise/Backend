@@ -55,4 +55,5 @@ public class StudentService {
         AuthenticationToken token = jwtProvider.reissue(accessToken, dto.getRefreshToken());
         return new ResponseRefreshToken(token);
     }
+
 }

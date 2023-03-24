@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import sejongPromise.backend.domain.student.model.dto.request.RequestRefreshSessionDto;
 import sejongPromise.backend.domain.student.model.dto.request.RequestRefreshTokenDto;
 import sejongPromise.backend.domain.student.model.dto.request.RequestStudentInfoDto;
 import sejongPromise.backend.domain.student.model.dto.response.ResponseLoginDto;
@@ -67,14 +68,27 @@ public class StudentController {
 
     /**
      * 토큰 재발급
+     *
      * @param request Header : Authorization
-     * @param dto refreshToken
+     * @param dto     refreshToken
      * @return 토큰 재발급
      */
     @PostMapping("/reissue")
     @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
     public ResponseRefreshToken refreshToken(HttpServletRequest request,
-                                             @RequestBody @Valid RequestRefreshTokenDto dto){
+                                             @RequestBody @Valid RequestRefreshTokenDto dto) {
         return studentService.refreshToken(request, dto);
+    }
+
+    /**
+     * Session 업데이트 및 유저 정보 업데이트
+     * @param dto 대양휴머니티 칼리지 비밀번호.
+     */
+    @PatchMapping("/resession")
+    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
+    public void refreshSession(Authentication auth,
+                               @RequestBody @Valid RequestRefreshSessionDto dto){
+        Long studentId = (Long) auth.getPrincipal();
+        signupService.refreshSession(studentId, dto);
     }
 }

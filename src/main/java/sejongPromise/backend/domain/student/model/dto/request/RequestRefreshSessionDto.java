@@ -7,7 +7,7 @@ import javax.validation.constraints.NotBlank;
 
 @Getter
 @RequiredArgsConstructor
-public class RequestRefreshTokenDto {
-    @NotBlank(message = "refreshToken 필수")
-    private final String refreshToken;
+public class RequestRefreshSessionDto {
+    @NotBlank(message = "비밀번호는 비어있으면 안됩니다.")
+    private final String password;
 }

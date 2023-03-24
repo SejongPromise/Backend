@@ -61,7 +61,7 @@ public class SejongClassicAuthenticationService {
 
         if(response == null) throw new CustomException(ErrorCode.NO_RESPONSE);
         if(response.getStatusCode().is2xxSuccessful()){
-            throw new CustomException(ErrorCode.NOT_FOUND_DATA);
+            throw new CustomException(ErrorCode.NOT_FOUND_USER, "해당 유저를 찾을 수 없습니다.");
         }
         checkJssesionId(response.getHeaders());
 

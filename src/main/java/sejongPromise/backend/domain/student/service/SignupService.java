@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sejongPromise.backend.domain.exam.model.Exam;
 import sejongPromise.backend.domain.exam.repository.ExamRepository;
 import sejongPromise.backend.domain.student.model.Student;
+import sejongPromise.backend.domain.student.model.dto.request.RequestRefreshSessionDto;
 import sejongPromise.backend.domain.student.model.dto.request.RequestStudentInfoDto;
 import sejongPromise.backend.domain.student.repository.StudentRepository;
 import sejongPromise.backend.global.error.ErrorCode;
@@ -18,6 +19,7 @@ import sejongPromise.backend.infra.sejong.model.SejongAuth;
 import sejongPromise.backend.infra.sejong.service.classic.SejongClassicAuthenticationService;
 import sejongPromise.backend.infra.sejong.service.classic.SejongClassicCrawlerService;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -69,6 +71,22 @@ public class SignupService {
                     .build();
             examRepository.save(exam);
         });
+    }
+
+    /**
+     * 회원 정보를 업데이트 합니다.
+     * 학과, 세션정보, 학기, 인증여부.
+     * // 비밀번호 검증 따로 하지 않습니다.
+     * @param studentId
+     * @param dto
+     */
+    @Transactional
+    public void refreshSession(Long studentId, RequestRefreshSessionDto dto) {
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+        SejongAuth auth = sejongClassicAuthenticationService.login(student.getStudentId(), dto.getPassword());
+        ClassicStudentInfo studentInfo = sejongClassicCrawlerService.getStudentInfo(auth);
+        student.updateSession(auth, studentInfo);
     }
 
 }

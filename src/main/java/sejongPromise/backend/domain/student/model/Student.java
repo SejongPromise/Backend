@@ -4,6 +4,9 @@ import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.domain.Persistable;
 import sejongPromise.backend.global.model.BaseEntity;
+import sejongPromise.backend.global.util.WebUtil;
+import sejongPromise.backend.infra.sejong.model.ClassicStudentInfo;
+import sejongPromise.backend.infra.sejong.model.SejongAuth;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -53,12 +56,11 @@ public class Student extends BaseEntity implements Persistable<Long> {
         this.password = encodedPassword;
     }
 
-    public void update(Student student){
-        this.major = student.getMajor();
-        this.ssoToken = student.getSsoToken();
-        this.sessionToken = student.getSessionToken();
-        this.semester = student.getSemester();
-        this.pass = student.isPass();
+    public void updateSession(SejongAuth auth, ClassicStudentInfo studentInfo){
+        this.major = studentInfo.getMajor();
+        this.sessionToken = WebUtil.makeCookieString(auth.cookies);
+        this.semester = Integer.parseInt(studentInfo.getSemester().substring(0, 1));
+        this.pass = studentInfo.isPass();
     }
 
     public String getStudentId() {
