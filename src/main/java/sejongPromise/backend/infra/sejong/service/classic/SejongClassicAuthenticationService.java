@@ -60,7 +60,9 @@ public class SejongClassicAuthenticationService {
         }
 
         if(response == null) throw new CustomException(ErrorCode.NO_RESPONSE);
-
+        if(response.getStatusCode().is2xxSuccessful()){
+            throw new CustomException(ErrorCode.NOT_FOUND_DATA);
+        }
         checkJssesionId(response.getHeaders());
 
         return response;

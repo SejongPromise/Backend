@@ -12,15 +12,19 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import sejongPromise.backend.domain.exam.model.BookField;
+import sejongPromise.backend.domain.exam.model.Exam;
 import sejongPromise.backend.global.config.qualifier.ChromeAgentWebClient;
 import sejongPromise.backend.global.error.exception.CustomException;
-import sejongPromise.backend.infra.sejong.model.BookScheduleInfo;
-import sejongPromise.backend.infra.sejong.model.BookInfo;
-import sejongPromise.backend.infra.sejong.model.SejongAuth;
+import sejongPromise.backend.infra.sejong.model.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import static sejongPromise.backend.global.error.ErrorCode.*;
 
 @Service
@@ -34,6 +38,8 @@ public class SejongClassicCrawlerService {
     private final String BOOK_SCHEDULE_URI;
     @Value("${sejong.classic.book.info}")
     private final String BOOK_INFO_URI;
+    @Value("${sejong.classic.student.info}")
+    private final String STUDENT_INFO_URI;
     private final String BASE_URL = "http://classic.sejong.ac.kr";
 
 
@@ -116,4 +122,71 @@ public class SejongClassicCrawlerService {
         return scheduleList;
     }
 
+    public ClassicStudentInfo getStudentInfo(SejongAuth auth) {
+        String html;
+        try{
+            html = webClient.get()
+                    .uri(STUDENT_INFO_URI)
+                    .cookies(auth.authCookies())
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+        }catch (Throwable t){
+            throw new RuntimeException(t);
+        }
+
+        return parseStudentInfoHtml(html);
+    }
+
+    private ClassicStudentInfo parseStudentInfoHtml(String html) {
+        //시험 인증 리스트 배열 생성.
+        List<ExamInfo> examInfos = new ArrayList<>();
+
+        //학생정보 가져오기
+        Document doc = Jsoup.parse(html);
+        Elements studentTable = doc.select("div.content-section ul.tblA");
+        Elements studentInfo = studentTable.select("dd");
+        // todo : 인증 여부 확인해야함. 현재는 "인증" 텍스트로만 확인.
+        // todo : 인증정보 가져오기 함수 수정.. 너무 복잡함.
+        String major = studentInfo.get(0).text();
+        String studentId = studentInfo.get(1).text();
+        String name = studentInfo.get(2).text();
+        String semester = studentInfo.get(5).text();
+        boolean isPass = studentInfo.get(7).text().contains("인증");
+
+        //시험정보 가져오기
+        Elements examInfoList = doc.select("div.content-section div.table_group tbody tr");
+        for(Element element : examInfoList){
+            //filtering -> 도서 인증 영역 텍스트를 가지고 있는 Element 만.
+            List<String> fields = Stream.of(BookField.values()).map(BookField::getName).collect(Collectors.toList());
+            for(String field : fields){
+                Elements elementsContainingText = element.getElementsContainingText(field);
+                if(elementsContainingText.hasText()){
+                    Elements td = elementsContainingText.select("td");
+                    String passAt = td.get(0).text();
+                    String fieldName, title;
+                    if(fields.contains(td.get(1).text())){
+                        fieldName = td.get(1).text();
+                        title = td.get(2).text();
+                    }else{
+                        fieldName = td.get(2).text();
+                        title = td.get(3).text();
+                    }
+                    Integer year = Integer.parseInt(passAt.substring(0, 4));
+                    String passSemester = passAt.substring(7);
+                    boolean pass = true;
+                    String passText = td.select("span.pass").text();
+                    if(!passText.isBlank()){
+                        pass = passText.contains("이수") | passText.contains("합격");
+                    }
+                    ExamInfo examInfo = new ExamInfo(year, passSemester, fieldName, title, pass);
+                    examInfos.add(examInfo);
+                }
+            }
+        }
+        return new ClassicStudentInfo(major, studentId, name, semester, isPass, examInfos);
+    }
 }
+
+
+
