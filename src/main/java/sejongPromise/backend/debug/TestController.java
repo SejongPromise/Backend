@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import sejongPromise.backend.debug.dto.TestLoginDto;
 import sejongPromise.backend.infra.sejong.model.BookScheduleInfo;
+import sejongPromise.backend.infra.sejong.model.MyRegisterInfo;
 import sejongPromise.backend.infra.sejong.model.SejongAuth;
 import sejongPromise.backend.infra.sejong.model.PortalStudentInfo;
 import sejongPromise.backend.infra.sejong.service.portal.SejongAuthenticationService;
@@ -57,6 +58,12 @@ public class TestController {
     public Long getAuth(Authentication auth){
         Long studentId = (Long) auth.getPrincipal();
         return studentId;
+    }
+
+    @GetMapping("/auth/student/schedule")
+    public List<MyRegisterInfo> getSchedule(@RequestBody TestLoginDto dto){
+        SejongAuth auth = classicAuthenticationService.login(dto.getStudentId(), dto.getPassword());
+        return classicCrawlerService.getMyRegisterInfo(auth);
     }
 
 

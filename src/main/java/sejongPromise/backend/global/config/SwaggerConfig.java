@@ -15,7 +15,7 @@ import sejongPromise.backend.global.config.jwt.JwtProvider;
                 version = SwaggerConfig.API_VERSION,
                 description = "세종대학교 예약해줘 RESTFUL API 제공"
         )
-}
+
 )
 
 @SecurityScheme(

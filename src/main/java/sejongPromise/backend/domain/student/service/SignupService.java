@@ -14,6 +14,7 @@ import sejongPromise.backend.global.error.exception.CustomException;
 import sejongPromise.backend.global.util.WebUtil;
 import sejongPromise.backend.infra.sejong.model.ClassicStudentInfo;
 import sejongPromise.backend.infra.sejong.model.ExamInfo;
+import sejongPromise.backend.infra.sejong.model.MyRegisterInfo;
 import sejongPromise.backend.infra.sejong.model.SejongAuth;
 import sejongPromise.backend.infra.sejong.service.classic.SejongClassicAuthenticationService;
 import sejongPromise.backend.infra.sejong.service.classic.SejongClassicCrawlerService;
