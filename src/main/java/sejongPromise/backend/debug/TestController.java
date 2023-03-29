@@ -10,6 +10,7 @@ import sejongPromise.backend.infra.sejong.model.dto.request.FindBookCodeRequestD
 import sejongPromise.backend.infra.sejong.model.dto.request.TestBookScheduleRequestDto;
 import sejongPromise.backend.debug.dto.TestLoginDto;
 import sejongPromise.backend.infra.sejong.model.BookScheduleInfo;
+import sejongPromise.backend.infra.sejong.model.MyRegisterInfo;
 import sejongPromise.backend.infra.sejong.model.SejongAuth;
 import sejongPromise.backend.infra.sejong.model.PortalStudentInfo;
 import sejongPromise.backend.infra.sejong.service.portal.SejongAuthenticationService;
@@ -68,6 +69,12 @@ public class TestController {
         return studentId;
     }
 
+    @GetMapping("/auth/student/schedule")
+    public List<MyRegisterInfo> getSchedule(@RequestBody TestLoginDto dto){
+        SejongAuth auth = classicAuthenticationService.login(dto.getStudentId(), dto.getPassword());
+        return classicCrawlerService.getMyRegisterInfo(auth);
+    }
+
     /**
      * 고전독서 인증 시험 신청
      * @param dto shInfoId, opTermId, bkAreaCode, bkCode
@@ -89,6 +96,7 @@ public class TestController {
         SejongAuth login = classicAuthenticationService.login(id, password);
         return classicCrawlerService.findBookCode(login, new FindBookCodeRequestDto(title, areaCode));
     }
+
 
     private static void printData(PortalStudentInfo portalStudentInfo) {
         String studentName = portalStudentInfo.getStudentName();

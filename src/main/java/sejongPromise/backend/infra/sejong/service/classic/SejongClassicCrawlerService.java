@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+
 import static sejongPromise.backend.global.error.ErrorCode.*;
 
 @Service
@@ -46,6 +47,8 @@ public class SejongClassicCrawlerService {
     private final String BOOK_INFO_URI;
     @Value("${sejong.classic.student.info}")
     private final String STUDENT_INFO_URI;
+    @Value("${sejong.classic.student.schedule}")
+    private final String STUDENT_SCHEDULE_URI;
     private final String BASE_URL = "http://classic.sejong.ac.kr";
 
     @Value("${sejong.classic.book.test.register}")
@@ -200,6 +203,23 @@ public class SejongClassicCrawlerService {
         return new ClassicStudentInfo(major, studentId, name, semester, isPass, examInfos);
     }
 
+
+    public List<MyRegisterInfo> getMyRegisterInfo(SejongAuth auth) {
+        String myRegisterInfoHtml;
+        try{
+            myRegisterInfoHtml = webClient.get()
+                    .uri(STUDENT_SCHEDULE_URI)
+                    .cookies(auth.authCookies())
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+        }catch (Throwable t){
+            throw new RuntimeException(t);
+        }
+        return parseMyRegisterInfoHtml(myRegisterInfoHtml);
+
+    }
+
     public void testRegister(SejongAuth auth, TestBookScheduleRequestDto dto) {
         String result;
 
@@ -214,12 +234,39 @@ public class SejongClassicCrawlerService {
                     .cookies(auth.authCookies())
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(BodyInserters.fromFormData(formData))
-                    .retrieve()
-                    .bodyToMono(String.class)
-                    .block();
-        }catch (Throwable t){
-            throw new RuntimeException(t);
-        }
+
+    private List<MyRegisterInfo> parseMyRegisterInfoHtml(String myRegisterInfoHtml) {
+
+        //나의 신청 현황 리스트 생성
+        List<MyRegisterInfo> myRegisterInfoList = new ArrayList<>();
+        Document doc = Jsoup.parse(myRegisterInfoHtml);
+        Elements tableList = doc.select("table[class=listA]").select("tbody");
+
+        for (Element table : tableList) {
+            Elements rowList = table.select("tr");
+
+            if(rowList.get(0).text().contains("결과")){
+                rowList.remove(0);
+            }
+
+            //시험 신청 현황에서 신청 취소 정보 가져오기
+           for (Element row : rowList) {
+                Elements cellList = row.select("td");
+
+                String year = cellList.get(0).text().substring(0,5);
+                String semester = cellList.get(0).text().substring(7,11);
+                String date = cellList.get(1).text();
+                String startTime = cellList.get(2).text().substring(0,5);
+                String endTime = cellList.get(2).text().substring(8,13);
+                String bookTitle = cellList.get(3).text();
+                String deleteDate = cellList.get(4).text();
+
+                myRegisterInfoList.add(new MyRegisterInfo(year, semester, date, startTime, endTime, bookTitle, deleteDate));
+            }
+
+            }
+
+        return myRegisterInfoList;
     }
 
     public long findBookCode(SejongAuth auth, FindBookCodeRequestDto dto){
