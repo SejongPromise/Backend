@@ -3,6 +3,10 @@ package sejongPromise.backend.infra.sejong.service.classic;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -10,14 +14,17 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import sejongPromise.backend.infra.sejong.model.dto.request.FindBookCodeRequestDto;
+import sejongPromise.backend.infra.sejong.model.dto.request.TestBookScheduleRequestDto;
 import sejongPromise.backend.domain.exam.model.BookField;
 import sejongPromise.backend.global.config.qualifier.ChromeAgentWebClient;
 import sejongPromise.backend.global.error.exception.CustomException;
 import sejongPromise.backend.infra.sejong.model.*;
 
-import java.util.Arrays;
 import java.util.List;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,6 +51,11 @@ public class SejongClassicCrawlerService {
     private final String STUDENT_SCHEDULE_URI;
     private final String BASE_URL = "http://classic.sejong.ac.kr";
 
+    @Value("${sejong.classic.book.test.register}")
+    private final String BOOK_TEST_REGISTER_URI;
+
+    @Value("${sejong.classic.book.code.list}")
+    private final String BOOK_CODE_LIST;
 
     public List<BookInfo> crawlBookInfo(){
         List<BookInfo> bookInfoList = new ArrayList<>();
@@ -82,6 +94,8 @@ public class SejongClassicCrawlerService {
         //User 로그인 구현되면 저장된 JSESSION으로 접근하도록 수정할 예정
         //JSESSION 없을 시 다시 로그인 하거나 관리자 계정으로 schedule 받아오는거까지 하거나 하기
         //일단 login해서 얻은 SejongAuth로 구현함
+
+        //id 값으로 student 찾고 JSESSION 찾기.. -> domain의 register에서 새로 만들것.
 
         String result;
         String param = String.format("shDate=%s", date);
@@ -189,6 +203,7 @@ public class SejongClassicCrawlerService {
         return new ClassicStudentInfo(major, studentId, name, semester, isPass, examInfos);
     }
 
+
     public List<MyRegisterInfo> getMyRegisterInfo(SejongAuth auth) {
         String myRegisterInfoHtml;
         try{
@@ -204,6 +219,22 @@ public class SejongClassicCrawlerService {
         return parseMyRegisterInfoHtml(myRegisterInfoHtml);
 
     }
+
+    public void testRegister(SejongAuth auth, TestBookScheduleRequestDto dto) {
+        String result;
+
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("shInfoId", dto.getShInfoId());
+        formData.add("opTermId", dto.getOpTermId());
+        formData.add("bkAreaCode", dto.getBkAreaCode());
+        formData.add("bkCode", dto.getBkCode());
+        try{
+            result = webClient.post()
+                    .uri(BOOK_TEST_REGISTER_URI)
+                    .cookies(auth.authCookies())
+                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                    .body(BodyInserters.fromFormData(formData))
+
     private List<MyRegisterInfo> parseMyRegisterInfoHtml(String myRegisterInfoHtml) {
 
         //나의 신청 현황 리스트 생성
@@ -236,6 +267,51 @@ public class SejongClassicCrawlerService {
             }
 
         return myRegisterInfoList;
+    }
+
+    public long findBookCode(SejongAuth auth, FindBookCodeRequestDto dto){
+        String result;
+
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("opTermId", "TERM-00566");
+        formData.add("bkAreaCode", dto.getAreaCode());
+
+        try{
+            result = webClient.post()
+                    .uri(BOOK_CODE_LIST)
+                    .cookies(auth.authCookies())
+                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                    .body(BodyInserters.fromFormData(formData))
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+        }catch (Throwable t){
+            throw new RuntimeException(t);
+        }
+        return parseBookCodeList(result, dto.getTitle());
+    }
+
+    private long parseBookCodeList(String result, String title){
+
+        JSONParser parser = new JSONParser();
+        try {
+            Object obj = parser.parse(result);
+
+            //obj를 JSONObject에 담음
+            JSONObject json = (JSONObject) obj;
+            JSONArray resultArr = (JSONArray) json.get("results");
+
+            for (int i = 0; i < resultArr.size(); i++) {
+                JSONObject bookObj = (JSONObject) resultArr.get(i);
+                if (bookObj.get("bkName").equals(title)) {
+                    log.info("bookCode: {}", bookObj.get("bkCode"));
+                    return (long) bookObj.get("bkCode");
+                }
+            }
+            throw new CustomException(NOT_FOUND_DATA);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
 
