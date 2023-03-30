@@ -8,6 +8,6 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @RequiredArgsConstructor
 public class RequestRefreshTokenDto {
-    @NotBlank
+    @NotBlank(message = "refreshToken is required")
     private final String refreshToken;
 }

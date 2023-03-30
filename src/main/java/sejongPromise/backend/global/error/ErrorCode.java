@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public enum ErrorCode {
+    INVALID_STUDENT_INFO(HttpStatus.BAD_REQUEST, "학생 정보가 유효하지 않습니다."),
     NOT_FOUND_DATA(HttpStatus.NOT_FOUND, "해당 데이터를 찾을 수 없습니다."),
     NO_RESPONSE(HttpStatus.NOT_FOUND, "응답값이 존재하지 않습니다."),
     WRONG_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다"),
