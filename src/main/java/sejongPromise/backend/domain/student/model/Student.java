@@ -3,6 +3,7 @@ package sejongPromise.backend.domain.student.model;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.domain.Persistable;
+import sejongPromise.backend.domain.enumerate.Semester;
 import sejongPromise.backend.global.model.BaseEntity;
 
 import javax.persistence.Column;
@@ -19,12 +20,11 @@ public class Student extends BaseEntity implements Persistable<Long> {
     @Column(name = "student_id")
     private Long id;
     private String password;
-    private String ssoToken;
     private String sessionToken;
     private String name;
     private String major;
-    private boolean pass;
-    private Integer semester;
+    private Semester semester;
+    private Boolean isPass;
 
     /**
      * Persistable override
@@ -42,23 +42,23 @@ public class Student extends BaseEntity implements Persistable<Long> {
                     @NonNull String name,
                     @NonNull String major,
                     @NonNull String encodedPassword,
-                    String ssoToken, String sessionToken, Integer semester, boolean pass){
+                    @NonNull String sessionToken,
+                    @NonNull String semester,
+                    @NonNull Boolean pass){
         this.id = studentId;
         this.name = name;
         this.major = major;
-        this.ssoToken = ssoToken;
         this.sessionToken = sessionToken;
-        this.semester = semester;
-        this.pass = pass;
+        this.semester = Semester.of(semester);
+        this.isPass = pass;
         this.password = encodedPassword;
     }
 
     public void update(Student student){
         this.major = student.getMajor();
-        this.ssoToken = student.getSsoToken();
         this.sessionToken = student.getSessionToken();
         this.semester = student.getSemester();
-        this.pass = student.isPass();
+        this.isPass = student.isPass;
     }
 
     public String getStudentId() {

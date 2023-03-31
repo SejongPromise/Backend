@@ -20,7 +20,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import sejongPromise.backend.infra.sejong.model.dto.request.FindBookCodeRequestDto;
 import sejongPromise.backend.infra.sejong.model.dto.request.TestBookScheduleRequestDto;
-import sejongPromise.backend.domain.exam.model.BookField;
+import sejongPromise.backend.domain.enumerate.BookField;
 import sejongPromise.backend.global.config.qualifier.ChromeAgentWebClient;
 import sejongPromise.backend.global.error.exception.CustomException;
 import sejongPromise.backend.infra.sejong.model.*;
@@ -50,10 +50,8 @@ public class SejongClassicCrawlerService {
     @Value("${sejong.classic.student.schedule}")
     private final String STUDENT_SCHEDULE_URI;
     private final String BASE_URL = "http://classic.sejong.ac.kr";
-
     @Value("${sejong.classic.book.test.register}")
     private final String BOOK_TEST_REGISTER_URI;
-
     @Value("${sejong.classic.book.code.list}")
     private final String BOOK_CODE_LIST;
 
@@ -91,7 +89,7 @@ public class SejongClassicCrawlerService {
      * @return 해당 날짜 예약 스케쥴 현황 리턴
      */
     public List<BookScheduleInfo> getScheduleInfo(SejongAuth auth, String date) {
-        //User 로그인 구현되면 저장된 JSESSION으로 접근하도록 수정할 예정
+        // todo : User 로그인 구현되면 저장된 JSESSION으로 접근하도록 수정할 예정
         //JSESSION 없을 시 다시 로그인 하거나 관리자 계정으로 schedule 받아오는거까지 하거나 하기
         //일단 login해서 얻은 SejongAuth로 구현함
 
@@ -155,6 +153,8 @@ public class SejongClassicCrawlerService {
     }
 
     private ClassicStudentInfo parseStudentInfoHtml(String html) {
+        //todo : 대회 인증 정보 가져오기 및 중복 제거
+
         //시험 인증 리스트 배열 생성.
         List<ExamInfo> examInfos = new ArrayList<>();
 
@@ -162,8 +162,6 @@ public class SejongClassicCrawlerService {
         Document doc = Jsoup.parse(html);
         Elements studentTable = doc.select("div.content-section ul.tblA");
         Elements studentInfo = studentTable.select("dd");
-        // todo : 인증 여부 확인해야함. 현재는 "인증" 텍스트로만 확인.
-        // todo : 인증정보 가져오기 함수 수정.. 너무 복잡함.
         String major = studentInfo.get(0).text();
         String studentId = studentInfo.get(1).text();
         String name = studentInfo.get(2).text();
@@ -220,6 +218,7 @@ public class SejongClassicCrawlerService {
 
     }
 
+
     public void testRegister(SejongAuth auth, TestBookScheduleRequestDto dto) {
         String result;
 
@@ -228,12 +227,19 @@ public class SejongClassicCrawlerService {
         formData.add("opTermId", dto.getOpTermId());
         formData.add("bkAreaCode", dto.getBkAreaCode());
         formData.add("bkCode", dto.getBkCode());
-        try{
+        try {
             result = webClient.post()
                     .uri(BOOK_TEST_REGISTER_URI)
                     .cookies(auth.authCookies())
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(BodyInserters.fromFormData(formData))
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
+        }
+    }
 
     private List<MyRegisterInfo> parseMyRegisterInfoHtml(String myRegisterInfoHtml) {
 
@@ -254,7 +260,7 @@ public class SejongClassicCrawlerService {
                 Elements cellList = row.select("td");
 
                 String year = cellList.get(0).text().substring(0,5);
-                String semester = cellList.get(0).text().substring(7,11);
+                String semester = cellList.get(0).text().substring(7);
                 String date = cellList.get(1).text();
                 String startTime = cellList.get(2).text().substring(0,5);
                 String endTime = cellList.get(2).text().substring(8,13);
@@ -292,7 +298,7 @@ public class SejongClassicCrawlerService {
     }
 
     private long parseBookCodeList(String result, String title){
-
+        //todo : Json 파싱 object mapper로 변경
         JSONParser parser = new JSONParser();
         try {
             Object obj = parser.parse(result);

@@ -1,4 +1,4 @@
-package sejongPromise.backend.domain.exam.model;
+package sejongPromise.backend.domain.enumerate;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

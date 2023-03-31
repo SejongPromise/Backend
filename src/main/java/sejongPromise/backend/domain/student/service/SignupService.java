@@ -52,7 +52,7 @@ public class SignupService {
                 .name(studentInfo.getName())
                 .major(studentInfo.getMajor())
                 .studentId(Long.parseLong(studentInfo.getStudentId()))
-                .semester(Integer.parseInt(studentInfo.getSemester().substring(0, 1)))
+                .semester(studentInfo.getSemester().replace(" ", ""))
                 .sessionToken(WebUtil.makeCookieString(auth.cookies))
                 .pass(studentInfo.isPass())
                 .encodedPassword(passwordEncoder.encode(dto.getPassword()))
