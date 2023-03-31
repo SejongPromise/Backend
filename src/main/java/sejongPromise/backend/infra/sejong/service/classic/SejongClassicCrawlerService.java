@@ -1,6 +1,5 @@
 package sejongPromise.backend.infra.sejong.service.classic;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
@@ -154,6 +153,8 @@ public class SejongClassicCrawlerService {
     }
 
     private ClassicStudentInfo parseStudentInfoHtml(String html) {
+        //todo : 대회 인증 정보 가져오기 및 중복 제거
+
         //시험 인증 리스트 배열 생성.
         List<ExamInfo> examInfos = new ArrayList<>();
 
@@ -216,6 +217,7 @@ public class SejongClassicCrawlerService {
         return parseMyRegisterInfoHtml(myRegisterInfoHtml);
 
     }
+
 
     public void testRegister(SejongAuth auth, TestBookScheduleRequestDto dto) {
         String result;
@@ -296,7 +298,7 @@ public class SejongClassicCrawlerService {
     }
 
     private long parseBookCodeList(String result, String title){
-
+        //todo : Json 파싱 object mapper로 변경
         JSONParser parser = new JSONParser();
         try {
             Object obj = parser.parse(result);

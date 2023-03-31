@@ -24,7 +24,7 @@ public class Student extends BaseEntity implements Persistable<Long> {
     private String name;
     private String major;
     private Semester semester;
-    private Boolean pass;
+    private Boolean isPass;
 
     /**
      * Persistable override
@@ -50,7 +50,7 @@ public class Student extends BaseEntity implements Persistable<Long> {
         this.major = major;
         this.sessionToken = sessionToken;
         this.semester = Semester.of(semester);
-        this.pass = pass;
+        this.isPass = pass;
         this.password = encodedPassword;
     }
 
@@ -58,7 +58,7 @@ public class Student extends BaseEntity implements Persistable<Long> {
         this.major = student.getMajor();
         this.sessionToken = student.getSessionToken();
         this.semester = student.getSemester();
-        this.pass = student.pass;
+        this.isPass = student.isPass;
     }
 
     public String getStudentId() {

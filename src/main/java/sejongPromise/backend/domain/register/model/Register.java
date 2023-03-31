@@ -39,7 +39,6 @@ public class Register extends BaseEntity{
                      @NonNull LocalTime endTime,
                      @NonNull String bookTitle,
                      @NonNull Boolean isCanceled,
-                     @NonNull Boolean isDeleted,
                      LocalDateTime deleteDate){
         this.student = student;
         this.year = year;
@@ -50,7 +49,6 @@ public class Register extends BaseEntity{
         this.bookTitle = bookTitle;
         this.isCanceled = isCanceled;
         this.deleteDate = deleteDate;
-
     }
 
 }

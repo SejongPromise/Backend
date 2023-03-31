@@ -32,11 +32,11 @@ public class TestController {
     private final SejongClassicCrawlerService classicCrawlerService;
     private final SejongCrawlerService crawlerService;
 
-    @Value("${sejong.id}")
-    private final String id;
-
-    @Value("${sejong.password}")
-    private final String password;
+//    @Value("${sejong.id}")
+//    private final String id;
+//
+//    @Value("${sejong.password}")
+//    private final String password;
 
     /**
      * 세종대학교 포털 로그인
@@ -57,10 +57,11 @@ public class TestController {
      * @return 스케쥴 List
      */
     @GetMapping("/classic/schedule")
-    public List<BookScheduleInfo> classicSchedule(@RequestParam("date") String date){
+    public List<BookScheduleInfo> classicSchedule(@RequestParam("date") String date, @RequestBody TestLoginDto dto){
         //추후 user에 저장된 JSESSIONID 이용하거나 관리자 id, password로 로그인한 세션을 이용할 예정 -> 논의 필요
         //이부분은 추후 service 메소드 인자를 JSESSIONID 넣는 등으로 수정할 것임.
-        SejongAuth login = classicAuthenticationService.login(id, password);
+        //todo : id / pw 에 데이터를 공유하지 않으실 거면, 해당 부분은 직접 DTO 생성하고, id 및 password를 요청하는 것이 좋습니다.
+        SejongAuth login = classicAuthenticationService.login(dto.getStudentId(), dto.getPassword());
         return classicCrawlerService.getScheduleInfo(login, date);
     }
     @GetMapping("/auth/student")
@@ -79,8 +80,9 @@ public class TestController {
      * 고전독서 인증 시험 신청
      * @param dto shInfoId, opTermId, bkAreaCode, bkCode
      */
+    //todo : 해당 부분도 위와 마찬가지 입니다.
     @PostMapping("/classic/test")
-    public void classicTestRegister(@RequestBody TestBookScheduleRequestDto dto) {
+    public void classicTestRegister(@RequestBody TestBookScheduleRequestDto dto, String id, String password) {
         SejongAuth login = classicAuthenticationService.login(id, password);
         classicCrawlerService.testRegister(login, dto);
     }
@@ -92,7 +94,7 @@ public class TestController {
      * @return 책 코드값
      */
     @GetMapping("/classic/book")
-    public long classicBookCode(@RequestParam("areaCode")String areaCode, @RequestParam("title") String title) {
+    public long classicBookCode(@RequestParam("areaCode")String areaCode, @RequestParam("title") String title, String id, String password) {
         SejongAuth login = classicAuthenticationService.login(id, password);
         return classicCrawlerService.findBookCode(login, new FindBookCodeRequestDto(title, areaCode));
     }

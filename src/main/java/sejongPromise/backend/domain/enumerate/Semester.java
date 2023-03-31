@@ -18,6 +18,8 @@ public enum Semester {
     SIXTH("6학기"),
     SEVENTH("7학기"),
     EIGHTH("8학기"),
+    NINTH("9학기"),
+    TENTH("10학기"),
     SUMMER("여름학기"),
     WINTER("겨울학기");
 
