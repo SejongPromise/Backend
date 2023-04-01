@@ -248,30 +248,40 @@ public class SejongClassicCrawlerService {
         Document doc = Jsoup.parse(myRegisterInfoHtml);
         Elements tableList = doc.select("table[class=listA]").select("tbody");
 
-        for (Element table : tableList) {
+        for(Element table : tableList){
+            if(table.select("tr").select("td").hasAttr("colspan")){
+                continue;
+            }
             Elements rowList = table.select("tr");
-
-            if(rowList.get(0).text().contains("결과")){
-                rowList.remove(0);
+            //신청 상태
+            //todo : 가영이한테 물어보기! 굉장히 맘에 안듦..
+            if(rowList.select("td").text().contains("예약취소")){
+                for(Element row : rowList){
+                    Elements cellList = row.select("td");
+                    String year = cellList.get(0).text().substring(0,4);
+                    String semester = cellList.get(0).text().substring(7);
+                    String date = cellList.get(1).text();
+                    String startTime = cellList.get(2).text().substring(0,5);
+                    String endTime = cellList.get(2).text().substring(8,13);
+                    String bookTitle = cellList.get(4).text();
+                    myRegisterInfoList.add(new MyRegisterInfo(year, semester, date, startTime, endTime, bookTitle, false, null));
+                }
             }
-
-            //시험 신청 현황에서 신청 취소 정보 가져오기
-           for (Element row : rowList) {
-                Elements cellList = row.select("td");
-
-                String year = cellList.get(0).text().substring(0,5);
-                String semester = cellList.get(0).text().substring(7);
-                String date = cellList.get(1).text();
-                String startTime = cellList.get(2).text().substring(0,5);
-                String endTime = cellList.get(2).text().substring(8,13);
-                String bookTitle = cellList.get(3).text();
-                String deleteDate = cellList.get(4).text();
-
-                myRegisterInfoList.add(new MyRegisterInfo(year, semester, date, startTime, endTime, bookTitle, deleteDate));
+            //신청 취소
+            else{
+                for(Element row : rowList){
+                    Elements cellList = row.select("td");
+                    String year = cellList.get(0).text().substring(0,4);
+                    String semester = cellList.get(0).text().substring(7);
+                    String date = cellList.get(1).text();
+                    String startTime = cellList.get(2).text().substring(0,5);
+                    String endTime = cellList.get(2).text().substring(8,13);
+                    String bookTitle = cellList.get(3).text();
+                    String deleteDate = cellList.get(4).text();
+                    myRegisterInfoList.add(new MyRegisterInfo(year, semester, date, startTime, endTime, bookTitle, true, deleteDate));
+                }
             }
-
-            }
-
+        }
         return myRegisterInfoList;
     }
 

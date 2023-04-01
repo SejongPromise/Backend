@@ -4,8 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sejongPromise.backend.domain.enumerate.RegisterStatus;
+import sejongPromise.backend.domain.enumerate.Semester;
 import sejongPromise.backend.domain.exam.model.Exam;
 import sejongPromise.backend.domain.exam.repository.ExamRepository;
+import sejongPromise.backend.domain.register.RegisterRepository.RegisterRepository;
+import sejongPromise.backend.domain.register.model.Register;
 import sejongPromise.backend.domain.student.model.Student;
 import sejongPromise.backend.domain.student.model.dto.request.RequestStudentInfoDto;
 import sejongPromise.backend.domain.student.repository.StudentRepository;
@@ -19,6 +23,10 @@ import sejongPromise.backend.infra.sejong.model.SejongAuth;
 import sejongPromise.backend.infra.sejong.service.classic.SejongClassicAuthenticationService;
 import sejongPromise.backend.infra.sejong.service.classic.SejongClassicCrawlerService;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +36,7 @@ import java.util.Optional;
 public class SignupService {
     private final StudentRepository studentRepository;
     private final ExamRepository examRepository;
+    private final RegisterRepository registerRepository;
     private final SejongClassicAuthenticationService sejongClassicAuthenticationService;
     private final SejongClassicCrawlerService sejongClassicCrawlerService;
     private final PasswordEncoder passwordEncoder;
@@ -46,6 +55,8 @@ public class SignupService {
         if(optionalStudent.isPresent()){
             throw new CustomException(ErrorCode.ALREADY_USER_EXIST);
         }
+
+        //1. 학생 정보 저장
         SejongAuth auth = sejongClassicAuthenticationService.login(dto.getStudentId(), dto.getPassword());
         ClassicStudentInfo studentInfo = sejongClassicCrawlerService.getStudentInfo(auth);
         Student student = Student.builder()
@@ -59,6 +70,7 @@ public class SignupService {
                 .build();
         Student saveStudent = studentRepository.save(student);
 
+        //2.시험 정보 저장
         List<ExamInfo> examInfoList = studentInfo.getExamInfoList();
         examInfoList.forEach(data -> {
             Exam exam = Exam.builder().title(data.getTitle())
@@ -70,6 +82,31 @@ public class SignupService {
                     .build();
             examRepository.save(exam);
         });
+
+        //3.신청내역과 신청 취소 내역 저장
+        List<MyRegisterInfo> myRegisterInfoList = sejongClassicCrawlerService.getMyRegisterInfo(auth);
+        myRegisterInfoList.forEach(data -> {
+            LocalDateTime deleteDate = null;
+            //todo : 승환님께서 마음에 안 든다고,,ㅎㅎ
+            if(data.getDeleteDate() != null){
+                deleteDate = LocalDateTime.parse(data.getDeleteDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            }
+            Register register = Register.builder()
+                    .student(saveStudent)
+                    .year(Integer.parseInt(data.getYear()))
+                    .semester(Semester.of(data.getSemester()))
+                    .date(LocalDate.parse(data.getDate(), DateTimeFormatter.ISO_DATE))
+                    .startTime(LocalTime.parse(data.getStartTime(), DateTimeFormatter.ISO_DATE))
+                    .endTime(LocalTime.parse(data.getEndTime(), DateTimeFormatter.ISO_DATE))
+                    .bookTitle(data.getBookTitle())
+                    .status(data.getIsCancel() ? RegisterStatus.CANCELED : RegisterStatus.ACTIVE)
+                    .deleteDate(deleteDate)
+                    .build();
+            registerRepository.save(register);
+
+        });
+
     }
+
 
 }

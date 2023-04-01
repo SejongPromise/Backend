@@ -3,7 +3,6 @@ package sejongPromise.backend.debug;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import sejongPromise.backend.infra.sejong.model.dto.request.FindBookCodeRequestDto;
