@@ -16,7 +16,7 @@ public class RegisterController {
 
     private final RegisterService registerService;
 
-    @PostMapping("/cancel/registerId")
+    @PostMapping("/cancel/{registerId}")
     @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
     public void cancelRegister(Authentication auth, @PathVariable Long registerId){
         Long studentId = (Long)auth.getPrincipal();
