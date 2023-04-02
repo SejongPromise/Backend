@@ -60,7 +60,7 @@ public class SignupService {
         Student saveStudent = studentRepository.save(student);
 
         List<ExamInfo> examInfoList = studentInfo.getExamInfoList();
-        examInfoList.forEach(data -> {
+        examInfoList.stream().distinct().forEach(data -> {
             Exam exam = Exam.builder().title(data.getTitle())
                     .isPass(data.isPass())
                     .field(data.getField())
