@@ -3,11 +3,6 @@ package sejongPromise.backend.infra.sejong.model;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-
 @Getter
 @RequiredArgsConstructor
 public class MyRegisterInfo {
@@ -17,5 +12,7 @@ public class MyRegisterInfo {
     private final String startTime;
     private final String endTime;
     private final String bookTitle;
+    private final Boolean isCancel;
     private final String deleteDate;
+
 }
