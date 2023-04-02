@@ -154,7 +154,6 @@ public class SejongClassicCrawlerService {
 
     private ClassicStudentInfo parseStudentInfoHtml(String html) {
         //todo : 대회 인증 정보 가져오기 및 중복 제거
-
         //시험 인증 리스트 배열 생성.
         List<ExamInfo> examInfos = new ArrayList<>();
 
@@ -173,8 +172,10 @@ public class SejongClassicCrawlerService {
         for(Element element : examInfoList){
             //filtering -> 도서 인증 영역 텍스트를 가지고 있는 Element 만.
             List<String> fields = Stream.of(BookField.values()).map(BookField::getName).collect(Collectors.toList());
+
             for(String field : fields){
                 Elements elementsContainingText = element.getElementsContainingText(field);
+
                 if(elementsContainingText.hasText()){
                     Elements td = elementsContainingText.select("td");
                     String passAt = td.get(0).text();

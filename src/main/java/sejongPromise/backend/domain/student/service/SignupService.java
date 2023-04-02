@@ -72,7 +72,7 @@ public class SignupService {
 
         //2.시험 정보 저장
         List<ExamInfo> examInfoList = studentInfo.getExamInfoList();
-        examInfoList.forEach(data -> {
+        examInfoList.stream().distinct().forEach(data -> {
             Exam exam = Exam.builder().title(data.getTitle())
                     .isPass(data.isPass())
                     .field(data.getField())
