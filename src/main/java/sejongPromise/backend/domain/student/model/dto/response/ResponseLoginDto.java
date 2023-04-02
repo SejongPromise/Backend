@@ -11,7 +11,7 @@ public class ResponseLoginDto {
     private final String userName;
     private final String studentId;
     private final String major;
-    private final Integer semester;
+    private final String semester;
 
     public ResponseLoginDto(Student student, AuthenticationToken token) {
         this.accessToken = token.getAccessToken();
@@ -19,6 +19,6 @@ public class ResponseLoginDto {
         this.userName = student.getName();
         this.studentId = student.getStudentId();
         this.major = student.getMajor();
-        this.semester = student.getSemester();
+        this.semester = student.getSemester().getName();
     }
 }

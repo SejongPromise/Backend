@@ -29,18 +29,18 @@ public class SejongClassicAuthenticationService {
     @Value("${sejong.classic.login}")
     private final String LOGIN_URI;
 
-    public SejongAuth login(String classId, String password) {
+    public SejongAuth login(String studentId, String password) {
         MultiValueMap<String, String> cookies = new LinkedMultiValueMap<>();
 
-        ResponseEntity<String> response = tryLogin(classId, password);
+        ResponseEntity<String> response = tryLogin(studentId, password);
 
         WebUtil.addMappedCookies(cookies, WebUtil.extractCookies(response.getHeaders()));
 
         return new SejongAuth(cookies);
     }
 
-    private ResponseEntity<String> tryLogin(String classId, String password) {
-        String param = String.format("userId=%s&password=%s&go=", classId, password);
+    private ResponseEntity<String> tryLogin(String studentId, String password) {
+        String param = String.format("userId=%s&password=%s&go=", studentId, password);
 
         ResponseEntity<String> response;
 
@@ -61,19 +61,19 @@ public class SejongClassicAuthenticationService {
 
         if(response == null) throw new CustomException(ErrorCode.NO_RESPONSE);
         if(response.getStatusCode().is2xxSuccessful()){
-            throw new CustomException(ErrorCode.NOT_FOUND_DATA);
+            throw new CustomException(ErrorCode.INVALID_STUDENT_INFO);
         }
-        checkJssesionId(response.getHeaders());
+        
+        checkJsessionId(response.getHeaders());
 
         return response;
     }
 
-    private void checkJssesionId(HttpHeaders response) {
+    private void checkJsessionId(HttpHeaders response) {
         List<ResponseCookie> responseCookies = WebUtil.extractCookies(response);
         if(responseCookies.stream()
                 .noneMatch(data -> data.getName().contains("JSESSIONID"))){
             throw new CustomException(ErrorCode.NOT_FOUND_DATA, "JSession 못 찾음");
         }
     }
-
 }

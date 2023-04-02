@@ -14,4 +14,5 @@ public class ClassicStudentInfo {
     private final String semester;
     private final boolean isPass;
     private final List<ExamInfo> examInfoList;
+
 }
