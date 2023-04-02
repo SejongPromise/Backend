@@ -19,8 +19,8 @@ public class Exam extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id")
     private Student student;
-
     private Integer year;
+    @Enumerated(EnumType.STRING)
     private Semester semester;
     @Enumerated(EnumType.STRING)
     private BookField field;
