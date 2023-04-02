@@ -6,9 +6,7 @@ import org.springframework.data.domain.Persistable;
 import sejongPromise.backend.domain.enumerate.Semester;
 import sejongPromise.backend.global.model.BaseEntity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -23,6 +21,7 @@ public class Student extends BaseEntity implements Persistable<Long> {
     private String sessionToken;
     private String name;
     private String major;
+    @Enumerated(EnumType.STRING)
     private Semester semester;
     private Boolean isPass;
 
