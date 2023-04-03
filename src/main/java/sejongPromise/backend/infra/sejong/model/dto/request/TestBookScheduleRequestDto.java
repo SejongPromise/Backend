@@ -1,17 +1,25 @@
 package sejongPromise.backend.infra.sejong.model.dto.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
+
+import javax.validation.constraints.NotNull;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class TestBookScheduleRequestDto {
+    @NotNull
     private String shInfoId;
     private String opTermId;
+    @NotNull
     private String bkAreaCode;
+    @NotNull
     private String bkCode;
 
+    @Builder
+    public TestBookScheduleRequestDto(String shInfoId, String bkAreaCode, String bkCode) {
+        this.shInfoId = shInfoId;
+        this.opTermId = "TERM-00566";
+        this.bkAreaCode = bkAreaCode;
+        this.bkCode = bkCode;
+    }
 }
