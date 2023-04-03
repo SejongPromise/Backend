@@ -55,4 +55,10 @@ public class StudentService {
         AuthenticationToken token = jwtProvider.reissue(accessToken, dto.getRefreshToken());
         return new ResponseRefreshToken(token);
     }
+
+    public Student findStudentById(Long studentId) {
+        return studentRepository.findById(studentId).orElseThrow(
+                () -> new CustomException(ErrorCode.NOT_FOUND_DATA, "해당 유저를 찾을 수 없습니다.")
+        );
+    }
 }
