@@ -89,12 +89,6 @@ public class SejongClassicCrawlerService {
      * @return 해당 날짜 예약 스케쥴 현황 리턴
      */
     public List<BookScheduleInfo> getScheduleInfo(SejongAuth auth, String date) {
-        // todo : User 로그인 구현되면 저장된 JSESSION으로 접근하도록 수정할 예정
-        //JSESSION 없을 시 다시 로그인 하거나 관리자 계정으로 schedule 받아오는거까지 하거나 하기
-        //일단 login해서 얻은 SejongAuth로 구현함
-
-        //id 값으로 student 찾고 JSESSION 찾기.. -> domain의 register에서 새로 만들것.
-
         String result;
         String param = String.format("shDate=%s", date);
         try{
