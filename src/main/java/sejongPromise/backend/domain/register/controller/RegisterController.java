@@ -36,6 +36,6 @@ public class RegisterController {
     @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
     public void createRegister(Authentication auth, @RequestBody RegisterCreateRequestDto dto) {
         Long studentId = (Long) auth.getPrincipal();
-        registerService.createRegister(studentId, dto);
+        registerService.testRegister(studentId, dto);
     }
 }

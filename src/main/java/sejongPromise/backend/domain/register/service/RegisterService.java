@@ -42,11 +42,11 @@ public class RegisterService {
     // -> 신청하자마자는 신청하면서 바로 넣었는데 크롤링해서 넣어야 하면 Register 생성 부분 없애고 수정해주세요!
 
     /**
-     * 시험 신청, Register 생성 서비스
+     * 시험 신청 서비스
      * @param studentId
      * @param dto
      */
-    public void createRegister(Long studentId, RegisterCreateRequestDto dto) {
+    public void testRegister(Long studentId, RegisterCreateRequestDto dto){
         //JSESSIION으로 쿠키 생성
         Student student = studentService.findStudentById(studentId);
         MultiValueMap<String, String> cookie = new LinkedMultiValueMap<>();
@@ -61,7 +61,15 @@ public class RegisterService {
                 .shInfoId(dto.getShInfoId())
                 .build();
         sejongClassicCrawlerService.testRegister(auth,testBookScheduleRequestDto);
+        createRegister(student, dto);
+    }
 
+    /**
+     * Register 생성 서비스
+     * @param student
+     * @param dto
+     */
+    public void createRegister(Student student, RegisterCreateRequestDto dto) {
         //Register 생성
         Register register = Register.builder()
                 .bookTitle(dto.getBookTitle())

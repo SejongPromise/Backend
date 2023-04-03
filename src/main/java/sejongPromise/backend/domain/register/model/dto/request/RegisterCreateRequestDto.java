@@ -13,7 +13,7 @@ import java.time.LocalTime;
 @Schema(description = "register 생성 request dto")
 @Getter
 @RequiredArgsConstructor
-public class RegisterCreateRequestDto {
+    public class RegisterCreateRequestDto {
 
     @Schema(description = "시험일자")
     @NotNull
