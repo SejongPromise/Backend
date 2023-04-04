@@ -8,6 +8,7 @@ import sejongPromise.backend.domain.enumerate.RegisterStatus;
 import sejongPromise.backend.domain.register.RegisterRepository.RegisterRepository;
 import sejongPromise.backend.domain.register.model.Register;
 import sejongPromise.backend.domain.register.model.dto.request.RegisterCreateRequestDto;
+import sejongPromise.backend.domain.register.model.dto.request.RegisterTestApplyRequestDto;
 import sejongPromise.backend.domain.student.model.Student;
 import sejongPromise.backend.domain.student.service.StudentService;
 import sejongPromise.backend.global.error.ErrorCode;
@@ -46,7 +47,7 @@ public class RegisterService {
      * @param studentId
      * @param dto
      */
-    public void testRegister(Long studentId, RegisterCreateRequestDto dto){
+    public void testRegister(Long studentId, RegisterTestApplyRequestDto dto){
         //JSESSIION으로 쿠키 생성
         Student student = studentService.findStudentById(studentId);
         SejongAuth auth = createSejongAuth(student);
@@ -58,7 +59,6 @@ public class RegisterService {
                 .shInfoId(dto.getShInfoId())
                 .build();
         sejongClassicCrawlerService.testRegister(auth,testBookScheduleRequestDto);
-        createRegister(student, dto);
     }
 
     /**

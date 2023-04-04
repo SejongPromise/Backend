@@ -36,8 +36,4 @@ import java.time.LocalTime;
     @Schema(description = "책 code")
     @NotBlank
     private final String bookCode;
-
-    @Schema(description = "예약 신청 버튼값")
-    @NotBlank
-    private final String shInfoId;
 }
