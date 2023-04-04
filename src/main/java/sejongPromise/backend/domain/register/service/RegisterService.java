@@ -49,10 +49,7 @@ public class RegisterService {
     public void testRegister(Long studentId, RegisterCreateRequestDto dto){
         //JSESSIION으로 쿠키 생성
         Student student = studentService.findStudentById(studentId);
-        MultiValueMap<String, String> cookie = new LinkedMultiValueMap<>();
-        String[] split = student.getSessionToken().split("=");
-        cookie.add(split[0], split[1]);
-        SejongAuth auth = new SejongAuth(cookie);
+        SejongAuth auth = createSejongAuth(student);
 
         //시험 예약
         TestBookScheduleRequestDto testBookScheduleRequestDto = TestBookScheduleRequestDto.builder()
@@ -62,6 +59,18 @@ public class RegisterService {
                 .build();
         sejongClassicCrawlerService.testRegister(auth,testBookScheduleRequestDto);
         createRegister(student, dto);
+    }
+
+    /**
+     * sejongAuth 생성
+     * @param student
+     * @return SejongAuth
+     */
+    private SejongAuth createSejongAuth(Student student){
+        MultiValueMap<String, String> cookie = new LinkedMultiValueMap<>();
+        String[] split = student.getSessionToken().split("=");
+        cookie.add(split[0], split[1]);
+        return new SejongAuth(cookie);
     }
 
     /**
@@ -85,6 +94,8 @@ public class RegisterService {
 
         registerRepository.save(register);
     }
+
+
 
 }
 
