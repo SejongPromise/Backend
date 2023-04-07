@@ -21,7 +21,7 @@ public class RegisterController {
     public void cancelRegister(Authentication auth, @PathVariable Long registerId){
         Long studentId = (Long)auth.getPrincipal();
         registerService.cancelRegister(studentId, registerId);
-
     }
+
 
 }

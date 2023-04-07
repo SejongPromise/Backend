@@ -51,7 +51,6 @@ public class Register extends BaseEntity{
         this.bookTitle = bookTitle;
         this.status = status;
         this.deleteDate = deleteDate;
-
         }
     public void cancelRegister(){
         this.status = RegisterStatus.CANCELED;

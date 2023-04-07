@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 @Getter
 @RequiredArgsConstructor
 public enum Semester {
+    ZERO("0학기"),
     FIRST("1학기"),
     SECOND("2학기"),
     THIRD("3학기"),

@@ -250,6 +250,7 @@ public class SejongClassicCrawlerService {
         Elements tableList = doc.select("table[class=listA]").select("tbody");
 
         for(Element table : tableList){
+            // Skip -> colspan 속성을 가지고 있는 검색 결과가 없습니다.
             if(table.select("tr").select("td").hasAttr("colspan")){
                 continue;
             }
