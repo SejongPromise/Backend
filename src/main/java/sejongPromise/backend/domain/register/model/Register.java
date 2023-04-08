@@ -23,7 +23,6 @@ public class Register extends BaseEntity{
     @JoinColumn(name = "student_id")
     private Student student;
     private Integer year;
-    @Enumerated(EnumType.STRING)
     private Semester semester;
     private LocalDate date;
     private LocalTime startTime; //10:00

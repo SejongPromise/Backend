@@ -6,7 +6,7 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @NoArgsConstructor
-public class TestBookScheduleRequestDto {
+public class RequestTestApplyDto {
     @NotNull
     private String shInfoId;
     private String opTermId;
@@ -16,7 +16,7 @@ public class TestBookScheduleRequestDto {
     private String bkCode;
 
     @Builder
-    public TestBookScheduleRequestDto(String shInfoId, String bkAreaCode, String bkCode) {
+    public RequestTestApplyDto(String shInfoId, String bkAreaCode, String bkCode) {
         this.shInfoId = shInfoId;
         this.opTermId = "TERM-00566";
         this.bkAreaCode = bkAreaCode;

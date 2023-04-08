@@ -18,8 +18,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import sejongPromise.backend.infra.sejong.model.dto.request.FindBookCodeRequestDto;
-import sejongPromise.backend.infra.sejong.model.dto.request.TestBookScheduleRequestDto;
+import sejongPromise.backend.domain.enumerate.Semester;
+import sejongPromise.backend.domain.register.model.dto.request.RequestFindBookCodeDto;
+import sejongPromise.backend.infra.sejong.model.dto.request.RequestTestApplyDto;
 import sejongPromise.backend.domain.enumerate.BookField;
 import sejongPromise.backend.global.config.qualifier.ChromeAgentWebClient;
 import sejongPromise.backend.global.error.exception.CustomException;
@@ -84,17 +85,18 @@ public class SejongClassicCrawlerService {
     }
 
     /**
-     * @param auth
+     * @param JSession
      * @param date
      * @return 해당 날짜 예약 스케쥴 현황 리턴
      */
-    public List<BookScheduleInfo> getScheduleInfo(SejongAuth auth, String date) {
+    public List<BookScheduleInfo> getScheduleInfo(String JSession, String date) {
         String result;
         String param = String.format("shDate=%s", date);
+        String[] splitJSession = JSession.split("=");
         try{
             result = webClient.post()
                     .uri(BOOK_SCHEDULE_URI)
-                    .cookies(auth.authCookies())
+                    .cookie(splitJSession[0],splitJSession[1])
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(BodyInserters.fromValue(param))
                     .retrieve()
@@ -103,7 +105,6 @@ public class SejongClassicCrawlerService {
         }catch (Throwable t){
             throw new RuntimeException(t);
         }
-
         return parseScheduleHtml(result);
     }
 
@@ -117,14 +118,45 @@ public class SejongClassicCrawlerService {
 
             for(Element row: rowList){
                 Elements cellList = row.select("td");
+                String[] yearAndSemester = cellList.get(1).text().split(" ");
+                int year = Integer.parseInt(yearAndSemester[0].substring(0, 4));
+                String firstLetterSemester = yearAndSemester[1].substring(0, 1);
+                //semester 계산
+                Semester semester;
+                if (firstLetterSemester.equals("1")) {
+                    semester = Semester.FIRST;
+                } else if (firstLetterSemester.equals("2")){
+                    semester = Semester.SECOND;
+                } else if (firstLetterSemester.equals("여")) {
+                    semester = Semester.SUMMER;
+                } else {
+                    semester = Semester.WINTER;
+                }
+
                 String time = cellList.get(3).text();
-                String applicant = cellList.get(5).text().substring(0, 2).trim();
+                int applicant = Integer.parseInt(cellList.get(5).text().substring(0, 2).trim());
+                int limitedApplicant = Integer.parseInt(cellList.get(6).text().substring(0, 2).trim());
                 String button = cellList.get(7).select("button").attr("onclick");
                 int start = button.indexOf("'");
                 int end = button.lastIndexOf("'");
                 String apply = button.substring(start + 1, end);
 
-                scheduleList.add(new BookScheduleInfo(time, Integer.parseInt(applicant),apply));
+                Boolean isAvailableApply;
+                if ((limitedApplicant - applicant) > 0) {
+                    isAvailableApply = true;
+                } else {
+                    isAvailableApply = false;
+                }
+
+                scheduleList.add(BookScheduleInfo.builder()
+                        .year(year)
+                        .semester(semester)
+                        .time(time)
+                        .applicant(applicant)
+                        .limitedApplicant(limitedApplicant)
+                        .apply(apply)
+                        .isAvailableApply(isAvailableApply)
+                        .build());
             }
         }
         return scheduleList;
@@ -214,7 +246,7 @@ public class SejongClassicCrawlerService {
     }
 
 
-    public void testRegister(SejongAuth auth, TestBookScheduleRequestDto dto) {
+    public void testRegister(String JSession, RequestTestApplyDto dto) {
         String result;
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
@@ -222,10 +254,12 @@ public class SejongClassicCrawlerService {
         formData.add("opTermId", dto.getOpTermId());
         formData.add("bkAreaCode", dto.getBkAreaCode());
         formData.add("bkCode", dto.getBkCode());
+
+        String[] splitJsession = JSession.split("=");
         try {
             result = webClient.post()
                     .uri(BOOK_TEST_REGISTER_URI)
-                    .cookies(auth.authCookies())
+                    .cookie(splitJsession[0],splitJsession[1])
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(BodyInserters.fromFormData(formData))
                     .retrieve()
@@ -280,17 +314,19 @@ public class SejongClassicCrawlerService {
         return myRegisterInfoList;
     }
 
-    public long findBookCode(SejongAuth auth, FindBookCodeRequestDto dto){
+    public long findBookCode(String JSession, RequestFindBookCodeDto dto){
         String result;
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("opTermId", "TERM-00566");
-        formData.add("bkAreaCode", dto.getAreaCode());
+        formData.add("bkAreaCode", dto.getBookAreaCode());
+
+        String[] splitJSession = JSession.split("=");
 
         try{
             result = webClient.post()
                     .uri(BOOK_CODE_LIST)
-                    .cookies(auth.authCookies())
+                    .cookie(splitJSession[0],splitJSession[1])
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(BodyInserters.fromFormData(formData))
                     .retrieve()
@@ -299,7 +335,7 @@ public class SejongClassicCrawlerService {
         }catch (Throwable t){
             throw new RuntimeException(t);
         }
-        return parseBookCodeList(result, dto.getTitle());
+        return parseBookCodeList(result, dto.getBookTitle());
     }
 
     private long parseBookCodeList(String result, String title){

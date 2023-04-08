@@ -1,32 +1,33 @@
 package sejongPromise.backend.domain.register.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import sejongPromise.backend.domain.enumerate.RegisterStatus;
 import sejongPromise.backend.domain.register.RegisterRepository.RegisterRepository;
 import sejongPromise.backend.domain.register.model.Register;
-import sejongPromise.backend.domain.register.model.dto.request.RegisterCreateRequestDto;
-import sejongPromise.backend.domain.register.model.dto.request.RegisterTestApplyRequestDto;
+import sejongPromise.backend.domain.register.model.dto.request.RequestCreateRegisterDto;
+import sejongPromise.backend.domain.register.model.dto.request.RequestFindBookCodeDto;
 import sejongPromise.backend.domain.student.model.Student;
-import sejongPromise.backend.domain.student.service.StudentService;
+import sejongPromise.backend.domain.student.repository.StudentRepository;
 import sejongPromise.backend.global.error.ErrorCode;
 import sejongPromise.backend.global.error.exception.CustomException;
-import sejongPromise.backend.infra.sejong.model.SejongAuth;
-import sejongPromise.backend.infra.sejong.model.dto.request.TestBookScheduleRequestDto;
+import sejongPromise.backend.infra.sejong.model.BookScheduleInfo;
+import sejongPromise.backend.infra.sejong.model.dto.request.RequestTestApplyDto;
 import sejongPromise.backend.infra.sejong.service.classic.SejongClassicCrawlerService;
 
 import javax.transaction.Transactional;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class RegisterService {
     private final RegisterRepository registerRepository;
     private final SejongClassicCrawlerService sejongClassicCrawlerService;
-    private final StudentService studentService;
+    private final StudentRepository studentRepository;
 
     //todo : 응시가 완료된 시점에서 스케줄링으로 상태값 반환하기
     public void cancelRegister(Long studentId, Long registerId){
@@ -47,30 +48,19 @@ public class RegisterService {
      * @param studentId
      * @param dto
      */
-    public void testRegister(Long studentId, RegisterTestApplyRequestDto dto){
-        //JSESSIION으로 쿠키 생성
-        Student student = studentService.findStudentById(studentId);
-        SejongAuth auth = createSejongAuth(student);
+    public void testRegister(Long studentId, RequestCreateRegisterDto dto){
+        Student student = studentRepository.findById(studentId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA));
 
         //시험 예약
-        TestBookScheduleRequestDto testBookScheduleRequestDto = TestBookScheduleRequestDto.builder()
+        RequestTestApplyDto requestTestApplyDto = RequestTestApplyDto.builder()
                 .bkAreaCode(dto.getBookAreaCode())
                 .bkCode(dto.getBookCode())
                 .shInfoId(dto.getShInfoId())
                 .build();
-        sejongClassicCrawlerService.testRegister(auth,testBookScheduleRequestDto);
-    }
+        sejongClassicCrawlerService.testRegister(student.getSessionToken(), requestTestApplyDto);
 
-    /**
-     * sejongAuth 생성
-     * @param student
-     * @return SejongAuth
-     */
-    private SejongAuth createSejongAuth(Student student){
-        MultiValueMap<String, String> cookie = new LinkedMultiValueMap<>();
-        String[] split = student.getSessionToken().split("=");
-        cookie.add(split[0], split[1]);
-        return new SejongAuth(cookie);
+        //regist 생성
+        createRegister(student, dto);
     }
 
     /**
@@ -78,7 +68,7 @@ public class RegisterService {
      * @param student
      * @param dto
      */
-    public void createRegister(Student student, RegisterCreateRequestDto dto) {
+    public void createRegister(Student student, RequestCreateRegisterDto dto) {
         //Register 생성
         Register register = Register.builder()
                 .bookTitle(dto.getBookTitle())
@@ -87,14 +77,23 @@ public class RegisterService {
                 .endTime(dto.getTime().plusMinutes(30L))
                 .year(dto.getDate().getYear())
                 .student(student)
-                .semester(student.getSemester())
+                .semester(dto.getSemester())
                 .status(RegisterStatus.ACTIVE)
-                .deleteDate(LocalDateTime.now()) //deleteDate는 builder에 있으면 안될 것 같아요. 일단 현재 시간 넣었습니다.
                 .build();
 
         registerRepository.save(register);
     }
 
+    public List<BookScheduleInfo> getSchedule(long studentId, LocalDate date) {
+        Student student = studentRepository.findById(studentId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA));
+        log.info("jsession: {}", student.getSessionToken());
+        return sejongClassicCrawlerService.getScheduleInfo(student.getSessionToken(), String.valueOf(date));
+    }
+
+    public long getBookCode(long studentId, RequestFindBookCodeDto dto) {
+        Student student = studentRepository.findById(studentId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA));
+        return sejongClassicCrawlerService.findBookCode(student.getSessionToken(), dto);
+    }
 
 
 }
