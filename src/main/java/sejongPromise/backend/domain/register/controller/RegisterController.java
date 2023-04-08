@@ -40,7 +40,7 @@ public class RegisterController {
     @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
     public void testApply(Authentication auth, @RequestBody RequestCreateRegisterDto dto) {
         Long studentId = (Long) auth.getPrincipal();
-        registerService.testRegister(studentId, dto);
+        registerService.testApply(studentId, dto);
     }
 
     @Operation(summary = "시험 스케쥴 가져오기", description = "해당 일자의 시험 정보를 가져옵니다.", responses = {

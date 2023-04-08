@@ -48,7 +48,7 @@ public class RegisterService {
      * @param studentId
      * @param dto
      */
-    public void testRegister(Long studentId, RequestCreateRegisterDto dto){
+    public void testApply(Long studentId, RequestCreateRegisterDto dto){
         Student student = studentRepository.findById(studentId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA));
 
         //시험 예약
@@ -59,7 +59,7 @@ public class RegisterService {
                 .build();
         sejongClassicCrawlerService.testRegister(student.getSessionToken(), requestTestApplyDto);
 
-        //regist 생성
+        //register 생성
         createRegister(student, dto);
     }
 
