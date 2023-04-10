@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import sejongPromise.backend.infra.sejong.model.dto.request.FindBookCodeRequestDto;
-import sejongPromise.backend.infra.sejong.model.dto.request.TestBookScheduleRequestDto;
+import sejongPromise.backend.domain.register.model.dto.request.RequestFindBookCodeDto;
+import sejongPromise.backend.infra.sejong.model.dto.request.RequestTestApplyDto;
 import sejongPromise.backend.debug.dto.TestLoginDto;
 import sejongPromise.backend.infra.sejong.model.BookScheduleInfo;
 import sejongPromise.backend.infra.sejong.model.MyRegisterInfo;
@@ -31,12 +31,6 @@ public class TestController {
     private final SejongClassicCrawlerService classicCrawlerService;
     private final SejongCrawlerService crawlerService;
 
-//    @Value("${sejong.id}")
-//    private final String id;
-//
-//    @Value("${sejong.password}")
-//    private final String password;
-
     /**
      * 세종대학교 포털 로그인
      * @param dto 학번 & 비밀번호
@@ -56,12 +50,8 @@ public class TestController {
      * @return 스케쥴 List
      */
     @GetMapping("/classic/schedule")
-    public List<BookScheduleInfo> classicSchedule(@RequestParam("date") String date, @RequestBody TestLoginDto dto){
-        //추후 user에 저장된 JSESSIONID 이용하거나 관리자 id, password로 로그인한 세션을 이용할 예정 -> 논의 필요
-        //이부분은 추후 service 메소드 인자를 JSESSIONID 넣는 등으로 수정할 것임.
-        //todo : id / pw 에 데이터를 공유하지 않으실 거면, 해당 부분은 직접 DTO 생성하고, id 및 password를 요청하는 것이 좋습니다.
-        SejongAuth login = classicAuthenticationService.login(dto.getStudentId(), dto.getPassword());
-        return classicCrawlerService.getScheduleInfo(login, date);
+    public List<BookScheduleInfo> classicSchedule(@RequestParam("date") String date, @RequestParam("JSession") String JSession){
+        return classicCrawlerService.getScheduleInfo(JSession, date);
     }
     @GetMapping("/auth/student")
     public Long getAuth(Authentication auth){
@@ -81,9 +71,9 @@ public class TestController {
      */
     //todo : 해당 부분도 위와 마찬가지 입니다.
     @PostMapping("/classic/test")
-    public void classicTestRegister(@RequestBody TestBookScheduleRequestDto dto, String id, String password) {
+    public void classicTestRegister(@RequestBody RequestTestApplyDto dto, String id, String password) {
         SejongAuth login = classicAuthenticationService.login(id, password);
-        classicCrawlerService.testRegister(login, dto);
+//        classicCrawlerService.testRegister(login, dto);
     }
 
     /**
@@ -93,9 +83,11 @@ public class TestController {
      * @return 책 코드값
      */
     @GetMapping("/classic/book")
-    public long classicBookCode(@RequestParam("areaCode")String areaCode, @RequestParam("title") String title, String id, String password) {
-        SejongAuth login = classicAuthenticationService.login(id, password);
-        return classicCrawlerService.findBookCode(login, new FindBookCodeRequestDto(title, areaCode));
+    public long classicBookCode(@RequestParam("title") String title,
+                                @RequestParam("JSession") String JSession,
+                                @RequestParam("areaCode")String areaCode) {
+
+        return classicCrawlerService.findBookCode(JSession, new RequestFindBookCodeDto(areaCode, title));
     }
 
 
