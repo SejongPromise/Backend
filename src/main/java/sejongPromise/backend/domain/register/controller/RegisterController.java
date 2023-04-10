@@ -30,7 +30,6 @@ public class RegisterController {
     public void cancelRegister(Authentication auth, @PathVariable Long registerId) {
         Long studentId = (Long) auth.getPrincipal();
         registerService.cancelRegister(studentId, registerId);
-
     }
 
     @Operation(summary = "Register 생성, 시험 예약", description = "RegisterCreateRequestDto를 이용해 register를 생성합니다.", responses = {
