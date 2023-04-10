@@ -29,6 +29,8 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Transactional(readOnly = true)
@@ -96,8 +98,8 @@ public class SignupService {
                     .year(Integer.parseInt(data.getYear()))
                     .semester(Semester.of(data.getSemester()))
                     .date(LocalDate.parse(data.getDate(), DateTimeFormatter.ISO_DATE))
-                    .startTime(LocalTime.parse(data.getStartTime(), DateTimeFormatter.ISO_DATE))
-                    .endTime(LocalTime.parse(data.getEndTime(), DateTimeFormatter.ISO_DATE))
+                    .startTime(LocalTime.parse(data.getStartTime(), DateTimeFormatter.ISO_TIME))
+                    .endTime(LocalTime.parse(data.getEndTime(), DateTimeFormatter.ISO_TIME))
                     .bookTitle(data.getBookTitle())
                     .status(data.getIsCancel() ? RegisterStatus.CANCELED : RegisterStatus.ACTIVE)
                     .deleteDate(deleteDate)

@@ -16,6 +16,7 @@ public class Book extends BaseEntity {
     @Column(name = "book_id")
     private Long id;
     private String title;
+    @Enumerated(EnumType.STRING)
     private BookField field;
     private String writer;
     private String com;
