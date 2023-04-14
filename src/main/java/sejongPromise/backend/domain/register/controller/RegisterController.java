@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import sejongPromise.backend.domain.register.model.dto.request.RequestCancelRegisterDto;
 import sejongPromise.backend.domain.register.model.dto.request.RequestCreateRegisterDto;
 import sejongPromise.backend.domain.register.model.dto.request.RequestFindBookCodeDto;
 import sejongPromise.backend.domain.register.service.RegisterService;
@@ -28,8 +29,9 @@ public class RegisterController {
     @PostMapping("/cancel/{registerId}")
     @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
     public void cancelRegister(Authentication auth, @PathVariable Long registerId) {
+        // 이 testCancel에서 cancelRegister를 호출해서 예약 취소하자마자 register 삭제를 하고 있어서 주석처리 했습니다.
         Long studentId = (Long) auth.getPrincipal();
-        registerService.cancelRegister(studentId, registerId);
+//        registerService.cancelRegister(studentId, registerId);
     }
 
     @Operation(summary = "Register 생성, 시험 예약", description = "RegisterCreateRequestDto를 이용해 register를 생성합니다.", responses = {
@@ -63,5 +65,16 @@ public class RegisterController {
                                                   @RequestParam("bookTitle") String bookTitle) {
         Long studentId = (Long) auth.getPrincipal();
         return registerService.getBookCode(studentId, new RequestFindBookCodeDto(bookAreaCode, bookTitle));
+    }
+
+    @Operation(summary = "시험 예약 취소, register 삭제", description = "예약 id로 예약을 취소합니다", responses = {
+            @ApiResponse(responseCode = "200", description = "예약을 취소 완료")
+    })
+    @DeleteMapping("/")
+    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
+    public void testRegisterCancel(Authentication auth,
+                                @RequestParam("registerId") Long registerId) {
+        Long studentId = (Long) auth.getPrincipal();
+        registerService.testCancel(studentId, new RequestCancelRegisterDto(registerId));
     }
 }
