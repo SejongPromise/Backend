@@ -31,6 +31,7 @@ public class Register extends BaseEntity{
     private String bookTitle;
     @Enumerated(EnumType.STRING)
     private RegisterStatus status; //응시 상태
+    private String cancelData; //OPAP 값
     private LocalDateTime deleteDate;
 
     @Builder
@@ -42,6 +43,7 @@ public class Register extends BaseEntity{
                      @NonNull LocalTime endTime,
                      @NonNull String bookTitle,
                      @NonNull RegisterStatus status,
+                     String cancelData,
                      LocalDateTime deleteDate){
         this.student = student;
         this.year = year;
@@ -51,6 +53,7 @@ public class Register extends BaseEntity{
         this.endTime = endTime;
         this.bookTitle = bookTitle;
         this.status = status;
+        this.cancelData = cancelData;
         this.deleteDate = deleteDate;
         }
     public void cancelRegister(){
