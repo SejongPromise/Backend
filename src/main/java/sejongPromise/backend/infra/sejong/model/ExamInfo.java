@@ -8,7 +8,7 @@ import java.util.Objects;
 @Getter
 @RequiredArgsConstructor
 public class ExamInfo {
-    private final Integer year;
+    private final String year;
     private final String semester;
     private final String field;
     private final String title;

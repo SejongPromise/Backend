@@ -29,6 +29,12 @@ public class SejongClassicAuthenticationService {
     @Value("${sejong.classic.login}")
     private final String LOGIN_URI;
 
+    /**
+     * 세종대학교 대양 휴머니티 칼리지에 로그인 합니다.
+     * @param studentId
+     * @param password
+     * @return
+     */
     public SejongAuth login(String studentId, String password) {
         MultiValueMap<String, String> cookies = new LinkedMultiValueMap<>();
 
@@ -59,7 +65,8 @@ public class SejongClassicAuthenticationService {
             throw new RuntimeException(t);
         }
 
-        if(response == null) throw new CustomException(ErrorCode.NO_RESPONSE);
+        validateResponse(response);
+
         if(response.getStatusCode().is2xxSuccessful()){
             throw new CustomException(ErrorCode.INVALID_STUDENT_INFO);
         }
@@ -69,7 +76,11 @@ public class SejongClassicAuthenticationService {
         return response;
     }
 
-    private void checkJsessionId(HttpHeaders response) {
+    private static void validateResponse(ResponseEntity<String> response) {
+        if(response == null) throw new CustomException(ErrorCode.NO_RESPONSE);
+    }
+
+    private static void checkJsessionId(HttpHeaders response) {
         List<ResponseCookie> responseCookies = WebUtil.extractCookies(response);
         if(responseCookies.stream()
                 .noneMatch(data -> data.getName().contains("JSESSIONID"))){

@@ -10,7 +10,7 @@ import sejongPromise.backend.domain.enumerate.Semester;
 @Builder
 public class BookScheduleInfo {
     private final Integer year;
-    private final Semester semester;
+    private final String semester;
     private final String time; //시간
     private final Integer applicant; //신청자수
     private final Integer limitedApplicant; //제한인원

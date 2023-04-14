@@ -13,6 +13,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -43,18 +44,18 @@ public class SejongClassicCrawlerService {
     @ChromeAgentWebClient
     private final WebClient webClient;
     @Value("${sejong.classic.book.schedule}")
-    private final String BOOK_SCHEDULE_URI;
+    private final String BOOK_SCHEDULE_URI; //REGISTER_
     @Value("${sejong.classic.book.info}")
     private final String BOOK_INFO_URI;
-    @Value("${sejong.classic.student.info}")
-    private final String STUDENT_INFO_URI;
     @Value("${sejong.classic.student.schedule}")
-    private final String STUDENT_SCHEDULE_URI;
+    private final String STUDENT_SCHEDULE_URI; //REGISTER_SCHEDULE
     private final String BASE_URL = "http://classic.sejong.ac.kr";
     @Value("${sejong.classic.book.test.register}")
     private final String BOOK_TEST_REGISTER_URI;
     @Value("${sejong.classic.book.code.list}")
     private final String BOOK_CODE_LIST;
+
+    private final String COOKIE = "Cookie";
 
     public List<BookInfo> crawlBookInfo(){
         List<BookInfo> bookInfoList = new ArrayList<>();
@@ -122,15 +123,15 @@ public class SejongClassicCrawlerService {
                 int year = Integer.parseInt(yearAndSemester[0].substring(0, 4));
                 String firstLetterSemester = yearAndSemester[1].substring(0, 1);
                 //semester 계산
-                Semester semester;
+                String semester;
                 if (firstLetterSemester.equals("1")) {
-                    semester = Semester.FIRST;
+                    semester = Semester.FIRST.getName();
                 } else if (firstLetterSemester.equals("2")){
-                    semester = Semester.SECOND;
+                    semester = Semester.SECOND.getName();
                 } else if (firstLetterSemester.equals("여")) {
-                    semester = Semester.SUMMER;
+                    semester = Semester.SUMMER.getName();
                 } else {
-                    semester = Semester.WINTER;
+                    semester = Semester.WINTER.getName();
                 }
 
                 String time = cellList.get(3).text();
@@ -162,73 +163,6 @@ public class SejongClassicCrawlerService {
         return scheduleList;
     }
 
-    public ClassicStudentInfo getStudentInfo(SejongAuth auth) {
-        String html;
-        try{
-            html = webClient.get()
-                    .uri(STUDENT_INFO_URI)
-                    .cookies(auth.authCookies())
-                    .retrieve()
-                    .bodyToMono(String.class)
-                    .block();
-        }catch (Throwable t){
-            throw new RuntimeException(t);
-        }
-
-        return parseStudentInfoHtml(html);
-    }
-
-    private ClassicStudentInfo parseStudentInfoHtml(String html) {
-        //todo : 대회 인증 정보 가져오기 및 중복 제거
-        //시험 인증 리스트 배열 생성.
-        List<ExamInfo> examInfos = new ArrayList<>();
-
-        //학생정보 가져오기
-        Document doc = Jsoup.parse(html);
-        Elements studentTable = doc.select("div.content-section ul.tblA");
-        Elements studentInfo = studentTable.select("dd");
-        String major = studentInfo.get(0).text();
-        String studentId = studentInfo.get(1).text();
-        String name = studentInfo.get(2).text();
-        String semester = studentInfo.get(5).text();
-        boolean isPass = studentInfo.get(7).text().contains("인증");
-
-        //시험정보 가져오기
-        Elements examInfoList = doc.select("div.content-section div.table_group tbody tr");
-        for(Element element : examInfoList){
-            //filtering -> 도서 인증 영역 텍스트를 가지고 있는 Element 만.
-            List<String> fields = Stream.of(BookField.values()).map(BookField::getName).collect(Collectors.toList());
-
-            for(String field : fields){
-                Elements elementsContainingText = element.getElementsContainingText(field);
-
-                if(elementsContainingText.hasText()){
-                    Elements td = elementsContainingText.select("td");
-                    String passAt = td.get(0).text();
-                    String fieldName, title;
-                    if(fields.contains(td.get(1).text())){
-                        fieldName = td.get(1).text();
-                        title = td.get(2).text();
-                    }else{
-                        fieldName = td.get(2).text();
-                        title = td.get(3).text();
-                    }
-                    Integer year = Integer.parseInt(passAt.substring(0, 4));
-                    String passSemester = passAt.substring(7);
-                    boolean pass = true;
-                    String passText = td.select("span.pass").text();
-                    if(!passText.isBlank()){
-                        pass = passText.contains("이수") | passText.contains("합격");
-                    }
-                    ExamInfo examInfo = new ExamInfo(year, passSemester, fieldName, title, pass);
-                    examInfos.add(examInfo);
-                }
-            }
-        }
-        return new ClassicStudentInfo(major, studentId, name, semester, isPass, examInfos);
-    }
-
-
     public List<MyRegisterInfo> getMyRegisterInfo(SejongAuth auth) {
         String myRegisterInfoHtml;
         try{
@@ -247,7 +181,7 @@ public class SejongClassicCrawlerService {
 
 
     public void testRegister(String JSession, RequestTestApplyDto dto) {
-        String result;
+        ResponseEntity<String> result;
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("shInfoId", dto.getShInfoId());
@@ -263,11 +197,24 @@ public class SejongClassicCrawlerService {
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(BodyInserters.fromFormData(formData))
                     .retrieve()
-                    .bodyToMono(String.class)
+                    .toEntity(String.class)
                     .block();
+
         } catch (Throwable t) {
             throw new RuntimeException(t);
         }
+
+        System.out.println("result = " + result.getStatusCode().toString());
+        /**
+         * String 으로 결과 값 받지 않고, Response를 직접 받아서 만약 304.. 성공시 redirect 면 통과시키고
+         * 200번대 요청으로 로그인 요청 페이지 뜨면 실패시키고,,
+         *
+         * 아니면 응답값 확인해서 로그인 응답값을 저장해두고 일치할 경우 Error 반환.
+         *
+         * redirect까지 진행해야함.
+         * redirect까지 진행하고, 응답값에서 "인증 가능 학기가 아닙니다. 관리자에게 문의하시기 바랍니다." -> Text 포함 여부로 에러처리하기
+         */
+
     }
 
     private List<MyRegisterInfo> parseMyRegisterInfoHtml(String myRegisterInfoHtml) {
@@ -315,19 +262,17 @@ public class SejongClassicCrawlerService {
         return myRegisterInfoList;
     }
 
-    public long findBookCode(String JSession, RequestFindBookCodeDto dto){
+    public long findBookCode(String cookieString, RequestFindBookCodeDto dto){
         String result;
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("opTermId", "TERM-00566");
         formData.add("bkAreaCode", dto.getBookAreaCode());
 
-        String[] splitJSession = JSession.split("=");
-
         try{
             result = webClient.post()
                     .uri(BOOK_CODE_LIST)
-                    .cookie(splitJSession[0],splitJSession[1])
+                    .header(COOKIE, cookieString)
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(BodyInserters.fromFormData(formData))
                     .retrieve()
@@ -340,7 +285,6 @@ public class SejongClassicCrawlerService {
     }
 
     private long parseBookCodeList(String result, String title){
-        //todo : Json 파싱 object mapper로 변경
         JSONParser parser = new JSONParser();
         try {
             Object obj = parser.parse(result);

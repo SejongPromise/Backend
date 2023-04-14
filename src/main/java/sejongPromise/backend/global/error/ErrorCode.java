@@ -17,7 +17,8 @@ public enum ErrorCode {
     EXPIRED_TOKEN(HttpStatus.NOT_ACCEPTABLE, "토큰이 만료되었습니다"),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
     ALREADY_USER_EXIST(HttpStatus.BAD_REQUEST, "이미 존재하는 회원입니다."),
-    NOT_STUDENT_MATCH(HttpStatus.NOT_FOUND, "학생 정보가 올바르지 않습니다.");
+    NOT_STUDENT_MATCH(HttpStatus.NOT_FOUND, "학생 정보가 올바르지 않습니다."),
+    SCRAPPER_ERROR(HttpStatus.BAD_REQUEST, "세종대학교 사이트에서 정보를 가져올 수 없습니다." );
 
     private final HttpStatus status;
     private final String message;
