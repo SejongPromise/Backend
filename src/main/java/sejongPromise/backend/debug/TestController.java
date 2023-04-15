@@ -74,16 +74,6 @@ public class TestController {
         return bookService.crawlBookCode(areaCode);
     }
 
-    private static void printData(PortalStudentInfo portalStudentInfo) {
-        String studentName = portalStudentInfo.getStudentName();
-        System.out.println("studentName = " + studentName);
-        String studentId = portalStudentInfo.getStudentId();
-        System.out.println("studentId = " + studentId);
-        String major = portalStudentInfo.getMajor();
-        System.out.println("major = " + major);
-    }
-
-
     @PostMapping("classic/book/cancel")
     public void classicRegisterCancel(@RequestParam("JSession") String JSession,
                                       @RequestBody RequestTestCancelDto dto) {

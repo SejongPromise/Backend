@@ -24,12 +24,12 @@ import java.util.stream.Stream;
 @Transactional(readOnly = true)
 public class BookService {
     private final BookRepository bookRepository;
-    private final SejongBookService bookService;
+    private final SejongBookService sejongBookService;
     @Transactional
     public void updateList() {
         List<Book> bookList = bookRepository.findAll();
         List<String> alreadyTitleList = bookList.stream().map(Book::getTitle).collect(Collectors.toList());
-        List<BookInfo> bookInfoList = bookService.crawlBookInfo();
+        List<BookInfo> bookInfoList = sejongBookService.crawlBookInfo();
         List<String> updateTitleList = bookInfoList.stream().map(BookInfo::getTitle).collect(Collectors.toList());
         //#1 기존에 있던 책이 사라진 경우
         bookList.forEach(book -> {
@@ -55,7 +55,7 @@ public class BookService {
         Stream<Integer> fieldStream = Arrays.stream(BookField.values()).map(BookField::getCode);
         fieldStream.forEach(field -> {
             List<Book> books = bookRepository.findAllByStatusAndField(BookStatus.ACTIVE, BookField.of(field));
-            List<BookCodeInfo> bookCodeInfos = bookService.crawlBookCode(field.toString());
+            List<BookCodeInfo> bookCodeInfos = sejongBookService.crawlBookCode(field.toString());
 
             // todo: 해당 도서 코드 찾는 로직 언제 깨져도 이상하지 않음. 수정 필요
             books.forEach(book -> {
@@ -69,12 +69,16 @@ public class BookService {
         });
     }
 
-    public List<ResponseBookInfoDto> list(){
-        return bookRepository.findAllByStatus(BookStatus.ACTIVE).stream().map(ResponseBookInfoDto::new).collect(Collectors.toList());
-    }
     public List<ResponseBookInfoDto> list(String field){
+        if(field == null)
+            return list();
         return bookRepository.findAllByStatusAndField(BookStatus.ACTIVE, BookField.of(field)).stream().map(ResponseBookInfoDto::new).collect(Collectors.toList());
     }
+
+    private List<ResponseBookInfoDto> list(){
+        return bookRepository.findAllByStatus(BookStatus.ACTIVE).stream().map(ResponseBookInfoDto::new).collect(Collectors.toList());
+    }
+
     public ResponseBookInfoDto findOne(Long bookId) {
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA, "해당 도서가 존재하지 않습니다."));
         return new ResponseBookInfoDto(book);
