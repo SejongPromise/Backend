@@ -68,7 +68,7 @@ public class RegisterService {
                         .student(student)
                         .semester(Semester.of(dto.getSemester()))
                         .status(RegisterStatus.ACTIVE)
-                        .cancelData(data.getCancelOPAP())
+                        .cancelOPAP(data.getCancelOPAP())
                         .build();
                 registerRepository.save(register);
             }
@@ -89,7 +89,7 @@ public class RegisterService {
         if (!register.getStudent().equals(student)) {
             throw new CustomException(ErrorCode.NOT_STUDENT_MATCH);
         }
-        registerService.cancelRegister(student.getSessionToken(), register.getCancelData());
+        registerService.cancelRegister(student.getSessionToken(), register.getCancelOPAP());
         log.info("예약 취소 완료");
         register.cancelRegister();
     }

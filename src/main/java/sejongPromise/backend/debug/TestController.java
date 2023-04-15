@@ -14,7 +14,6 @@ import sejongPromise.backend.debug.dto.RequestTestCancelDto;
 import sejongPromise.backend.infra.sejong.service.classic.SejongAuthenticationService;
 import sejongPromise.backend.infra.sejong.service.classic.SejongBookService;
 import sejongPromise.backend.infra.sejong.service.classic.SejongRegisterService;
-import sejongPromise.backend.infra.sejong.service.classic.SejongStudentService;
 
 import java.time.LocalDate;
 import java.util.List;

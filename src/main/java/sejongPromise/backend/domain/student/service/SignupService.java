@@ -102,6 +102,7 @@ public class SignupService {
                     .bookTitle(data.getBookTitle())
                     .status(data.getIsCancel() ? RegisterStatus.CANCELED : RegisterStatus.ACTIVE)
                     .deleteDate(deleteDate)
+                    .cancelOPAP(data.getCancelOPAP())
                     .build();
             registerRepository.save(register);
 

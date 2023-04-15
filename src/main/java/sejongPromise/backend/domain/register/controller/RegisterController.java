@@ -30,7 +30,7 @@ public class RegisterController {
      * 시험 예약 API
      * @param dto 시험 예약 정보
      */
-    @PostMapping("/")
+    @PostMapping("/apply")
     @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
     public void testApply(Authentication auth, @RequestBody RequestCreateRegisterDto dto) {
         Long studentId = (Long) auth.getPrincipal();
