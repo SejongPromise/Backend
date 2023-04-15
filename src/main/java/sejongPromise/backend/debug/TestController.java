@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import sejongPromise.backend.domain.register.model.dto.request.RequestFindBookCodeDto;
 import sejongPromise.backend.global.util.WebUtil;
 import sejongPromise.backend.infra.sejong.model.*;
 import sejongPromise.backend.infra.sejong.model.dto.request.RequestTestApplyDto;
@@ -17,7 +16,6 @@ import sejongPromise.backend.infra.sejong.service.classic.SejongRegisterService;
 
 import java.time.LocalDate;
 import java.util.List;
-
 
 @Tag(name = "테스트용 컨트롤러", description = "개발하면서 필요한 debug용 Controller")
 @RestController
@@ -68,15 +66,12 @@ public class TestController {
      * 고전독서 인증 시험 신청에 필요한 책 code 찾기
      *
      * @param areaCode 분야
-     * @param title    책 제목
      * @return 책 코드값
      */
     @GetMapping("/classic/book")
-    public long classicBookCode(@RequestParam("title") String title,
-                                @RequestParam("JSession") String JSession,
-                                @RequestParam("areaCode") String areaCode) {
+    public List<BookCodeInfo> classicBookCode(@RequestParam("areaCode") String areaCode) {
 
-        return bookService.findBookCode(JSession, title, areaCode);
+        return bookService.crawlBookCode(areaCode);
     }
 
     private static void printData(PortalStudentInfo portalStudentInfo) {

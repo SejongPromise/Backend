@@ -21,7 +21,14 @@ public enum BookField {
     private static final Map<String, BookField> BY_LABEL =
             Stream.of(values()).collect(Collectors.toMap(BookField::getName, e -> e));
 
+    private static final Map<Integer, BookField> BY_CODE_LABEL =
+            Stream.of(values()).collect(Collectors.toMap(BookField::getCode, e -> e));
+
     public static BookField of(String name){
         return BY_LABEL.get(name);
+    }
+
+    public static BookField of(Integer code){
+        return BY_CODE_LABEL.get(code);
     }
 }
