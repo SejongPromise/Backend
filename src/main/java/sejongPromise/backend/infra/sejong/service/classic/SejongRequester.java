@@ -105,6 +105,8 @@ public class SejongRequester {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(BodyInserters.fromValue(param));
     }
+
+
     private static void validateResponse(ResponseEntity<String> response) {
         if(response == null) throw new CustomException(ErrorCode.NO_RESPONSE);
     }

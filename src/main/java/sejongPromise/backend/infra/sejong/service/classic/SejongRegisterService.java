@@ -28,8 +28,8 @@ public class SejongRegisterService extends SejongRequester{
     public SejongRegisterService(@ChromeAgentWebClient WebClient webClient,
                                  @Value("${sejong.classic.student.schedule}") String registerScheduleUri,
                                  @Value("${sejong.classic.book.schedule}") String registerBookScheduleUri,
-                                 @Value("${sejong.classic.book.test.register") String registerUri,
-                                 @Value("${sejong.classic.book.test.cancel") String cancelRegisterUri) {
+                                 @Value("${sejong.classic.book.test.register}") String registerUri,
+                                 @Value("${sejong.classic.book.test.cancel}") String cancelRegisterUri) {
         super(webClient);
         this.REGISTER_SCHEDULE_URI = registerScheduleUri;
         this.REGISTER_BOOK_SCHEDULE_URI = registerBookScheduleUri;

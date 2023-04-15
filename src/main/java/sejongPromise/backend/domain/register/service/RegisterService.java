@@ -43,12 +43,10 @@ public class RegisterService {
     public void applyTest(Long studentId, RequestCreateRegisterDto dto){
         Student student = studentRepository.findById(studentId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA, "해당 유저가 존재하지 않습니다."));
         Book book = bookRepository.findByTitle(dto.getBookTitle()).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA, "해당 도서를 찾을 수 없습니다."));
-        // 책코드 찾아오기.
-        Long bookCode = bookService.findBookCode(student.getSessionToken(), book.getTitle(), book.getField().getCode().toString());
         // 신청 DTO 생성.
         RequestTestApplyDto requestTestApplyDto = RequestTestApplyDto.builder()
                 .bkAreaCode(book.getField().getCode().toString())
-                .bkCode(bookCode.toString())
+                .bkCode(book.getCode().toString())
                 .shInfoId(dto.getShInfoId())
                 .build();
 
@@ -56,6 +54,7 @@ public class RegisterService {
         log.info("시험 예약 완료");
         // todo : 시험 신청을 하면 OPAP 값을 던져주어야 한다.
         List<MyRegisterInfo> myRegisterInfos = registerService.crawlRegisterInfo(student.getSessionToken());
+        // todo : 잘 되는지 확인 필요.
         myRegisterInfos.forEach(data ->{
             if(data.getBookTitle().equals(dto.getBookTitle()) && !data.getCancelOPAP().isBlank()){
                 //register 생성

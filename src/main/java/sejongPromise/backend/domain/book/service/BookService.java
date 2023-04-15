@@ -10,11 +10,14 @@ import sejongPromise.backend.domain.enumerate.BookField;
 import sejongPromise.backend.domain.enumerate.BookStatus;
 import sejongPromise.backend.global.error.ErrorCode;
 import sejongPromise.backend.global.error.exception.CustomException;
+import sejongPromise.backend.infra.sejong.model.BookCodeInfo;
 import sejongPromise.backend.infra.sejong.model.BookInfo;
 import sejongPromise.backend.infra.sejong.service.classic.SejongBookService;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +49,23 @@ public class BookService {
                         .build();
                 bookRepository.save(newBook);
             }
+        });
+
+        // #3 책 코드 가져오기
+        Stream<Integer> fieldStream = Arrays.stream(BookField.values()).map(BookField::getCode);
+        fieldStream.forEach(field -> {
+            List<Book> books = bookRepository.findAllByStatusAndField(BookStatus.ACTIVE, BookField.of(field));
+            List<BookCodeInfo> bookCodeInfos = bookService.crawlBookCode(field.toString());
+
+            // todo: 해당 도서 코드 찾는 로직 언제 깨져도 이상하지 않음. 수정 필요
+            books.forEach(book -> {
+                bookCodeInfos.forEach(bookCodeInfo -> {
+                    if(bookCodeInfo.getTitle().replaceAll(" ", "").contains(book.getTitle().replaceAll(" ", "").substring(0,2))){
+                        book.updateCode(bookCodeInfo.getCode());
+                        bookRepository.save(book);
+                    }
+                });
+            });
         });
     }
 
