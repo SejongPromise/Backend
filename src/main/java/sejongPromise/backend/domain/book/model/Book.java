@@ -22,7 +22,7 @@ public class Book extends BaseEntity {
     private String com;
     private String imageUrl;
 
-    private String code;
+    private Long code;
     @Enumerated(EnumType.STRING)
     private BookStatus status;
 
@@ -42,5 +42,9 @@ public class Book extends BaseEntity {
 
     public void deprecated() {
         this.status = BookStatus.DEPRECATED;
+    }
+
+    public void updateCode(Long code) {
+        this.code = code;
     }
 }
