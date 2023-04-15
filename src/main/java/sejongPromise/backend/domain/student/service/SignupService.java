@@ -20,8 +20,9 @@ import sejongPromise.backend.infra.sejong.model.ClassicStudentInfo;
 import sejongPromise.backend.infra.sejong.model.ExamInfo;
 import sejongPromise.backend.infra.sejong.model.MyRegisterInfo;
 import sejongPromise.backend.infra.sejong.model.SejongAuth;
-import sejongPromise.backend.infra.sejong.service.classic.SejongClassicAuthenticationService;
-import sejongPromise.backend.infra.sejong.service.classic.SejongClassicCrawlerService;
+import sejongPromise.backend.infra.sejong.service.classic.SejongAuthenticationService;
+import sejongPromise.backend.infra.sejong.service.classic.SejongRegisterService;
+import sejongPromise.backend.infra.sejong.service.classic.SejongStudentService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,8 +30,6 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Transactional(readOnly = true)
@@ -39,8 +38,9 @@ public class SignupService {
     private final StudentRepository studentRepository;
     private final ExamRepository examRepository;
     private final RegisterRepository registerRepository;
-    private final SejongClassicAuthenticationService sejongClassicAuthenticationService;
-    private final SejongClassicCrawlerService sejongClassicCrawlerService;
+    private final SejongAuthenticationService sejongAuthenticationService;
+    private final SejongStudentService sejongStudentService;
+    private final SejongRegisterService sejongRegisterService;
     private final PasswordEncoder passwordEncoder;
 
     /**
@@ -59,8 +59,8 @@ public class SignupService {
         }
 
         //1. 학생 정보 저장
-        SejongAuth auth = sejongClassicAuthenticationService.login(dto.getStudentId(), dto.getPassword());
-        ClassicStudentInfo studentInfo = sejongClassicCrawlerService.getStudentInfo(auth);
+        SejongAuth auth = sejongAuthenticationService.login(dto.getStudentId(), dto.getPassword());
+        ClassicStudentInfo studentInfo = sejongStudentService.crawlStudentInfo(WebUtil.makeCookieString(auth.cookies));
         Student student = Student.builder()
                 .name(studentInfo.getName())
                 .major(studentInfo.getMajor())
@@ -74,11 +74,11 @@ public class SignupService {
 
         //2.시험 정보 저장
         List<ExamInfo> examInfoList = studentInfo.getExamInfoList();
-        examInfoList.stream().distinct().forEach(data -> {
+        examInfoList.forEach(data -> {
             Exam exam = Exam.builder().title(data.getTitle())
                     .isPass(data.isPass())
                     .field(data.getField())
-                    .year(data.getYear())
+                    .year(Integer.parseInt(data.getYear()))
                     .semester(data.getSemester())
                     .student(saveStudent)
                     .build();
@@ -86,10 +86,9 @@ public class SignupService {
         });
 
         //3.신청내역과 신청 취소 내역 저장
-        List<MyRegisterInfo> myRegisterInfoList = sejongClassicCrawlerService.getMyRegisterInfo(auth);
+        List<MyRegisterInfo> myRegisterInfoList = sejongRegisterService.crawlRegisterInfo(WebUtil.makeCookieString(auth.cookies));
         myRegisterInfoList.forEach(data -> {
             LocalDateTime deleteDate = null;
-            //todo : 승환님께서 마음에 안 든다고,,ㅎㅎ
             if(data.getDeleteDate() != null){
                 deleteDate = LocalDateTime.parse(data.getDeleteDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             }
@@ -103,6 +102,7 @@ public class SignupService {
                     .bookTitle(data.getBookTitle())
                     .status(data.getIsCancel() ? RegisterStatus.CANCELED : RegisterStatus.ACTIVE)
                     .deleteDate(deleteDate)
+                    .cancelOPAP(data.getCancelOPAP())
                     .build();
             registerRepository.save(register);
 

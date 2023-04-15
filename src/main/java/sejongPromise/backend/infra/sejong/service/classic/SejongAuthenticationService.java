@@ -1,15 +1,12 @@
 package sejongPromise.backend.infra.sejong.service.classic;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import sejongPromise.backend.global.config.qualifier.ChromeAgentWebClient;
 import sejongPromise.backend.global.error.ErrorCode;
@@ -20,15 +17,22 @@ import sejongPromise.backend.infra.sejong.model.SejongAuth;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
-public class SejongClassicAuthenticationService {
+public class SejongAuthenticationService extends SejongRequester{
 
-    @ChromeAgentWebClient
-    private final WebClient webClient;
-
-    @Value("${sejong.classic.login}")
     private final String LOGIN_URI;
 
+    public SejongAuthenticationService(@ChromeAgentWebClient WebClient webClient,
+                                       @Value("${sejong.classic.login}") String loginUri) {
+        super(webClient);
+        this.LOGIN_URI = loginUri;
+    }
+
+    /**
+     * 세종대학교 대양 휴머니티 칼리지에 로그인 합니다.
+     * @param studentId
+     * @param password
+     * @return
+     */
     public SejongAuth login(String studentId, String password) {
         MultiValueMap<String, String> cookies = new LinkedMultiValueMap<>();
 
@@ -41,25 +45,8 @@ public class SejongClassicAuthenticationService {
 
     private ResponseEntity<String> tryLogin(String studentId, String password) {
         String param = String.format("userId=%s&password=%s&go=", studentId, password);
+        ResponseEntity<String> response = requestApi(LOGIN_URI, param);
 
-        ResponseEntity<String> response;
-
-        try{
-            response = webClient.post()
-                    .uri(LOGIN_URI)
-                    .header("Origin","http://classic.sejong.ac.kr")
-                    .header("Host","classic.sejong.ac.kr")
-                    .header("Referer", "http://classic.sejong.ac.kr/userLoginPage.do")
-                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                    .body(BodyInserters.fromValue(param))
-                    .retrieve()
-                    .toEntity(String.class)
-                    .block();
-        }catch (Throwable t){
-            throw new RuntimeException(t);
-        }
-
-        if(response == null) throw new CustomException(ErrorCode.NO_RESPONSE);
         if(response.getStatusCode().is2xxSuccessful()){
             throw new CustomException(ErrorCode.INVALID_STUDENT_INFO);
         }
@@ -69,7 +56,8 @@ public class SejongClassicAuthenticationService {
         return response;
     }
 
-    private void checkJsessionId(HttpHeaders response) {
+
+    private static void checkJsessionId(HttpHeaders response) {
         List<ResponseCookie> responseCookies = WebUtil.extractCookies(response);
         if(responseCookies.stream()
                 .noneMatch(data -> data.getName().contains("JSESSIONID"))){

@@ -3,13 +3,9 @@ package sejongPromise.backend.domain.book.controller;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import sejongPromise.backend.domain.book.model.Book;
 import sejongPromise.backend.domain.book.model.dto.response.ResponseBookInfoDto;
 import sejongPromise.backend.domain.book.service.BookService;
-import sejongPromise.backend.infra.sejong.model.BookInfo;
-import sejongPromise.backend.infra.sejong.service.classic.SejongClassicCrawlerService;
 
-import javax.websocket.server.PathParam;
 import java.util.List;
 
 @Tag(name = "BOOK", description = "BOOK API 모음")

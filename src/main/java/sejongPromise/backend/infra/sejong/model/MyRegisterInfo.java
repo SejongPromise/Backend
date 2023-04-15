@@ -14,5 +14,5 @@ public class MyRegisterInfo {
     private final String bookTitle;
     private final Boolean isCancel;
     private final String deleteDate;
-
+    private final String cancelOPAP;
 }

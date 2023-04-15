@@ -3,21 +3,22 @@ package sejongPromise.backend.domain.register.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import sejongPromise.backend.domain.book.model.Book;
+import sejongPromise.backend.domain.book.repository.BookRepository;
 import sejongPromise.backend.domain.enumerate.RegisterStatus;
+import sejongPromise.backend.domain.enumerate.Semester;
 import sejongPromise.backend.domain.register.RegisterRepository.RegisterRepository;
 import sejongPromise.backend.domain.register.model.Register;
 import sejongPromise.backend.domain.register.model.dto.request.RequestCreateRegisterDto;
-import sejongPromise.backend.domain.register.model.dto.request.RequestFindBookCodeDto;
-import sejongPromise.backend.domain.register.model.dto.request.RequestCancelRegisterDto;
 import sejongPromise.backend.domain.student.model.Student;
 import sejongPromise.backend.domain.student.repository.StudentRepository;
 import sejongPromise.backend.global.error.ErrorCode;
 import sejongPromise.backend.global.error.exception.CustomException;
 import sejongPromise.backend.infra.sejong.model.BookScheduleInfo;
-import sejongPromise.backend.infra.sejong.model.dto.GetCancelDataDto;
+import sejongPromise.backend.infra.sejong.model.MyRegisterInfo;
 import sejongPromise.backend.infra.sejong.model.dto.request.RequestTestApplyDto;
-import sejongPromise.backend.infra.sejong.service.classic.SejongClassicCrawlerService;
-import sejongPromise.backend.infra.sejong.service.classic.SejongClassicCrawlerServiceTwo;
+import sejongPromise.backend.infra.sejong.service.classic.SejongBookService;
+import sejongPromise.backend.infra.sejong.service.classic.SejongRegisterService;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
@@ -29,95 +30,68 @@ import java.util.List;
 @Transactional
 public class RegisterService {
     private final RegisterRepository registerRepository;
-    private final SejongClassicCrawlerService sejongClassicCrawlerService;
+    private final BookRepository bookRepository;
     private final StudentRepository studentRepository;
-    private final SejongClassicCrawlerServiceTwo sejongClassicCrawlerServiceTwo;
-
-    //todo : 응시가 완료된 시점에서 스케줄링으로 상태값 반환하기
-    public void cancelRegister(Register register){
-        //todo : 이부분 어짜피 testCancel 에서 Register 조회하니까 Register 인자로 받게 수정했습니다.
-        // Register의 Student match 여부를 testCancel에서 조회하도록 옮겼습니다
-//        Register register = registerRepository.findById(registerId).orElseThrow(()-> new CustomException(ErrorCode.NOT_FOUND_DATA, "해당 시험을 찾을 수 없습니다.")); //databases에 registerId 존재
-//        log.info("studentId: {}, register.getStuedentId: {}", studentId, register.getStudent().getId());
-//        if(studentId.equals(register.getStudent().getId())){
-            register.cancelRegister(); //캔슬 호출
-            registerRepository.save(register); //다시 저장
-//        }
-//        throw new CustomException(ErrorCode.NOT_STUDENT_MATCH);
-    }
-
-    //신청하기->가영이가 신청하기 로직 만들면 신청하자마자 CREATEREGISTER 로직 구현하기
-    // -> 신청하자마자는 신청하면서 바로 넣었는데 크롤링해서 넣어야 하면 Register 생성 부분 없애고 수정해주세요!
+    private final SejongRegisterService registerService;
+    private final SejongBookService bookService;
 
     /**
      * 시험 신청 서비스
      * @param studentId
      * @param dto
      */
-    public void testApply(Long studentId, RequestCreateRegisterDto dto){
-        Student student = studentRepository.findById(studentId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA));
-
-        //시험 예약
+    public void applyTest(Long studentId, RequestCreateRegisterDto dto){
+        Student student = studentRepository.findById(studentId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA, "해당 유저가 존재하지 않습니다."));
+        Book book = bookRepository.findByTitle(dto.getBookTitle()).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA, "해당 도서를 찾을 수 없습니다."));
+        // 책코드 찾아오기.
+        Long bookCode = bookService.findBookCode(student.getSessionToken(), book.getTitle(), book.getField().getCode().toString());
+        // 신청 DTO 생성.
         RequestTestApplyDto requestTestApplyDto = RequestTestApplyDto.builder()
-                .bkAreaCode(dto.getBookAreaCode())
-                .bkCode(dto.getBookCode())
+                .bkAreaCode(book.getField().getCode().toString())
+                .bkCode(bookCode.toString())
                 .shInfoId(dto.getShInfoId())
                 .build();
-        sejongClassicCrawlerService.testRegister(student.getSessionToken(), requestTestApplyDto);
 
+        registerService.registerTest(student.getSessionToken(), requestTestApplyDto);
         log.info("시험 예약 완료");
-
-        //register 생성
-        createRegister(student, dto);
+        // todo : 시험 신청을 하면 OPAP 값을 던져주어야 한다.
+        List<MyRegisterInfo> myRegisterInfos = registerService.crawlRegisterInfo(student.getSessionToken());
+        myRegisterInfos.forEach(data ->{
+            if(data.getBookTitle().equals(dto.getBookTitle()) && !data.getCancelOPAP().isBlank()){
+                //register 생성
+                Register register = Register.builder()
+                        .bookTitle(dto.getBookTitle())
+                        .date(dto.getDate())
+                        .startTime(dto.getTime())
+                        .endTime(dto.getTime().plusMinutes(30L))
+                        .year(dto.getYear())
+                        .student(student)
+                        .semester(Semester.of(dto.getSemester()))
+                        .status(RegisterStatus.ACTIVE)
+                        .cancelOPAP(data.getCancelOPAP())
+                        .build();
+                registerRepository.save(register);
+            }
+        });
     }
 
-    /**
-     * Register 생성 서비스
-     * @param student
-     * @param dto
-     */
-    public void createRegister(Student student, RequestCreateRegisterDto dto) {
-        String cancelData = sejongClassicCrawlerServiceTwo.getCancelOPAP(student.getSessionToken(),
-                new GetCancelDataDto(dto.getDate()));
 
-        log.info("cancleData: {}", cancelData);
-        //Register 생성
-        Register register = Register.builder()
-                .bookTitle(dto.getBookTitle())
-                .date(dto.getDate())
-                .startTime(dto.getTime())
-                .endTime(dto.getTime().plusMinutes(30L))
-                .year(dto.getDate().getYear())
-                .student(student)
-                .semester(dto.getSemester())
-                .status(RegisterStatus.ACTIVE)
-                .cancelData(cancelData)
-                .build();
-
-        registerRepository.save(register);
+    public List<BookScheduleInfo> getSchedule(Long studentId, LocalDate date) {
+        Student student = studentRepository.findById(studentId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA, "해당 유저를 찾을 수 없습니다."));
+        return registerService.crawlBookScheduleInfo(student.getSessionToken(), date);
     }
 
-    public List<BookScheduleInfo> getSchedule(long studentId, LocalDate date) {
+
+    public void testCancel(Long studentId, Long registerId) {
         Student student = studentRepository.findById(studentId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA));
-        log.info("jsession: {}", student.getSessionToken());
-        return sejongClassicCrawlerService.getScheduleInfo(student.getSessionToken(), String.valueOf(date));
-    }
+        Register register = registerRepository.findById(registerId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA));
 
-    public long getBookCode(long studentId, RequestFindBookCodeDto dto) {
-        Student student = studentRepository.findById(studentId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA));
-        return sejongClassicCrawlerService.findBookCode(student.getSessionToken(), dto);
-    }
-
-    public void testCancel(long studentId, RequestCancelRegisterDto dto) {
-        Student student = studentRepository.findById(studentId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA));
-        Register register = registerRepository.findById(dto.getRegisterId()).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA));
-
-        if (!register.getStudent().equals(student)) { //학번 비교할지 student 객체 비교할지 고민하다가 객체 비교로 구현했습니다.
+        if (!register.getStudent().equals(student)) {
             throw new CustomException(ErrorCode.NOT_STUDENT_MATCH);
         }
-        sejongClassicCrawlerServiceTwo.cancelRegister(student.getSessionToken(), register.getCancelData());
+        registerService.cancelRegister(student.getSessionToken(), register.getCancelOPAP());
         log.info("예약 취소 완료");
-        cancelRegister(register);
+        register.cancelRegister();
     }
 
 

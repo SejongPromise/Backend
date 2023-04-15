@@ -8,6 +8,7 @@ import sejongPromise.backend.domain.enumerate.Semester;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -26,21 +27,18 @@ import java.time.LocalTime;
     @DateTimeFormat(pattern = "hh:mm:ss")
     private final LocalTime time; //시간
 
+    @Schema(description = "년도")
+    @NotNull
+    @Pattern(regexp = "^[0-9]{4}$", message = "년도는 4자리 숫자로 입력해주세요.")
+    private final Integer year; // 년도
+
     @Schema(description = "학기")
     @NotNull
-    private final Semester semester; //학기
+    private final String semester; //학기
 
     @Schema(description = "책 제목")
     @NotBlank
     private final String bookTitle;
-
-    @Schema(description = "책 영역 code")
-    @NotBlank
-    private final String bookAreaCode;
-
-    @Schema(description = "책 code")
-    @NotBlank
-    private final String bookCode;
 
     @Schema(description = "예약 신청 버튼값")
     @NotBlank
