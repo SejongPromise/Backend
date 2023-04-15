@@ -11,7 +11,7 @@ import sejongPromise.backend.domain.enumerate.BookStatus;
 import sejongPromise.backend.global.error.ErrorCode;
 import sejongPromise.backend.global.error.exception.CustomException;
 import sejongPromise.backend.infra.sejong.model.BookInfo;
-import sejongPromise.backend.infra.sejong.service.classic.SejongClassicCrawlerService;
+import sejongPromise.backend.infra.sejong.service.classic.SejongBookService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,12 +21,12 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class BookService {
     private final BookRepository bookRepository;
-    private final SejongClassicCrawlerService classicCrawlerService;
+    private final SejongBookService bookService;
     @Transactional
     public void updateList() {
         List<Book> bookList = bookRepository.findAll();
         List<String> alreadyTitleList = bookList.stream().map(Book::getTitle).collect(Collectors.toList());
-        List<BookInfo> bookInfoList = classicCrawlerService.crawlBookInfo();
+        List<BookInfo> bookInfoList = bookService.crawlBookInfo();
         List<String> updateTitleList = bookInfoList.stream().map(BookInfo::getTitle).collect(Collectors.toList());
         //#1 기존에 있던 책이 사라진 경우
         bookList.forEach(book -> {

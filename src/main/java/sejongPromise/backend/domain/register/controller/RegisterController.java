@@ -26,27 +26,22 @@ public class RegisterController {
 
     private final RegisterService registerService;
 
-    @PostMapping("/cancel/{registerId}")
-    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
-    public void cancelRegister(Authentication auth, @PathVariable Long registerId) {
-        // 이 testCancel에서 cancelRegister를 호출해서 예약 취소하자마자 register 삭제를 하고 있어서 주석처리 했습니다.
-        Long studentId = (Long) auth.getPrincipal();
-//        registerService.cancelRegister(studentId, registerId);
-    }
-
-    @Operation(summary = "Register 생성, 시험 예약", description = "RegisterCreateRequestDto를 이용해 register를 생성합니다.", responses = {
-            @ApiResponse(responseCode = "200", description = "register 생성 성공")
-    })
+    /**
+     * 시험 예약 API
+     * @param dto 시험 예약 정보
+     */
     @PostMapping("/")
     @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
     public void testApply(Authentication auth, @RequestBody RequestCreateRegisterDto dto) {
         Long studentId = (Long) auth.getPrincipal();
-        registerService.testApply(studentId, dto);
+        registerService.applyTest(studentId, dto);
     }
 
-    @Operation(summary = "시험 스케쥴 가져오기", description = "해당 일자의 시험 정보를 가져옵니다.", responses = {
-            @ApiResponse(responseCode = "200", description = "시험 정보 가져오기 완료")
-    })
+    /**
+     * 시험 일정 API - 일자의 시험 정보를 가져옵니다.
+     * @param date 요청파마리터 yyyy-mm-dd 형식
+     * @return
+     */
     @GetMapping("/schedule")
     @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
     public List<BookScheduleInfo> getTestSchedule(Authentication auth,
@@ -55,26 +50,15 @@ public class RegisterController {
         return registerService.getSchedule(studentId, date);
     }
 
-    @Operation(summary = "책 코드 가져오기", description = "제목과 영역 코드로 책 코드를 가져옵니다.", responses = {
-            @ApiResponse(responseCode = "200", description = "책 코드 정보 가져오기 완료")
-    })
-    @GetMapping("/bookcode")
-    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
-    public long getTestSchedule(Authentication auth,
-                                                  @RequestParam("bookAreaCode") String bookAreaCode,
-                                                  @RequestParam("bookTitle") String bookTitle) {
-        Long studentId = (Long) auth.getPrincipal();
-        return registerService.getBookCode(studentId, new RequestFindBookCodeDto(bookAreaCode, bookTitle));
-    }
-
-    @Operation(summary = "시험 예약 취소, register 삭제", description = "예약 id로 예약을 취소합니다", responses = {
-            @ApiResponse(responseCode = "200", description = "예약을 취소 완료")
-    })
-    @DeleteMapping("/")
+    /**
+     * 시험 예약 취소 API
+     * @param registerId 예약 id
+     */
+    @DeleteMapping("/{id}")
     @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
     public void testRegisterCancel(Authentication auth,
-                                @RequestParam("registerId") Long registerId) {
+                                @PathVariable("id") Long registerId) {
         Long studentId = (Long) auth.getPrincipal();
-        registerService.testCancel(studentId, new RequestCancelRegisterDto(registerId));
+        registerService.testCancel(studentId, registerId);
     }
 }

@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 
 @Slf4j
 @Service
-public class SejongStudentService extends SejongScrapper{
+public class SejongStudentService extends SejongRequester{
     private final String STUDENT_INFO_URI;
 
     public SejongStudentService(@ChromeAgentWebClient WebClient webClient,
@@ -43,7 +43,7 @@ public class SejongStudentService extends SejongScrapper{
         String studentId = studentInfo.get(1).text();
         String name = studentInfo.get(2).text();
         String semester = studentInfo.get(5).text();
-        boolean isPass = studentInfo.get(7).text().equals("인증");
+        boolean isPass = studentInfo.get(7).text().contains("인증") | studentInfo.get(7).text().contains("대체이수");
 
         //시험 정보 크롤링
         List<ExamInfo> examList = new ArrayList<>();
@@ -57,19 +57,18 @@ public class SejongStudentService extends SejongScrapper{
 
                 if(elementsContainingText.hasText()){
                     Elements examInfo = elementsContainingText.select("td");
-                    String examYear = examInfo.get(0).text().substring(0,4);
-                    String examSemester = examInfo.get(0).text().substring(7);
+                    String[] yearAndSemester = examInfo.get(0).text().split(" ");
+                    String examYear = yearAndSemester[0].substring(0, 4);
+                    String examSemester = yearAndSemester[1];
                     String title;
                     if(examInfo.get(1).text().equals(field)) {
                         title = examInfo.get(2).text();
                     }else{
                         title = examInfo.get(3).text();
                     }
-                    boolean examPass = true;
-                    String passText = examInfo.select("span.pass").text();
-                    if(!passText.isBlank()){
-                        examPass = passText.contains("이수") | passText.contains("합격");
-                    }
+                    //no-pass 불합격 / 미이수
+                    boolean examPass = !examInfo.select("span.no-pass").hasText() &&
+                            !examInfo.text().contains("미응시");
                     ExamInfo exam = new ExamInfo(examYear, examSemester, field, title, examPass);
                     examList.add(exam);
                 }
