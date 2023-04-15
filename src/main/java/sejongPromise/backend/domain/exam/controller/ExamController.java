@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import sejongPromise.backend.domain.exam.model.dto.ResponseExamFieldInfoDto;
 import sejongPromise.backend.domain.exam.model.dto.response.ResponseExamInfoDto;
 import sejongPromise.backend.domain.exam.service.ExamService;
 import sejongPromise.backend.global.config.jwt.JwtProvider;
@@ -32,13 +33,15 @@ public class ExamController {
         return examService.list(studentId);
     }
 
-
     /**
-     * 영역별 현황 통계 조회
+     * 영역별 이수 통계 조회
+     * @param auth Header : Authorization
+     * @return 영역별 이수 통계
      */
     @GetMapping("/field")
-    public int getListByField(@RequestParam("field") String field){
-        return examService.list(field).size();
+    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
+    public List<ResponseExamFieldInfoDto> getListByField(Authentication auth){
+        return examService.fieldList((Long) auth.getPrincipal());
     }
 
 }

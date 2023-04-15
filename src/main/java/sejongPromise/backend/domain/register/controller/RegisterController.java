@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import sejongPromise.backend.domain.register.model.dto.request.RequestCancelRegisterDto;
 import sejongPromise.backend.domain.register.model.dto.request.RequestCreateRegisterDto;
 import sejongPromise.backend.domain.register.model.dto.request.RequestFindBookCodeDto;
+import sejongPromise.backend.domain.register.model.dto.response.ResponseMyRegisterDto;
 import sejongPromise.backend.domain.register.service.RegisterService;
 import sejongPromise.backend.global.config.jwt.JwtProvider;
 import sejongPromise.backend.infra.sejong.model.BookScheduleInfo;
@@ -27,8 +28,20 @@ public class RegisterController {
     private final RegisterService registerService;
 
     /**
+     * 나의 시험 신청 현황을 조회합니다.
+     * @param auth
+     * @return 나의 신청시험 현황
+     */
+    @GetMapping
+    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
+    public List<ResponseMyRegisterDto> getMyRegister(Authentication auth) {
+        Long studentId = (Long) auth.getPrincipal();
+        return registerService.getMyRegister(studentId);
+    }
+
+    /**
      * 시험 예약 API
-     * @param dto 시험 예약 정보
+     * @param dto 시험 예약 정보 일자, 시간, 년도, 학기, 제목, 신청버튼 값
      */
     @PostMapping("/apply")
     @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
@@ -38,7 +51,7 @@ public class RegisterController {
     }
 
     /**
-     * 시험 일정 API - 일자의 시험 정보를 가져옵니다.
+     * 시험 일정 API - 일자의 시험 정보를 가져옵니다, 시험신청 버튼 값을 활용해야 합니다.
      * @param date 요청파마리터 yyyy-mm-dd 형식
      * @return
      */
@@ -61,4 +74,5 @@ public class RegisterController {
         Long studentId = (Long) auth.getPrincipal();
         registerService.testCancel(studentId, registerId);
     }
+
 }

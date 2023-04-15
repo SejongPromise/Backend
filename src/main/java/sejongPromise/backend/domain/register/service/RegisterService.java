@@ -10,6 +10,7 @@ import sejongPromise.backend.domain.enumerate.Semester;
 import sejongPromise.backend.domain.register.RegisterRepository.RegisterRepository;
 import sejongPromise.backend.domain.register.model.Register;
 import sejongPromise.backend.domain.register.model.dto.request.RequestCreateRegisterDto;
+import sejongPromise.backend.domain.register.model.dto.response.ResponseMyRegisterDto;
 import sejongPromise.backend.domain.student.model.Student;
 import sejongPromise.backend.domain.student.repository.StudentRepository;
 import sejongPromise.backend.global.error.ErrorCode;
@@ -17,12 +18,12 @@ import sejongPromise.backend.global.error.exception.CustomException;
 import sejongPromise.backend.infra.sejong.model.BookScheduleInfo;
 import sejongPromise.backend.infra.sejong.model.MyRegisterInfo;
 import sejongPromise.backend.infra.sejong.model.dto.request.RequestTestApplyDto;
-import sejongPromise.backend.infra.sejong.service.classic.SejongBookService;
 import sejongPromise.backend.infra.sejong.service.classic.SejongRegisterService;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -32,8 +33,7 @@ public class RegisterService {
     private final RegisterRepository registerRepository;
     private final BookRepository bookRepository;
     private final StudentRepository studentRepository;
-    private final SejongRegisterService registerService;
-    private final SejongBookService bookService;
+    private final SejongRegisterService sejongRegisterService;
 
     /**
      * 시험 신청 서비스
@@ -50,10 +50,10 @@ public class RegisterService {
                 .shInfoId(dto.getShInfoId())
                 .build();
 
-        registerService.registerTest(student.getSessionToken(), requestTestApplyDto);
+        sejongRegisterService.registerTest(student.getSessionToken(), requestTestApplyDto);
         log.info("시험 예약 완료");
         // todo : 시험 신청을 하면 OPAP 값을 던져주어야 한다.
-        List<MyRegisterInfo> myRegisterInfos = registerService.crawlRegisterInfo(student.getSessionToken());
+        List<MyRegisterInfo> myRegisterInfos = sejongRegisterService.crawlRegisterInfo(student.getSessionToken());
         // todo : 잘 되는지 확인 필요.
         myRegisterInfos.forEach(data ->{
             if(data.getBookTitle().equals(dto.getBookTitle()) && !data.getCancelOPAP().isBlank()){
@@ -77,7 +77,7 @@ public class RegisterService {
 
     public List<BookScheduleInfo> getSchedule(Long studentId, LocalDate date) {
         Student student = studentRepository.findById(studentId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA, "해당 유저를 찾을 수 없습니다."));
-        return registerService.crawlBookScheduleInfo(student.getSessionToken(), date);
+        return sejongRegisterService.crawlBookScheduleInfo(student.getSessionToken(), date);
     }
 
 
@@ -88,11 +88,15 @@ public class RegisterService {
         if (!register.getStudent().equals(student)) {
             throw new CustomException(ErrorCode.NOT_STUDENT_MATCH);
         }
-        registerService.cancelRegister(student.getSessionToken(), register.getCancelOPAP());
+        sejongRegisterService.cancelRegister(student.getSessionToken(), register.getCancelOPAP());
         log.info("예약 취소 완료");
         register.cancelRegister();
     }
 
 
+    public List<ResponseMyRegisterDto> getMyRegister(Long studentId) {
+        List<Register> allByStudentId = registerRepository.findAllByStudentId(studentId);
+        return allByStudentId.stream().map(ResponseMyRegisterDto::new).collect(Collectors.toList());
+    }
 }
 
