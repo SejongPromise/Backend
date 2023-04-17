@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import sejongPromise.backend.domain.enumerate.Role;
 import sejongPromise.backend.domain.student.model.Student;
 import sejongPromise.backend.global.config.auth.AuthenticationToken;
 import sejongPromise.backend.global.config.auth.CustomAuthentication;
@@ -16,6 +17,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.HashMap;
 
 import static sejongPromise.backend.global.error.ErrorCode.*;
 
@@ -35,7 +37,7 @@ public class JwtProvider {
 
     public AuthenticationToken issue(Student student){
         return AuthenticationToken.builder()
-                .accessToken(createAccessToken(student.getId()))
+                .accessToken(createAccessToken(student.getStudentId(), student.getRole()))
                 .refreshToken(createRefreshToken()).build();
     }
 
@@ -49,13 +51,17 @@ public class JwtProvider {
     }
 
     //JWT 토큰 생성
-    private String createAccessToken(Long studentId) {
-        Claims claims = Jwts.claims().setSubject(String.valueOf(studentId)); //JWT payload에 저장되는 정보 단위, user 식별값 넣음 (id)
+    private String createAccessToken(String studentId, Role role) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime validity = now.plus(accessExpiration);
 
+        HashMap<String, Object> payloads = new HashMap<>();
+        payloads.put("studentId", studentId);
+        payloads.put("role", role.getRole());
+
         return Jwts.builder()
-                .setClaims(claims) //정보 저장
+                .setSubject("StudentInfo")
+                .setClaims(payloads) //정보 저장
                 .setIssuedAt(Date.from(now.atZone(ZoneId.systemDefault()).toInstant())) //토큰 발생 시간
                 .setExpiration(Date.from(validity.atZone(ZoneId.systemDefault()).toInstant())) //만료 기간
                 .signWith(SignatureAlgorithm.HS256, secretKey.getBytes()) //암호화 알고리즘, secret 값
@@ -74,22 +80,30 @@ public class JwtProvider {
 
     private String refreshAccessToken(String accessToken) {
         String studentId;
+        Role role;
         try{
             Jws<Claims> claimsJws = validateAccessToken(accessToken);
-            studentId = claimsJws.getBody().getSubject();
+            Claims body = claimsJws.getBody();
+            studentId = (String) body.get("studentId");
+            role = Role.of((String) body.get("role"));
         }catch (ExpiredJwtException e){
-            studentId = e.getClaims().getSubject();
+            studentId = (String) e.getClaims().get("studentId");
+            role = Role.of((String) e.getClaims().get("role"));
         }
-        return createAccessToken(Long.parseLong(studentId));
+        return createAccessToken(studentId, role);
     }
 
 
     //JWT 토큰에서 인증 정보 조회
     public Authentication getAuthentication(String accessToken) {
         Jws<Claims> claimsJws = validateAccessToken(accessToken);
-        Long studentId = Long.parseLong(claimsJws.getBody().getSubject());
+
+        Claims body = claimsJws.getBody();
+        Long studentId = Long.parseLong((String) body.get("studentId"));
+        Role role = Role.of((String) body.get("role"));
+
         //발급할 때는 인증이 필요없지만 검증 시에는 user 데이터에 token의 학번과 일치하는 사용자가 있는지 확인 필요함
-        return new CustomAuthentication(studentId);
+        return new CustomAuthentication(studentId, role);
     }
 
     //JWT 토큰에서 회원 정보(학번) 추출 -> token을 발급받을 때는 무조건 인증된 사용자만 발급받아서 회원 정보 검증할 필요가 없음

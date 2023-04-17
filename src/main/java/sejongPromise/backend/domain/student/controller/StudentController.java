@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import sejongPromise.backend.domain.student.model.dto.request.RequestRefreshSessionDto;
 import sejongPromise.backend.domain.student.model.dto.request.RequestRefreshTokenDto;
 import sejongPromise.backend.domain.student.model.dto.request.RequestStudentInfoDto;
 import sejongPromise.backend.domain.student.model.dto.response.ResponseLoginDto;
@@ -12,7 +13,10 @@ import sejongPromise.backend.domain.student.model.dto.response.ResponseRefreshTo
 import sejongPromise.backend.domain.student.model.dto.response.ResponseStudentInfoDto;
 import sejongPromise.backend.domain.student.service.SignupService;
 import sejongPromise.backend.domain.student.service.StudentService;
+import sejongPromise.backend.global.config.auth.CustomAuthentication;
 import sejongPromise.backend.global.config.jwt.JwtProvider;
+import sejongPromise.backend.global.config.qualifier.Admin;
+import sejongPromise.backend.global.config.qualifier.Student;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -59,9 +63,9 @@ public class StudentController {
      * @return 내 정보
      */
     @GetMapping
-    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
-    public ResponseStudentInfoDto getMyInfo(Authentication auth) {
-        Long studentId = (Long) auth.getPrincipal();
+    @Student
+    public ResponseStudentInfoDto getMyInfo(CustomAuthentication auth) {
+        Long studentId = auth.getStudentId();
         return studentService.getStudentInfo(studentId);
     }
 
@@ -72,9 +76,20 @@ public class StudentController {
      * @return 토큰 재발급
      */
     @PostMapping("/reissue")
-    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
+    @Student
     public ResponseRefreshToken refreshToken(HttpServletRequest request,
                                              @RequestBody @Valid RequestRefreshTokenDto dto){
         return studentService.refreshToken(request, dto);
+    }
+
+    /**
+     * 세션 재발급
+     * @param dto password
+     */
+    @PostMapping("/resession")
+    @Student
+    public void resession(CustomAuthentication auth, @RequestBody @Valid RequestRefreshSessionDto dto){
+        Long studentId = auth.getStudentId();
+        signupService.refreshSession(studentId, dto.getPassword());
     }
 }

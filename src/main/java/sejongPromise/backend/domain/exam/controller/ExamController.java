@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.*;
 import sejongPromise.backend.domain.exam.model.dto.ResponseExamFieldInfoDto;
 import sejongPromise.backend.domain.exam.model.dto.response.ResponseExamInfoDto;
 import sejongPromise.backend.domain.exam.service.ExamService;
+import sejongPromise.backend.global.config.auth.CustomAuthentication;
 import sejongPromise.backend.global.config.jwt.JwtProvider;
+import sejongPromise.backend.global.config.qualifier.Student;
 
 import java.util.List;
 
@@ -27,9 +29,9 @@ public class ExamController {
      * @return 내 이수 여부
      */
     @GetMapping
-    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
-    public List<ResponseExamInfoDto> getList(Authentication auth) {
-        Long studentId = (Long) auth.getPrincipal();
+    @Student
+    public List<ResponseExamInfoDto> getList(CustomAuthentication auth) {
+        Long studentId = auth.getStudentId();
         return examService.list(studentId);
     }
 
@@ -39,9 +41,9 @@ public class ExamController {
      * @return 영역별 이수 통계
      */
     @GetMapping("/field")
-    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
-    public List<ResponseExamFieldInfoDto> getListByField(Authentication auth){
-        return examService.fieldList((Long) auth.getPrincipal());
+    @Student
+    public List<ResponseExamFieldInfoDto> getListByField(CustomAuthentication auth){
+        return examService.fieldList(auth.getStudentId());
     }
 
 }
