@@ -1,10 +1,12 @@
 package sejongPromise.backend.infra.sejong.service.classic;
 
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -19,6 +21,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class SejongRegisterService extends SejongRequester{
     private final String REGISTER_SCHEDULE_URI;
@@ -70,6 +73,11 @@ public class SejongRegisterService extends SejongRequester{
         /**
          * todo : response 값을 활용하여 에러처리하기.
          */
+
+//        response = <302,[Server:"Apache-Coyote/1.1", X-FRAME-OPTIONS:"SAMEORIGIN", Access-Control-Allow-Methods:"POST, GET, OPTIONS, DELETE", Access-Control-Max-Age:"3600", Access-Control-Allow-Headers:"x-requested-with", Access-Control-Allow-Origin:"*", Location:"/viewUserAppInfo.do?menuInfoId=MAIN_02_04", Content-Language:"ko", Content-Length:"0", Date:"Mon, 17 Apr 2023 13:54:00 GMT"]>
+//        body = null
+//        statusCode = 302 FOUND
+//                s = 302 FOUND
 
 
     }
@@ -147,7 +155,7 @@ public class SejongRegisterService extends SejongRequester{
                 String startTime = dataInfo.get(2).text().substring(0, 5);
                 String endTime = dataInfo.get(2).text().substring(8, 13);
                 String bookTitle = dataInfo.get(4).text();
-                String cancelOPAP = dataInfo.get(5).select("button").attr("onclick").replaceAll("'", "");
+                String cancelOPAP = dataInfo.get(5).select("button").attr("onclick").split("'")[1];
                 ret.add(new MyRegisterInfo(year, semester, date, startTime, endTime, bookTitle, false, null, cancelOPAP));
             }
             // 예약취소 - 취소된 예약 목록

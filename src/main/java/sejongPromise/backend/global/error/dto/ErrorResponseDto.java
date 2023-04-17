@@ -48,4 +48,13 @@ public class ErrorResponseDto {
         this.message = List.of("잘못된 요청입니다.");
         this.detailMessage = "메소드 타입 오류";
     }
+
+    public ErrorResponseDto(Exception e) {
+        this.timestamp = LocalDateTime.now().toString();
+        this.trackingId = UUID.randomUUID().toString();
+        this.status = HttpStatus.INTERNAL_SERVER_ERROR;
+        this.code = e.getClass().getSimpleName();
+        this.message = List.of("서버 에러");
+        this.detailMessage = e.getMessage();
+    }
 }

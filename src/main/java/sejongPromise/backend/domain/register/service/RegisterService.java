@@ -22,6 +22,7 @@ import sejongPromise.backend.infra.sejong.service.classic.SejongRegisterService;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,9 +55,9 @@ public class RegisterService {
         log.info("시험 예약 완료");
         // todo : 시험 신청을 하면 OPAP 값을 던져주어야 한다.
         List<MyRegisterInfo> myRegisterInfos = sejongRegisterService.crawlRegisterInfo(student.getSessionToken());
-        // todo : 잘 되는지 확인 필요.
-        myRegisterInfos.forEach(data ->{
-            if(data.getBookTitle().equals(dto.getBookTitle()) && !data.getCancelOPAP().isBlank()){
+        // 시험 신청은 1일 1회이므로 date 로 구별한다.
+        for (MyRegisterInfo data : myRegisterInfos) {
+            if (!data.getIsCancel() && data.getDate().equals(dto.getDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))) && !data.getCancelOPAP().isBlank()) {
                 //register 생성
                 Register register = Register.builder()
                         .bookTitle(dto.getBookTitle())
@@ -70,8 +71,9 @@ public class RegisterService {
                         .cancelOPAP(data.getCancelOPAP())
                         .build();
                 registerRepository.save(register);
+                break;
             }
-        });
+        }
     }
 
 
@@ -88,8 +90,10 @@ public class RegisterService {
         if (!register.getStudent().equals(student)) {
             throw new CustomException(ErrorCode.NOT_STUDENT_MATCH);
         }
+        if(register.getStatus().equals(RegisterStatus.CANCELED)) {
+            throw new CustomException(ErrorCode.ALREADY_CANCEL_REGISTER);
+        }
         sejongRegisterService.cancelRegister(student.getSessionToken(), register.getCancelOPAP());
-        log.info("예약 취소 완료");
         register.cancelRegister();
     }
 
