@@ -90,6 +90,9 @@ public class RegisterService {
         if (!register.getStudent().equals(student)) {
             throw new CustomException(ErrorCode.NOT_STUDENT_MATCH);
         }
+        if(register.getStatus().equals(RegisterStatus.CANCELED)) {
+            throw new CustomException(ErrorCode.ALREADY_CANCEL_REGISTER);
+        }
         sejongRegisterService.cancelRegister(student.getSessionToken(), register.getCancelOPAP());
         register.cancelRegister();
     }

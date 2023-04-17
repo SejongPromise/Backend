@@ -46,7 +46,7 @@ public class SecurityConfig {
                 .addFilterBefore(exceptionHandlerFilter, JwtFilter.class)
                 .exceptionHandling()
                 .accessDeniedHandler(customAccessDeniedHandler)
-                .authenticationEntryPoint(customAuthenticationEntryPoint); //jwt filter 추가 (커스텀 필터, 그 후에 등록될 필터)
+                .authenticationEntryPoint(customAuthenticationEntryPoint);
 
         return http.build();
     }

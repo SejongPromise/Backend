@@ -13,7 +13,9 @@ import sejongPromise.backend.domain.register.model.dto.request.RequestCreateRegi
 import sejongPromise.backend.domain.register.model.dto.request.RequestFindBookCodeDto;
 import sejongPromise.backend.domain.register.model.dto.response.ResponseMyRegisterDto;
 import sejongPromise.backend.domain.register.service.RegisterService;
+import sejongPromise.backend.global.config.auth.CustomAuthentication;
 import sejongPromise.backend.global.config.jwt.JwtProvider;
+import sejongPromise.backend.global.config.qualifier.Student;
 import sejongPromise.backend.infra.sejong.model.BookScheduleInfo;
 
 import java.time.LocalDate;
@@ -33,9 +35,9 @@ public class RegisterController {
      * @return 나의 신청시험 현황
      */
     @GetMapping
-    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
-    public List<ResponseMyRegisterDto> getMyRegister(Authentication auth) {
-        Long studentId = (Long) auth.getPrincipal();
+    @Student
+    public List<ResponseMyRegisterDto> getMyRegister(CustomAuthentication auth) {
+        Long studentId = auth.getStudentId();
         return registerService.getMyRegister(studentId);
     }
 
@@ -44,9 +46,9 @@ public class RegisterController {
      * @param dto 시험 예약 정보 일자, 시간, 년도, 학기, 제목, 신청버튼 값
      */
     @PostMapping("/apply")
-    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
-    public void testApply(Authentication auth, @RequestBody RequestCreateRegisterDto dto) {
-        Long studentId = (Long) auth.getPrincipal();
+    @Student
+    public void testApply(CustomAuthentication auth, @RequestBody RequestCreateRegisterDto dto) {
+        Long studentId = auth.getStudentId();
         registerService.applyTest(studentId, dto);
     }
 
@@ -56,10 +58,10 @@ public class RegisterController {
      * @return
      */
     @GetMapping("/schedule")
-    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
-    public List<BookScheduleInfo> getTestSchedule(Authentication auth,
+    @Student
+    public List<BookScheduleInfo> getTestSchedule(CustomAuthentication auth,
                                                   @RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
-        Long studentId = (Long) auth.getPrincipal();
+        Long studentId = auth.getStudentId();
         return registerService.getSchedule(studentId, date);
     }
 
@@ -68,10 +70,10 @@ public class RegisterController {
      * @param registerId 예약 id
      */
     @DeleteMapping("/{id}")
-    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
-    public void testRegisterCancel(Authentication auth,
+    @Student
+    public void testRegisterCancel(CustomAuthentication auth,
                                 @PathVariable("id") Long registerId) {
-        Long studentId = (Long) auth.getPrincipal();
+        Long studentId = auth.getStudentId();
         registerService.testCancel(studentId, registerId);
     }
 

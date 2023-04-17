@@ -3,6 +3,7 @@ package sejongPromise.backend.domain.student.model;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.domain.Persistable;
+import sejongPromise.backend.domain.enumerate.Role;
 import sejongPromise.backend.domain.enumerate.Semester;
 import sejongPromise.backend.global.model.BaseEntity;
 
@@ -24,6 +25,8 @@ public class Student extends BaseEntity implements Persistable<Long> {
     @Enumerated(EnumType.STRING)
     private Semester semester;
     private Boolean isPass;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     /**
      * Persistable override
@@ -43,7 +46,8 @@ public class Student extends BaseEntity implements Persistable<Long> {
                     @NonNull String encodedPassword,
                     @NonNull String sessionToken,
                     @NonNull String semester,
-                    @NonNull Boolean pass){
+                    @NonNull Boolean pass,
+                    @NonNull Role role) {
         this.id = studentId;
         this.name = name;
         this.major = major;
@@ -51,6 +55,7 @@ public class Student extends BaseEntity implements Persistable<Long> {
         this.semester = Semester.of(semester);
         this.isPass = pass;
         this.password = encodedPassword;
+        this.role = role;
     }
 
     public void update(Student student){

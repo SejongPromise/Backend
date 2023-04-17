@@ -5,6 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sejongPromise.backend.domain.enumerate.RegisterStatus;
+import sejongPromise.backend.domain.enumerate.Role;
 import sejongPromise.backend.domain.enumerate.Semester;
 import sejongPromise.backend.domain.exam.model.Exam;
 import sejongPromise.backend.domain.exam.repository.ExamRepository;
@@ -69,6 +70,7 @@ public class SignupService {
                 .sessionToken(WebUtil.makeCookieString(auth.cookies))
                 .pass(studentInfo.isPass())
                 .encodedPassword(passwordEncoder.encode(dto.getPassword()))
+                .role(Role.STUDENT)
                 .build();
         Student saveStudent = studentRepository.save(student);
 
