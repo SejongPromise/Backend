@@ -6,6 +6,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -72,6 +73,11 @@ public class SejongRegisterService extends SejongRequester{
         /**
          * todo : response 값을 활용하여 에러처리하기.
          */
+
+//        response = <302,[Server:"Apache-Coyote/1.1", X-FRAME-OPTIONS:"SAMEORIGIN", Access-Control-Allow-Methods:"POST, GET, OPTIONS, DELETE", Access-Control-Max-Age:"3600", Access-Control-Allow-Headers:"x-requested-with", Access-Control-Allow-Origin:"*", Location:"/viewUserAppInfo.do?menuInfoId=MAIN_02_04", Content-Language:"ko", Content-Length:"0", Date:"Mon, 17 Apr 2023 13:54:00 GMT"]>
+//        body = null
+//        statusCode = 302 FOUND
+//                s = 302 FOUND
 
 
     }
