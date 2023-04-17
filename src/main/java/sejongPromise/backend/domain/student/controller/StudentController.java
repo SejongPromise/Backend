@@ -63,7 +63,7 @@ public class StudentController {
      * @return 내 정보
      */
     @GetMapping
-    @Admin
+    @Student
     public ResponseStudentInfoDto getMyInfo(CustomAuthentication auth) {
         Long studentId = auth.getStudentId();
         return studentService.getStudentInfo(studentId);
