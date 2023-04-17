@@ -1,5 +1,6 @@
 package sejongPromise.backend.infra.sejong.service.classic;
 
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -19,6 +20,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class SejongRegisterService extends SejongRequester{
     private final String REGISTER_SCHEDULE_URI;
@@ -147,7 +149,9 @@ public class SejongRegisterService extends SejongRequester{
                 String startTime = dataInfo.get(2).text().substring(0, 5);
                 String endTime = dataInfo.get(2).text().substring(8, 13);
                 String bookTitle = dataInfo.get(4).text();
-                String cancelOPAP = dataInfo.get(5).select("button").attr("onclick").replaceAll("'", "");
+                String[] split = dataInfo.get(5).select("button").attr("onclick").split("'");
+                String cancelOPAP = split[1];
+                log.info("cancelOPAP : {}", cancelOPAP);
                 ret.add(new MyRegisterInfo(year, semester, date, startTime, endTime, bookTitle, false, null, cancelOPAP));
             }
             // 예약취소 - 취소된 예약 목록
