@@ -110,5 +110,17 @@ public class SignupService {
 
     }
 
+    @Transactional
+    public void refreshSession(Long studentId, String password) {
+        Student student = studentRepository.findById(studentId).orElseThrow(
+                () -> new CustomException(ErrorCode.NOT_FOUND_DATA, "해당 유저를 찾을 수 없습니다.")
+        );
+        if (passwordEncoder.matches(password, student.getPassword())) {
+            SejongAuth auth = sejongAuthenticationService.login(studentId.toString(), password);
+            student.updateSessionToken(WebUtil.makeCookieString(auth.cookies));
+        }else{
+            throw new CustomException(ErrorCode.WRONG_PASSWORD);
+        }
+    }
 
 }

@@ -55,9 +55,8 @@ public class RegisterService {
         log.info("시험 예약 완료");
         // todo : 시험 신청을 하면 OPAP 값을 던져주어야 한다.
         List<MyRegisterInfo> myRegisterInfos = sejongRegisterService.crawlRegisterInfo(student.getSessionToken());
-        // todo : 잘 되는지 확인 필요.
+        // 시험 신청은 1일 1회이므로 date 로 구별한다.
         for (MyRegisterInfo data : myRegisterInfos) {
-            log.info("data.bookTitle : {} data.cancelOPAP: {}", data.getBookTitle(), data.getCancelOPAP());
             if (!data.getIsCancel() && data.getDate().equals(dto.getDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))) && !data.getCancelOPAP().isBlank()) {
                 //register 생성
                 Register register = Register.builder()
@@ -92,7 +91,6 @@ public class RegisterService {
             throw new CustomException(ErrorCode.NOT_STUDENT_MATCH);
         }
         sejongRegisterService.cancelRegister(student.getSessionToken(), register.getCancelOPAP());
-        log.info("예약 취소 완료");
         register.cancelRegister();
     }
 

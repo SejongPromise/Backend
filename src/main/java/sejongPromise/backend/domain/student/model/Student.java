@@ -63,4 +63,8 @@ public class Student extends BaseEntity implements Persistable<Long> {
     public String getStudentId() {
         return id.toString();
     }
+
+    public void updateSessionToken(String cookieString) {
+        this.sessionToken = cookieString;
+    }
 }

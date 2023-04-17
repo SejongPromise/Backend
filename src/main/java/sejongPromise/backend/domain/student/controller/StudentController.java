@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import sejongPromise.backend.domain.student.model.dto.request.RequestRefreshSessionDto;
 import sejongPromise.backend.domain.student.model.dto.request.RequestRefreshTokenDto;
 import sejongPromise.backend.domain.student.model.dto.request.RequestStudentInfoDto;
 import sejongPromise.backend.domain.student.model.dto.response.ResponseLoginDto;
@@ -76,5 +77,16 @@ public class StudentController {
     public ResponseRefreshToken refreshToken(HttpServletRequest request,
                                              @RequestBody @Valid RequestRefreshTokenDto dto){
         return studentService.refreshToken(request, dto);
+    }
+
+    /**
+     * 세션 재발급
+     * @param dto password
+     */
+    @PostMapping("/resession")
+    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
+    public void resession(Authentication auth, RequestRefreshSessionDto dto){
+        Long studentId = (Long) auth.getPrincipal();
+        signupService.refreshSession(studentId, dto.getPassword());
     }
 }
