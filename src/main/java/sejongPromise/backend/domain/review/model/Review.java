@@ -71,7 +71,7 @@ public class Review extends BaseEntity {
     }
 
     public String displayName(){
-        return this.passSemester.getName() + "수강자";
+        return this.passSemester.getName() + " " + "수강자";
     }
 
 }
