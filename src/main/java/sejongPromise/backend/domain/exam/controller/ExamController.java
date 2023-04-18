@@ -1,16 +1,13 @@
 package sejongPromise.backend.domain.exam.controller;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import sejongPromise.backend.domain.exam.model.dto.ResponseExamFieldInfoDto;
 import sejongPromise.backend.domain.exam.model.dto.response.ResponseExamInfoDto;
 import sejongPromise.backend.domain.exam.service.ExamService;
 import sejongPromise.backend.global.config.auth.CustomAuthentication;
-import sejongPromise.backend.global.config.jwt.JwtProvider;
-import sejongPromise.backend.global.config.qualifier.Student;
+import sejongPromise.backend.global.config.qualifier.StudentAuth;
 
 import java.util.List;
 
@@ -29,7 +26,7 @@ public class ExamController {
      * @return 내 이수 여부
      */
     @GetMapping
-    @Student
+    @StudentAuth
     public List<ResponseExamInfoDto> getList(CustomAuthentication auth) {
         Long studentId = auth.getStudentId();
         return examService.list(studentId);
@@ -41,7 +38,7 @@ public class ExamController {
      * @return 영역별 이수 통계
      */
     @GetMapping("/field")
-    @Student
+    @StudentAuth
     public List<ResponseExamFieldInfoDto> getListByField(CustomAuthentication auth){
         return examService.fieldList(auth.getStudentId());
     }

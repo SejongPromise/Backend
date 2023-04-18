@@ -11,6 +11,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
-@Secured(AuthNames.ROLE_ADMIN)
-public @interface Admin {
+@Secured(AuthNames.ROLE_STUDENT)
+public @interface StudentAuth {
 }
