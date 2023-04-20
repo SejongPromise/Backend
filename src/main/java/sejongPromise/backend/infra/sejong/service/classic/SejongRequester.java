@@ -8,10 +8,14 @@ import org.springframework.web.reactive.function.client.WebClient;
 import sejongPromise.backend.global.error.ErrorCode;
 import sejongPromise.backend.global.error.exception.CustomException;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import static org.springframework.web.reactive.function.client.WebClient.*;
 
 @RequiredArgsConstructor
 public class SejongRequester {
+    private static final Pattern NON_PAGE_PATTERN = Pattern.compile("<div\\s*class=\"page_none\">");
     private final WebClient webClient;
     protected ResponseEntity<String> requestApi(String uri, String param) {
         ResponseEntity<String> response;
@@ -54,6 +58,7 @@ public class SejongRequester {
         if(result == null){
             throw new CustomException(ErrorCode.SCRAPPER_ERROR, "응답값이 존재하지 않습니다.");
         }
+        validateNonePage(result);
         return result;
     }
 
@@ -70,6 +75,7 @@ public class SejongRequester {
         if(result == null){
             throw new CustomException(ErrorCode.SCRAPPER_ERROR, "응답값이 존재하지 않습니다.");
         }
+        validateNonePage(result);
         return result;
     }
     private RequestBodySpec makeRequestApi(String uri, String param) {
@@ -111,4 +117,10 @@ public class SejongRequester {
         if(response == null) throw new CustomException(ErrorCode.NO_RESPONSE);
     }
 
+    private static void validateNonePage(String html){
+        Matcher matcher = NON_PAGE_PATTERN.matcher(html);
+        if(matcher.find()){
+            throw new CustomException(ErrorCode.SCRAPPER_ERROR, "세션을 재발급 받으세요");
+        }
+    }
 }
