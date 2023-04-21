@@ -11,6 +11,7 @@ import sejongPromise.backend.global.config.auth.CustomAuthentication;
 import sejongPromise.backend.global.config.qualifier.StudentAuth;
 import sejongPromise.backend.infra.sejong.model.BookScheduleInfo;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -40,7 +41,7 @@ public class RegisterController {
      */
     @PostMapping("/apply")
     @StudentAuth
-    public void testApply(CustomAuthentication auth, @RequestBody RequestCreateRegisterDto dto) {
+    public void testApply(CustomAuthentication auth, @RequestBody @Valid RequestCreateRegisterDto dto) {
         Long studentId = auth.getStudentId();
         registerService.applyTest(studentId, dto);
     }

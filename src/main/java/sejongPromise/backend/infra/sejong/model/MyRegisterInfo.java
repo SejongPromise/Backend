@@ -12,7 +12,5 @@ public class MyRegisterInfo {
     private final String startTime;
     private final String endTime;
     private final String bookTitle;
-    private final Boolean isCancel;
-    private final String deleteDate;
     private final String cancelOPAP;
 }
