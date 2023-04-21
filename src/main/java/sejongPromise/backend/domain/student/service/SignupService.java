@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sejongPromise.backend.domain.enumerate.RegisterStatus;
 import sejongPromise.backend.domain.enumerate.Role;
 import sejongPromise.backend.domain.enumerate.Semester;
 import sejongPromise.backend.domain.exam.model.Exam;
@@ -26,7 +25,6 @@ import sejongPromise.backend.infra.sejong.service.classic.SejongRegisterService;
 import sejongPromise.backend.infra.sejong.service.classic.SejongStudentService;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;

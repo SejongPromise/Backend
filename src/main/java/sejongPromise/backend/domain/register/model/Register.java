@@ -1,14 +1,12 @@
 package sejongPromise.backend.domain.register.model;
 
 import lombok.*;
-import sejongPromise.backend.domain.enumerate.RegisterStatus;
 import sejongPromise.backend.domain.enumerate.Semester;
 import sejongPromise.backend.domain.student.model.Student;
 import sejongPromise.backend.global.model.BaseEntity;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Entity

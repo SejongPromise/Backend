@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sejongPromise.backend.domain.book.model.Book;
 import sejongPromise.backend.domain.book.repository.BookRepository;
-import sejongPromise.backend.domain.enumerate.RegisterStatus;
 import sejongPromise.backend.domain.enumerate.Semester;
 import sejongPromise.backend.domain.register.RegisterRepository.RegisterRepository;
 import sejongPromise.backend.domain.register.model.Register;
