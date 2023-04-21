@@ -156,19 +156,7 @@ public class SejongRegisterService extends SejongRequester{
                 String endTime = dataInfo.get(2).text().substring(8, 13);
                 String bookTitle = dataInfo.get(4).text();
                 String cancelOPAP = dataInfo.get(5).select("button").attr("onclick").split("'")[1];
-                ret.add(new MyRegisterInfo(year, semester, date, startTime, endTime, bookTitle, false, null, cancelOPAP));
-            }
-            // 예약취소 - 취소된 예약 목록
-            else{
-                Elements dataInfo = registerInfo.select("td");
-                String year = dataInfo.get(0).text().substring(0, 4);
-                String semester = dataInfo.get(0).text().substring(7);
-                String date = dataInfo.get(1).text();
-                String startTime = dataInfo.get(2).text().substring(0, 5);
-                String endTime = dataInfo.get(2).text().substring(8, 13);
-                String bookTitle = dataInfo.get(3).text();
-                String deleteDate = dataInfo.get(4).text();
-                ret.add(new MyRegisterInfo(year, semester, date, startTime, endTime, bookTitle, true, deleteDate, null));
+                ret.add(new MyRegisterInfo(year, semester, date, startTime, endTime, bookTitle, cancelOPAP));
             }
         }
         return ret;

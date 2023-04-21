@@ -80,9 +80,8 @@ public class SignupService {
             Exam exam = Exam.builder().title(data.getTitle())
                     .isPass(data.isPass())
                     .field(data.getField())
-                    .year(Integer.parseInt(data.getYear()))
-                    .semester(data.getSemester())
                     .student(saveStudent)
+                    .isTest(data.isTest())
                     .build();
             examRepository.save(exam);
         });
@@ -90,10 +89,6 @@ public class SignupService {
         //3.신청내역과 신청 취소 내역 저장
         List<MyRegisterInfo> myRegisterInfoList = sejongRegisterService.crawlRegisterInfo(WebUtil.makeCookieString(auth.cookies));
         myRegisterInfoList.forEach(data -> {
-            LocalDateTime deleteDate = null;
-            if(data.getDeleteDate() != null){
-                deleteDate = LocalDateTime.parse(data.getDeleteDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-            }
             Register register = Register.builder()
                     .student(saveStudent)
                     .year(Integer.parseInt(data.getYear()))
@@ -102,8 +97,6 @@ public class SignupService {
                     .startTime(LocalTime.parse(data.getStartTime(), DateTimeFormatter.ISO_TIME))
                     .endTime(LocalTime.parse(data.getEndTime(), DateTimeFormatter.ISO_TIME))
                     .bookTitle(data.getBookTitle())
-                    .status(data.getIsCancel() ? RegisterStatus.CANCELED : RegisterStatus.ACTIVE)
-                    .deleteDate(deleteDate)
                     .cancelOPAP(data.getCancelOPAP())
                     .build();
             registerRepository.save(register);
