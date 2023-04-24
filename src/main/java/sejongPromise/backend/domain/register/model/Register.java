@@ -1,6 +1,7 @@
 package sejongPromise.backend.domain.register.model;
 
 import lombok.*;
+import sejongPromise.backend.domain.book.model.Book;
 import sejongPromise.backend.domain.enumerate.Semester;
 import sejongPromise.backend.domain.student.model.Student;
 import sejongPromise.backend.global.model.BaseEntity;
@@ -20,6 +21,10 @@ public class Register extends BaseEntity{
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "student_id")
     private Student student;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "book_id")
+    private Book book;
     private Integer year;
     @Enumerated(EnumType.STRING)
     private Semester semester;

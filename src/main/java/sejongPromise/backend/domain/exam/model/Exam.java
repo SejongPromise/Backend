@@ -41,4 +41,8 @@ public class Exam extends BaseEntity {
         this.isReviewed = false;
     }
 
+    public void updateReviewed(){
+        this.isReviewed = true;
+    }
+
 }
