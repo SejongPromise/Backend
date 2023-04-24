@@ -138,5 +138,4 @@ public class SignupService {
                 throw new CustomException(ErrorCode.WRONG_PASSWORD);
             }
         }
-
     }
