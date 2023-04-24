@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import sejongPromise.backend.domain.enumerate.ReportField;
+import sejongPromise.backend.domain.enumerate.ReportType;
 import sejongPromise.backend.domain.review.model.Review;
 import sejongPromise.backend.domain.student.model.Student;
 import sejongPromise.backend.global.model.BaseEntity;
@@ -28,13 +28,13 @@ public class Report extends BaseEntity {
     private Review review;
 
     @Enumerated(EnumType.STRING)
-    private ReportField report;
+    private ReportType type;
 
     @Builder
-    private Report(Student student, Review review, ReportField report) {
+    private Report(Student student, Review review, ReportType type) {
         this.student = student;
         this.review = review;
-        this.report = report;
+        this.type = type;
     }
 
 }

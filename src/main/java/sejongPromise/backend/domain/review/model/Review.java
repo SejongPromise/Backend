@@ -82,4 +82,7 @@ public class Review extends BaseEntity {
         return this.passSemester.getName() + " " + "수강자";
     }
 
+    public void blind() {
+        this.status = ReviewStatus.DELETED_BY_ADMIN;
+    }
 }
