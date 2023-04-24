@@ -77,19 +77,20 @@ public class ReviewService {
 
     /**
      * 해당 검증 로직은 학생 정보를 update 할 경우, 기존 미인증 시험 -> 인증 시험으로 바뀐다는 전제하에 적용됩니다.
-     * @param student
-     * @param book
      */
     private void validateReview(Student student, Book book) {
         List<Exam> studentExamList = examRepository.findAllByStudentIdAndTitle(student.getId(), book.getTitle());
         if(studentExamList.stream().noneMatch(Exam::isTest)){
             throw new CustomException(ErrorCode.NOT_FOUND_DATA, "해당 책을 수강한 시험이 없습니다");
         }
-        if(studentExamList.stream().anyMatch(exam ->exam.isPass() && exam.isReviewed())){
+        if(studentExamList.stream().anyMatch(Exam::isReviewed)){
             throw new CustomException(ErrorCode.ALREADY_REVIEWED);
         }
     }
 
+    /**
+     * 해당 시험을 인증하고, 리뷰를 작성했다면 리뷰 상태를 수정합니다.
+     */
     private void checkReviewed(Student student, Book book) {
         List<Exam> studentExamList = examRepository.findAllByStudentIdAndTitle(student.getId(), book.getTitle());
         studentExamList.stream().filter(Exam::isTest).forEach(Exam::updateReviewed);

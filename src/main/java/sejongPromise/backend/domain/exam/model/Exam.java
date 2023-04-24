@@ -22,7 +22,7 @@ public class Exam extends BaseEntity {
     private Student student;
     @Enumerated(EnumType.STRING)
     private BookField field;
-    private String title; // todo : 1:1 맵핑.
+    private String title; // todo : 1:1 맵핑. -> 불가능 deprecated 된 시험 목록이 존재함.
     private boolean isPass;
     private boolean isTest;
     private boolean isReviewed;
