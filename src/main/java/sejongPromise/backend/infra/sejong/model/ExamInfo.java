@@ -12,6 +12,8 @@ public class ExamInfo {
     private final String title;
     private final boolean isPass;
     private final boolean isTest;
+    private final String examDate;
+
 
     @Override
     public boolean equals(Object o) {

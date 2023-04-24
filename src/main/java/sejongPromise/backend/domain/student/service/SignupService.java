@@ -29,6 +29,8 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -110,10 +112,31 @@ public class SignupService {
         );
         if (passwordEncoder.matches(password, student.getPassword())) {
             SejongAuth auth = sejongAuthenticationService.login(studentId.toString(), password);
-            student.updateSessionToken(WebUtil.makeCookieString(auth.cookies));
-        }else{
-            throw new CustomException(ErrorCode.WRONG_PASSWORD);
-        }
-    }
 
-}
+            //#1. User Session Update
+            student.updateSessionToken(WebUtil.makeCookieString(auth.cookies));
+            ClassicStudentInfo studentInfo = sejongStudentService.crawlStudentInfo(student.getSessionToken());
+
+            //#2. 학생 정보 Update
+            student.updateStudentInfo(studentInfo);
+
+            //#3. 인증 시험 현황 Update
+            List<ExamInfo> newExamInfoList = studentInfo.getExamInfoList();
+            List<Exam> alreadyExamInfoList = examRepository.findAllByStudentId(student.getId());
+
+            List<Exam> noneMatchList = alreadyExamInfoList.stream()
+                    .filter(o -> newExamInfoList.stream().noneMatch( n -> {
+                        return o.getExamDate().equals(n.getExamDate());
+                    })).collect(Collectors.toList());
+
+            alreadyExamInfoList.addAll(noneMatchList);
+
+            //#4. 시험 완료 후 응시 예정 데이터 삭제
+            registerRepository.delete((Register) noneMatchList);
+
+            }else{
+                throw new CustomException(ErrorCode.WRONG_PASSWORD);
+            }
+        }
+
+    }

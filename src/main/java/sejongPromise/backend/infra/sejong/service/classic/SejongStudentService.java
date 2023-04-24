@@ -62,17 +62,20 @@ public class SejongStudentService extends SejongRequester{
                         }
                         String title;
                         Boolean isTest;
+                        String examDate;
                         if(examInfo.get(1).text().equals(field)) {
                             title = examInfo.get(2).text();
                             isTest = true;
+                            examDate = examInfo.get(3).text();
                         }else{
                             title = examInfo.get(3).text();
                             isTest = false;
+                            examDate = null;
                         }
                         //no-pass 불합격인 경우.
                         boolean examPass = !examInfo.select("span.no-pass").hasText();
 
-                        ExamInfo exam = new ExamInfo(field, title, examPass, isTest);
+                        ExamInfo exam = new ExamInfo(field, title, examPass, isTest, examDate);
                         examList.add(exam);
                     }
                 }

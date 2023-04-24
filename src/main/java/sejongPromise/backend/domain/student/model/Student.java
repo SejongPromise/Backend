@@ -6,6 +6,7 @@ import org.springframework.data.domain.Persistable;
 import sejongPromise.backend.domain.enumerate.Role;
 import sejongPromise.backend.domain.enumerate.Semester;
 import sejongPromise.backend.global.model.BaseEntity;
+import sejongPromise.backend.infra.sejong.model.ClassicStudentInfo;
 
 import javax.persistence.*;
 
@@ -71,5 +72,12 @@ public class Student extends BaseEntity implements Persistable<Long> {
 
     public void updateSessionToken(String cookieString) {
         this.sessionToken = cookieString;
+    }
+
+    public void updateStudentInfo(ClassicStudentInfo studentInfo) {
+        this.name = studentInfo.getName();
+        this.major = studentInfo.getMajor();
+        this.semester = Semester.valueOf(studentInfo.getSemester());
+        this.isPass = studentInfo.isPass();
     }
 }
