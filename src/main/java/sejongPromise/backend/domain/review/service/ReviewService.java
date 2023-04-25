@@ -1,8 +1,8 @@
 package sejongPromise.backend.domain.review.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sejongPromise.backend.domain.book.model.Book;
@@ -32,7 +32,7 @@ public class ReviewService {
      * @param pageable  페이징 정보
      * @return          페이징 된 리뷰 목록
      */
-    public Page<ReviewDto> list(Long bookId, Pageable pageable) {
+    public Slice<ReviewDto> list(Long bookId, Pageable pageable) {
         bookRepository.findById(bookId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA, "해당 책을 찾을 수 없습니다"));
         return reviewRepository.findAllByBookId(bookId, pageable).map(ReviewDto::new);
     }
