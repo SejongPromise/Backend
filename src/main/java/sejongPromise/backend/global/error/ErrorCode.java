@@ -33,11 +33,19 @@ public enum ErrorCode {
     INVALID_DATE(HttpStatus.BAD_REQUEST, "유효하지 않은 날짜입니다."),
     UNAVAILABLE_SEMESTER(HttpStatus.FORBIDDEN, "이용 불가능한 학기입니다."),
     EXCEED_APPLY(HttpStatus.BAD_REQUEST, "초과된 시험 신청입니다."),
-
+    
+    //review
+    ALREADY_REVIEWED(HttpStatus.CONFLICT, "이미 리뷰를 작성한 시험입니다."),
+    ALREADY_CANCEL_REGISTER(HttpStatus.CONFLICT, "이미 취소된 시험 신청입니다."),
+    
 
     //sejong
     SCRAPPER_ERROR(HttpStatus.BAD_REQUEST, "세종대학교 사이트에서 정보를 가져올 수 없습니다."),
-    REQUEST_API_ERROR(HttpStatus.BAD_REQUEST, "세종대학교 API 에서 정보를 가져올 수 없습니다.");
+    REQUEST_API_ERROR(HttpStatus.BAD_REQUEST, "세종대학교 API 에서 정보를 가져올 수 없습니다."),
+    NOT_GRANTED(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
+    ACCESS_TOKEN_REQUIRED(HttpStatus.UNAUTHORIZED, "접근 토큰이 필요합니다.");
+
+
 
 
     private final HttpStatus status;

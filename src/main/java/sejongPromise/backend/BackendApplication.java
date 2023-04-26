@@ -11,7 +11,6 @@ import javax.annotation.PostConstruct;
 @EnableJpaAuditing //하위 클래스에서 Entity Listener 를 체크한다.
 @EnableScheduling // enable scheduling
 public class BackendApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(BackendApplication.class, args);
 	}

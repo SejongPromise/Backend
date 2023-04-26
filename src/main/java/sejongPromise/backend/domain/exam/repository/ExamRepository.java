@@ -17,4 +17,6 @@ public interface ExamRepository extends JpaRepository<Exam, Long> {
             "group by e.field " +
             "order by count(e.field) desc")
     List<ResponseExamFieldInfoDto> findCountGroupByField(Long studentId);
+
+    List<Exam> findAllByStudentIdAndTitle(Long studentId, String title);
 }

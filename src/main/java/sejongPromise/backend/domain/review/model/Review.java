@@ -8,10 +8,14 @@ import sejongPromise.backend.domain.book.model.Book;
 import sejongPromise.backend.domain.enumerate.BookRatio;
 import sejongPromise.backend.domain.enumerate.ReviewStatus;
 import sejongPromise.backend.domain.enumerate.Semester;
+import sejongPromise.backend.domain.reports.Report;
 import sejongPromise.backend.domain.student.model.Student;
 import sejongPromise.backend.global.model.BaseEntity;
 
 import javax.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static lombok.AccessLevel.PROTECTED;
 
@@ -40,6 +44,10 @@ public class Review extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ReviewStatus status;
     private Semester passSemester;
+
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Report> reports = new ArrayList<>();
+
 
     @Builder
     private Review(@NonNull Book book,
@@ -74,4 +82,7 @@ public class Review extends BaseEntity {
         return this.passSemester.getName() + " " + "수강자";
     }
 
+    public void blind() {
+        this.status = ReviewStatus.DELETED_BY_ADMIN;
+    }
 }

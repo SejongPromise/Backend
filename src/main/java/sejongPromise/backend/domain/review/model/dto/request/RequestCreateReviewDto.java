@@ -12,7 +12,7 @@ public class RequestCreateReviewDto {
     private final Integer score;
     @Max(value = 5, message = "회독은 5회 이하로 입력해주세요.")
     private final Integer volume;
-    @Max(value = 3, message = "0 - 초반, 1 - 중반, 2 - 후반")
+    @Max(value = 2, message = "0 - 초반, 1 - 중반, 2 - 후반")
     private final Integer ratioIdx;
     private final String comment;
 }

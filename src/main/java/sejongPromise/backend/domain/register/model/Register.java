@@ -1,6 +1,7 @@
 package sejongPromise.backend.domain.register.model;
 
 import lombok.*;
+import sejongPromise.backend.domain.book.model.Book;
 import sejongPromise.backend.domain.enumerate.Semester;
 import sejongPromise.backend.domain.student.model.Student;
 import sejongPromise.backend.global.model.BaseEntity;
@@ -20,13 +21,17 @@ public class Register extends BaseEntity{
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "student_id")
     private Student student;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "book_id")
+    private Book book;
     private Integer year;
     @Enumerated(EnumType.STRING)
     private Semester semester;
     private LocalDate date;
     private LocalTime startTime; //10:00
     private LocalTime endTime; //10:10
-    private String bookTitle; // todo : Book 1:1 맵핑.
+    private String bookTitle; // todo : Book 1:1 맵핑. -> 굳이 할 필요는 없을 것 같음.
     private String cancelOPAP; //OPAP 값
 
     @Builder
