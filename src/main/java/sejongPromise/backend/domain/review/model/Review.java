@@ -8,7 +8,7 @@ import sejongPromise.backend.domain.book.model.Book;
 import sejongPromise.backend.domain.enumerate.BookRatio;
 import sejongPromise.backend.domain.enumerate.ReviewStatus;
 import sejongPromise.backend.domain.enumerate.Semester;
-import sejongPromise.backend.domain.reports.Report;
+import sejongPromise.backend.domain.reports.model.Report;
 import sejongPromise.backend.domain.student.model.Student;
 import sejongPromise.backend.global.model.BaseEntity;
 

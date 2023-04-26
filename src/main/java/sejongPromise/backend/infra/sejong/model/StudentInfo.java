@@ -7,7 +7,7 @@ import java.util.List;
 
 @Getter
 @RequiredArgsConstructor
-public class ClassicStudentInfo {
+public class StudentInfo {
     private final String major;
     private final String studentId;
     private final String name;

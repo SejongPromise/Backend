@@ -1,4 +1,4 @@
-package sejongPromise.backend.domain.reports;
+package sejongPromise.backend.domain.reports.model;
 
 import lombok.AccessLevel;
 import lombok.Builder;

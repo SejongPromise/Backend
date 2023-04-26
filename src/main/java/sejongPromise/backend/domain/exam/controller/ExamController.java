@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import sejongPromise.backend.domain.exam.model.dto.ResponseExamFieldInfoDto;
-import sejongPromise.backend.domain.exam.model.dto.response.ResponseExamInfoDto;
+import sejongPromise.backend.domain.exam.model.dto.ResponseExamInfoDto;
 import sejongPromise.backend.domain.exam.service.ExamService;
 import sejongPromise.backend.global.config.auth.CustomAuthentication;
 import sejongPromise.backend.global.config.qualifier.StudentAuth;
