@@ -12,7 +12,7 @@ public class ReviewDto {
     private final Long id;
 
     @Schema(description = "작성자", example = "6학기")
-    private final String author;
+    private final String writer;
     @Schema(description = "점수", example = "5")
     private final Integer score;
 
@@ -29,7 +29,7 @@ public class ReviewDto {
 
     public ReviewDto(Review review) {
         this.id = review.getId();
-        this.author = review.displayName();
+        this.writer = review.displayName();
         this.createdAt = review.getCreate_at().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         this.score = review.getScore();
         this.volume = review.getVolume();

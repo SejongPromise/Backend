@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 @Getter
 @RequiredArgsConstructor
 public enum BookRatio {
-    FIRST(0), MIDDlE(1), Last(2);
+    FIRST(0), MIDDLE(1), LAST(2);
     private final Integer idx;
 
     private static final Map<Integer, BookRatio> BY_IDX =
