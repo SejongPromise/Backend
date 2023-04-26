@@ -127,10 +127,7 @@ public class RegisterService {
     private boolean isExceedApply(Student student, LocalDate date) {
         LocalDate startDate = date.with(DayOfWeek.MONDAY);
         LocalDate endDate = date.with(DayOfWeek.SUNDAY);
-        if(registerRepository.existsByStudentAndDateBetween(student, startDate, endDate)){
-            return true;
-        }
-        return false;
+        return registerRepository.existsByStudentAndDateBetween(student, startDate, endDate);
     }
 }
 

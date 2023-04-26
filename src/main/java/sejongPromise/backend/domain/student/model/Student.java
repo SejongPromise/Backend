@@ -5,10 +5,13 @@ import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.domain.Persistable;
 import sejongPromise.backend.domain.enumerate.Role;
 import sejongPromise.backend.domain.enumerate.Semester;
+import sejongPromise.backend.domain.exam.model.Exam;
 import sejongPromise.backend.global.model.BaseEntity;
 import sejongPromise.backend.infra.sejong.model.StudentInfo;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter

@@ -2,6 +2,7 @@ package sejongPromise.backend.domain.register.repository;
 
 import org.hibernate.annotations.Where;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import sejongPromise.backend.domain.register.model.Register;
 import sejongPromise.backend.domain.student.model.Student;
 

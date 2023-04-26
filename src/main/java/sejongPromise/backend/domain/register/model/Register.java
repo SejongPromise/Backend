@@ -29,7 +29,7 @@ public class Register extends BaseEntity{
     private LocalDate date;
     private LocalTime startTime; //10:00
     private LocalTime endTime; //10:10
-    private String bookTitle; // todo : Book 1:1 맵핑. -> 굳이 할 필요는 없을 것 같음.
+    private String bookTitle;
     private String cancelOPAP; //OPAP 값
     @Enumerated(EnumType.STRING)
     private RegisterStatus status;
