@@ -29,7 +29,6 @@ import java.time.LocalTime;
 
     @Schema(description = "년도")
     @NotNull
-    @Pattern(regexp = "^[0-9]{4}$", message = "년도는 4자리 숫자로 입력해주세요.")
     private final Integer year; // 년도
 
     @Schema(description = "학기")
