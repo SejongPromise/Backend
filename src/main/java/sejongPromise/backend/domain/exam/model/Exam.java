@@ -1,7 +1,6 @@
 package sejongPromise.backend.domain.exam.model;
 
 import lombok.*;
-import sejongPromise.backend.domain.book.model.Book;
 import sejongPromise.backend.domain.enumerate.BookField;
 import sejongPromise.backend.domain.enumerate.Semester;
 import sejongPromise.backend.domain.student.model.Student;

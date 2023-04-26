@@ -43,6 +43,7 @@ public class Review extends BaseEntity {
     private String comment;
     @Enumerated(EnumType.STRING)
     private ReviewStatus status;
+    @Enumerated(EnumType.STRING)
     private Semester passSemester;
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)

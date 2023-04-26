@@ -70,7 +70,7 @@ public class RegisterService {
                         .endTime(dto.getTime().plusMinutes(30L))
                         .year(dto.getYear())
                         .student(student)
-                        .semester(Semester.of(dto.getSemester()))
+                        .semester(Semester.of(dto.getSemester().replace(" ", "")))
                         .cancelOPAP(data.getCancelOPAP())
                         .build();
                 registerRepository.save(register);

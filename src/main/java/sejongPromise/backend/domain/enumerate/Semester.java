@@ -2,6 +2,8 @@ package sejongPromise.backend.domain.enumerate;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import sejongPromise.backend.global.error.ErrorCode;
+import sejongPromise.backend.global.error.exception.CustomException;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,6 +31,9 @@ public enum Semester {
             Stream.of(values()).collect(Collectors.toMap(Semester::getName, e -> e));
 
     public static Semester of(String name){
+        if(BY_LABEL.get(name) == null){
+            throw new CustomException(ErrorCode.INVALID_REQUEST, "존재하지 않는 학기입니다.");
+        }
         return BY_LABEL.get(name);
     }
 
