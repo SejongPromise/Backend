@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sejongPromise.backend.domain.enumerate.ReportType;
-import sejongPromise.backend.domain.reports.Report;
+import sejongPromise.backend.domain.reports.model.Report;
 import sejongPromise.backend.domain.reports.repository.ReportRepository;
 import sejongPromise.backend.domain.review.model.Review;
 import sejongPromise.backend.domain.review.repository.ReviewRepository;

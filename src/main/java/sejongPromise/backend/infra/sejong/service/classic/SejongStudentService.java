@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import sejongPromise.backend.domain.enumerate.BookField;
 import sejongPromise.backend.global.config.qualifier.ChromeAgentWebClient;
-import sejongPromise.backend.infra.sejong.model.ClassicStudentInfo;
+import sejongPromise.backend.infra.sejong.model.StudentInfo;
 import sejongPromise.backend.infra.sejong.model.ExamInfo;
 
 import java.util.ArrayList;
@@ -29,12 +29,12 @@ public class SejongStudentService extends SejongRequester{
             this.STUDENT_INFO_URI = studentInfoUri;
         }
 
-        public ClassicStudentInfo crawlStudentInfo(String cookieString) {
+        public StudentInfo crawlStudentInfo(String cookieString) {
             String html = requestWebInfo(cookieString, STUDENT_INFO_URI);
             return parseStudentInfoHtml(html);
         }
 
-        private ClassicStudentInfo parseStudentInfoHtml(String html) {
+        private StudentInfo parseStudentInfoHtml(String html) {
             Document doc = Jsoup.parse(html);
 
             //학생정보 크롤링
@@ -60,8 +60,11 @@ public class SejongStudentService extends SejongRequester{
                         if(examInfo.text().contains("미응시") || examInfo.text().contains("미이수")){
                             continue;
                         }
+                        String[] yearAndSemester = examInfo.get(0).text().split(" ");
+                        String examYear = yearAndSemester[0].substring(0, 4);
+                        String examSemester = yearAndSemester[1];
                         String title;
-                        Boolean isTest;
+                        boolean isTest;
                         if(examInfo.get(1).text().equals(field)) {
                             title = examInfo.get(2).text();
                             isTest = true;
@@ -72,14 +75,14 @@ public class SejongStudentService extends SejongRequester{
                         //no-pass 불합격인 경우.
                         boolean examPass = !examInfo.select("span.no-pass").hasText();
 
-                        ExamInfo exam = new ExamInfo(field, title, examPass, isTest);
+                        ExamInfo exam = new ExamInfo(examYear, examSemester, field, title, examPass, isTest);
                         examList.add(exam);
                     }
                 }
             }
 
-            //시험 정보 중복 제거
+            //시험 정보 중복 제거 : title & field unique
             examList = examList.stream().distinct().collect(Collectors.toList());
-            return new ClassicStudentInfo(major, studentId, name, semester, isPass, examList);
+            return new StudentInfo(major, studentId, name, semester, isPass, examList);
         }
 }

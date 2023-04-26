@@ -8,6 +8,8 @@ import java.util.Objects;
 @Getter
 @RequiredArgsConstructor
 public class ExamInfo {
+    private final String year;
+    private final String semester;
     private final String field;
     private final String title;
     private final boolean isPass;
@@ -18,11 +20,11 @@ public class ExamInfo {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ExamInfo examInfo = (ExamInfo) o;
-        return isPass == examInfo.isPass && Objects.equals(field, examInfo.field) && Objects.equals(title, examInfo.title);
+        return Objects.equals(field, examInfo.field) && Objects.equals(title, examInfo.title);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(field, title, isPass);
+        return Objects.hash(field, title);
     }
 }

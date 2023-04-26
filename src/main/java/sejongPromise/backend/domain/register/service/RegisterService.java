@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import sejongPromise.backend.domain.book.model.Book;
 import sejongPromise.backend.domain.book.repository.BookRepository;
 import sejongPromise.backend.domain.enumerate.Semester;
-import sejongPromise.backend.domain.register.RegisterRepository.RegisterRepository;
+import sejongPromise.backend.domain.register.repository.RegisterRepository;
 import sejongPromise.backend.domain.register.model.Register;
 import sejongPromise.backend.domain.register.model.dto.request.RequestCreateRegisterDto;
 import sejongPromise.backend.domain.register.model.dto.response.ResponseMyRegisterDto;
@@ -55,7 +55,7 @@ public class RegisterService {
                 .shInfoId(dto.getShInfoId())
                 .build();
 
-        sejongRegisterService.registerTest(student.getSessionToken(), requestTestApplyDto);
+        sejongRegisterService.applyRegister(student.getSessionToken(), requestTestApplyDto);
         log.info("시험 예약 완료");
         // todo : 시험 신청을 하면 OPAP 값을 던져주어야 한다.
         List<MyRegisterInfo> myRegisterInfos = sejongRegisterService.crawlRegisterInfo(student.getSessionToken());
@@ -64,13 +64,13 @@ public class RegisterService {
             if (data.getDate().equals(dto.getDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))) && !data.getCancelOPAP().isBlank()) {
                 //register 생성
                 Register register = Register.builder()
-                        .bookTitle(dto.getBookTitle()) // todo : BOOK 맵핑
+                        .bookTitle(dto.getBookTitle())
                         .date(dto.getDate())
                         .startTime(dto.getTime())
                         .endTime(dto.getTime().plusMinutes(30L))
                         .year(dto.getYear())
                         .student(student)
-                        .semester(Semester.of(dto.getSemester()))
+                        .semester(Semester.of(dto.getSemester().replace(" ", "")))
                         .cancelOPAP(data.getCancelOPAP())
                         .build();
                 registerRepository.save(register);
@@ -127,10 +127,7 @@ public class RegisterService {
     private boolean isExceedApply(Student student, LocalDate date) {
         LocalDate startDate = date.with(DayOfWeek.MONDAY);
         LocalDate endDate = date.with(DayOfWeek.SUNDAY);
-        if(registerRepository.existsByStudentAndDateBetween(student, startDate, endDate)){
-            return true;
-        }
-        return false;
+        return registerRepository.existsByStudentAndDateBetween(student, startDate, endDate);
     }
 }
 

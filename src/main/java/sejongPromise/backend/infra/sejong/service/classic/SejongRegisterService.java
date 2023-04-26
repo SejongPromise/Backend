@@ -67,7 +67,7 @@ public class SejongRegisterService extends SejongRequester{
      * @param cookieString
      * @param dto
      */
-    public void registerTest(String cookieString, RequestTestApplyDto dto){
+    public void applyRegister(String cookieString, RequestTestApplyDto dto){
         String param = String.format("shInfoId=%s&opTermId=%s&bkAreaCode=%s&bkCode=%s", dto.getShInfoId(), dto.getOpTermId(), dto.getBkAreaCode(), dto.getBkCode());
         ResponseEntity<String> response = requestApi(cookieString, REGISTER_URI, param);
 
