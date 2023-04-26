@@ -16,8 +16,6 @@ public class ResponseMyRegisterDto {
     private final String startTime; //10:00
     private final String endTime; //10:10
     private final String bookTitle;
-    private final String status; //응시 상태
-    private final String deleteDate;
 
     public ResponseMyRegisterDto(Register register) {
         this.id = register.getId();
@@ -27,7 +25,5 @@ public class ResponseMyRegisterDto {
         this.startTime = register.getStartTime().toString();
         this.endTime = register.getEndTime().toString();
         this.bookTitle = register.getBookTitle();
-        this.status = register.getStatus().name();
-        this.deleteDate = register.getDeleteDate().toString();
     }
 }

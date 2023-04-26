@@ -67,19 +67,17 @@ public class SejongRegisterService extends SejongRequester{
      * @param cookieString
      * @param dto
      */
-    public void registerTest(String cookieString, RequestTestApplyDto dto){
+    public void applyRegister(String cookieString, RequestTestApplyDto dto){
         String param = String.format("shInfoId=%s&opTermId=%s&bkAreaCode=%s&bkCode=%s", dto.getShInfoId(), dto.getOpTermId(), dto.getBkAreaCode(), dto.getBkCode());
         ResponseEntity<String> response = requestApi(cookieString, REGISTER_URI, param);
+
+        log.info("status: {}, header: {}, body: {}", response.getStatusCode(), response.getHeaders(), response.getBody());
         /**
          * todo : response 값을 활용하여 에러처리하기.
          */
-
-//        response = <302,[Server:"Apache-Coyote/1.1", X-FRAME-OPTIONS:"SAMEORIGIN", Access-Control-Allow-Methods:"POST, GET, OPTIONS, DELETE", Access-Control-Max-Age:"3600", Access-Control-Allow-Headers:"x-requested-with", Access-Control-Allow-Origin:"*", Location:"/viewUserAppInfo.do?menuInfoId=MAIN_02_04", Content-Language:"ko", Content-Length:"0", Date:"Mon, 17 Apr 2023 13:54:00 GMT"]>
-//        body = null
-//        statusCode = 302 FOUND
-//                s = 302 FOUND
-
-
+        if (response.getStatusCode().equals(HttpStatus.OK)) {
+            throw new CustomException(ErrorCode.NOT_GRANTED, "JSession 값이 만료되었습니다");
+        }
     }
 
     /**
@@ -93,6 +91,8 @@ public class SejongRegisterService extends SejongRequester{
         /**
          * todo : response 값을 활용하여 에러처리하기.
          */
+        log.info("status: {}, header: {}, body: {}", response.getStatusCode(), response.getHeaders(), response.getBody());
+
     }
     private List<BookScheduleInfo> parseBookScheduleInfo(String html) {
         Document doc =Jsoup.parse(html);
@@ -156,19 +156,7 @@ public class SejongRegisterService extends SejongRequester{
                 String endTime = dataInfo.get(2).text().substring(8, 13);
                 String bookTitle = dataInfo.get(4).text();
                 String cancelOPAP = dataInfo.get(5).select("button").attr("onclick").split("'")[1];
-                ret.add(new MyRegisterInfo(year, semester, date, startTime, endTime, bookTitle, false, null, cancelOPAP));
-            }
-            // 예약취소 - 취소된 예약 목록
-            else{
-                Elements dataInfo = registerInfo.select("td");
-                String year = dataInfo.get(0).text().substring(0, 4);
-                String semester = dataInfo.get(0).text().substring(7);
-                String date = dataInfo.get(1).text();
-                String startTime = dataInfo.get(2).text().substring(0, 5);
-                String endTime = dataInfo.get(2).text().substring(8, 13);
-                String bookTitle = dataInfo.get(3).text();
-                String deleteDate = dataInfo.get(4).text();
-                ret.add(new MyRegisterInfo(year, semester, date, startTime, endTime, bookTitle, true, deleteDate, null));
+                ret.add(new MyRegisterInfo(year, semester, date, startTime, endTime, bookTitle, cancelOPAP));
             }
         }
         return ret;

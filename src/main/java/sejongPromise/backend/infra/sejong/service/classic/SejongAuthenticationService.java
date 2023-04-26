@@ -1,5 +1,7 @@
 package sejongPromise.backend.infra.sejong.service.classic;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -14,6 +16,8 @@ import sejongPromise.backend.global.error.exception.CustomException;
 import sejongPromise.backend.global.util.WebUtil;
 import sejongPromise.backend.infra.sejong.model.SejongAuth;
 
+import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 
 @Service
@@ -43,14 +47,14 @@ public class SejongAuthenticationService extends SejongRequester{
         return new SejongAuth(cookies);
     }
 
-    private ResponseEntity<String> tryLogin(String studentId, String password) {
+    private ResponseEntity<String> tryLogin(String studentId, String password){
         String param = String.format("userId=%s&password=%s&go=", studentId, password);
         ResponseEntity<String> response = requestApi(LOGIN_URI, param);
 
         if(response.getStatusCode().is2xxSuccessful()){
             throw new CustomException(ErrorCode.INVALID_STUDENT_INFO);
         }
-        
+
         checkJsessionId(response.getHeaders());
 
         return response;

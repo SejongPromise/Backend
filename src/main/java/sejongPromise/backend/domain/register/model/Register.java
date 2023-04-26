@@ -1,6 +1,7 @@
 package sejongPromise.backend.domain.register.model;
 
 import lombok.*;
+import org.hibernate.annotations.Where;
 import sejongPromise.backend.domain.enumerate.RegisterStatus;
 import sejongPromise.backend.domain.enumerate.Semester;
 import sejongPromise.backend.domain.student.model.Student;
@@ -8,18 +9,18 @@ import sejongPromise.backend.global.model.BaseEntity;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Where(clause = "status = 'ACTIVE'")
 public class Register extends BaseEntity{
 
     @Id @GeneratedValue
     @Column(name = "register_id")
     private Long Id;
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id")
     private Student student;
     private Integer year;
@@ -29,10 +30,9 @@ public class Register extends BaseEntity{
     private LocalTime startTime; //10:00
     private LocalTime endTime; //10:10
     private String bookTitle;
-    @Enumerated(EnumType.STRING)
-    private RegisterStatus status; //응시 상태
     private String cancelOPAP; //OPAP 값
-    private LocalDateTime deleteDate;
+    @Enumerated(EnumType.STRING)
+    private RegisterStatus status;
 
     @Builder
     private Register(@NonNull Student student,
@@ -42,9 +42,7 @@ public class Register extends BaseEntity{
                      @NonNull LocalTime startTime,
                      @NonNull LocalTime endTime,
                      @NonNull String bookTitle,
-                     @NonNull RegisterStatus status,
-                     String cancelOPAP,
-                     LocalDateTime deleteDate){
+                     @NonNull String cancelOPAP) {
         this.student = student;
         this.year = year;
         this.semester = semester;
@@ -52,14 +50,12 @@ public class Register extends BaseEntity{
         this.startTime = startTime;
         this.endTime = endTime;
         this.bookTitle = bookTitle;
-        this.status = status;
         this.cancelOPAP = cancelOPAP;
-        this.deleteDate = deleteDate;
-        }
-    public void cancelRegister(){
-        this.status = RegisterStatus.CANCELED;
-        this.deleteDate = LocalDateTime.now();
+        this.status = RegisterStatus.ACTIVE;
     }
 
+    public void delete(){
+        this.status = RegisterStatus.DELETED;
+    }
 }
 

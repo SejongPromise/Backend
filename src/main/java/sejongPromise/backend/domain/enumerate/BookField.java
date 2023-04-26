@@ -2,6 +2,8 @@ package sejongPromise.backend.domain.enumerate;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import sejongPromise.backend.global.error.ErrorCode;
+import sejongPromise.backend.global.error.exception.CustomException;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -25,10 +27,16 @@ public enum BookField {
             Stream.of(values()).collect(Collectors.toMap(BookField::getCode, e -> e));
 
     public static BookField of(String name){
+        if(BY_LABEL.get(name) == null){
+            throw new CustomException(ErrorCode.INVALID_REQUEST, "존재하지 않는 영역 입니다.");
+        }
         return BY_LABEL.get(name);
     }
 
     public static BookField of(Integer code){
+        if(BY_CODE_LABEL.get(code) == null){
+            throw new CustomException(ErrorCode.INVALID_REQUEST, "존재하지 않는 code 입니다.");
+        }
         return BY_CODE_LABEL.get(code);
     }
 }

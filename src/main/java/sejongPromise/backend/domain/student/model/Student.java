@@ -5,9 +5,13 @@ import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.domain.Persistable;
 import sejongPromise.backend.domain.enumerate.Role;
 import sejongPromise.backend.domain.enumerate.Semester;
+import sejongPromise.backend.domain.exam.model.Exam;
 import sejongPromise.backend.global.model.BaseEntity;
+import sejongPromise.backend.infra.sejong.model.StudentInfo;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -58,11 +62,11 @@ public class Student extends BaseEntity implements Persistable<Long> {
         this.role = role;
     }
 
-    public void update(Student student){
-        this.major = student.getMajor();
-        this.sessionToken = student.getSessionToken();
-        this.semester = student.getSemester();
-        this.isPass = student.isPass;
+    public void updateStudentInfo(StudentInfo studentInfo) {
+        this.major = studentInfo.getMajor();
+        this.semester = Semester.of(studentInfo.getSemester().replace(" ", ""));
+        this.name = studentInfo.getName();
+        this.isPass = studentInfo.isPass();
     }
 
     public String getStudentId() {

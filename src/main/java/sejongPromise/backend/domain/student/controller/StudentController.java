@@ -1,9 +1,7 @@
 package sejongPromise.backend.domain.student.controller;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import sejongPromise.backend.domain.student.model.dto.request.RequestRefreshSessionDto;
 import sejongPromise.backend.domain.student.model.dto.request.RequestRefreshTokenDto;
@@ -14,9 +12,7 @@ import sejongPromise.backend.domain.student.model.dto.response.ResponseStudentIn
 import sejongPromise.backend.domain.student.service.SignupService;
 import sejongPromise.backend.domain.student.service.StudentService;
 import sejongPromise.backend.global.config.auth.CustomAuthentication;
-import sejongPromise.backend.global.config.jwt.JwtProvider;
-import sejongPromise.backend.global.config.qualifier.Admin;
-import sejongPromise.backend.global.config.qualifier.Student;
+import sejongPromise.backend.global.config.qualifier.StudentAuth;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -25,7 +21,7 @@ import javax.validation.Valid;
  * @ResponseBody : 반환되는 Object 를 Json 형식으로 바꿔주는 것.
  * @Controller : 이 클래스는 API 를 생성하는 클래스 입니다.
  */
-@Tag(name = "대양휴머니티 칼리지 API", description = "대양 휴머니티 칼리지 API 모음")
+@Tag(name = "사용자 API", description = "사용자 API 모음")
 @RestController // @ResponseBody & @Controller
 @RequestMapping("/api/student")
 @RequiredArgsConstructor
@@ -35,7 +31,7 @@ public class StudentController {
     private final SignupService signupService;
 
     /**
-     * 대양휴머니티 칼리지 회원가입 API
+     * 회원가입 API
      *
      * @param dto 요청 body (학번 : 8자리 , 비번 : 자유형식)
      * @return 학번, 학과, 이름, 학기
@@ -63,7 +59,7 @@ public class StudentController {
      * @return 내 정보
      */
     @GetMapping
-    @Student
+    @StudentAuth
     public ResponseStudentInfoDto getMyInfo(CustomAuthentication auth) {
         Long studentId = auth.getStudentId();
         return studentService.getStudentInfo(studentId);
@@ -76,7 +72,7 @@ public class StudentController {
      * @return 토큰 재발급
      */
     @PostMapping("/reissue")
-    @Student
+    @StudentAuth
     public ResponseRefreshToken refreshToken(HttpServletRequest request,
                                              @RequestBody @Valid RequestRefreshTokenDto dto){
         return studentService.refreshToken(request, dto);
@@ -87,7 +83,7 @@ public class StudentController {
      * @param dto password
      */
     @PostMapping("/resession")
-    @Student
+    @StudentAuth
     public void resession(CustomAuthentication auth, @RequestBody @Valid RequestRefreshSessionDto dto){
         Long studentId = auth.getStudentId();
         signupService.refreshSession(studentId, dto.getPassword());

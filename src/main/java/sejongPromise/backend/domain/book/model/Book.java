@@ -21,7 +21,6 @@ public class Book extends BaseEntity {
     private String writer;
     private String com;
     private String imageUrl;
-
     private Long code;
     @Enumerated(EnumType.STRING)
     private BookStatus status;

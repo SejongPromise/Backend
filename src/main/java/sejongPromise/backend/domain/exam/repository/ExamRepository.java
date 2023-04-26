@@ -7,6 +7,7 @@ import sejongPromise.backend.domain.exam.model.Exam;
 import sejongPromise.backend.domain.exam.model.dto.ResponseExamFieldInfoDto;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ExamRepository extends JpaRepository<Exam, Long> {
 
@@ -17,4 +18,6 @@ public interface ExamRepository extends JpaRepository<Exam, Long> {
             "group by e.field " +
             "order by count(e.field) desc")
     List<ResponseExamFieldInfoDto> findCountGroupByField(Long studentId);
+
+    Optional<Exam> findByStudentIdAndTitle(Long studentId, String title);
 }
