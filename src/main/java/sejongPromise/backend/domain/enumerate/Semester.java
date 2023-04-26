@@ -31,4 +31,11 @@ public enum Semester {
     public static Semester of(String name){
         return BY_LABEL.get(name);
     }
+
+    public boolean isAvailableSemester() { //enum 상수가 더이상 변경되지 않을 것 같아서 ordinal 사용
+        if (this.ordinal() >= 6) {
+            return false;
+        }
+        return true;
+    }
 }
