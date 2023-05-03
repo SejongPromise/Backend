@@ -27,17 +27,12 @@ public class Review extends BaseEntity {
     @GeneratedValue
     @Column(name = "review_id")
     private Long id;
-
     @ManyToOne(fetch = FetchType.LAZY)
     private Book book;
-
     @ManyToOne(fetch = FetchType.LAZY)
     private Student student;
-
     private Integer score;
-
     private Integer volume;
-
     @Enumerated(EnumType.STRING)
     private BookRatio ratio;
     private String comment;
