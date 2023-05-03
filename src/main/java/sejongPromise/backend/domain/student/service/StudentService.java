@@ -5,6 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import sejongPromise.backend.domain.enumerate.StudentStatus;
 import sejongPromise.backend.domain.student.model.Student;
 import sejongPromise.backend.domain.student.model.dto.request.RequestRefreshTokenDto;
 import sejongPromise.backend.domain.student.model.dto.request.RequestStudentInfoDto;
@@ -34,6 +35,9 @@ public class StudentService {
         Student student = studentRepository.findById(Long.parseLong(dto.getStudentId())).orElseThrow(
                 () -> new CustomException(ErrorCode.NOT_FOUND_DATA, "해당 유저를 찾을 수 없습니다.")
         );
+        if(student.getStudentStatus()==StudentStatus.Deleted){
+            throw new CustomException(ErrorCode.NOT_FOUND_DATA);
+        }
         if (passwordEncoder.matches(dto.getPassword(), student.getPassword())) {
             AuthenticationToken token = jwtProvider.issue(student);
             return new ResponseLoginDto(student, token);
