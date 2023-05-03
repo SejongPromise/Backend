@@ -112,6 +112,7 @@ public class SignupService {
         );
         if (passwordEncoder.matches(password, student.getPassword())) {
             // 세션 토큰 갱신
+            //todo: 도서관 JSESSIONID 갱신 필요
             SejongAuth auth = sejongAuthenticationService.login(studentId.toString(), password);
             student.updateSessionToken(WebUtil.makeCookieString(auth.cookies));
 

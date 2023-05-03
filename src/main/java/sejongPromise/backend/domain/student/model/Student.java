@@ -19,6 +19,7 @@ import java.util.List;
 @DynamicUpdate // 필요한 필드만 업데이트 시킵니다.
 public class Student extends BaseEntity implements Persistable<Long> {
 
+    //todo: 학술정보원 JSESSIONID 추가
     @Id
     @Column(name = "student_id")
     private Long id;
