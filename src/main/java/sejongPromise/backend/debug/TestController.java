@@ -84,7 +84,7 @@ public class TestController {
     }
 
     @PostMapping("portal")
-    public void portalLogin(@RequestBody RequestTestPortalLoginDto dto) {
-        portalAuthenticationService.login(dto.getId(), dto.getPassword());
+    public SejongAuth portalLogin(@RequestBody RequestTestPortalLoginDto dto) {
+        return portalAuthenticationService.login(dto.getId(), dto.getPassword());
     }
 }

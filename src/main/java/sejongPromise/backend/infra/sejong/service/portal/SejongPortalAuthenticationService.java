@@ -33,18 +33,15 @@ public class SejongPortalAuthenticationService extends SejongPortalRequester {
     }
 
     /**
-     * 세종대학교 포털 사이트에 로그인 합니다.
+     * 세종대학교 포털 사이트에 로그인 하고 얻은 ssoToken으로 학술정보원에 로그인합니다.
      * @param studentId
      * @param password
      * @return
      */
     public SejongAuth login(String studentId, String password) {
         MultiValueMap<String, String> cookies = new LinkedMultiValueMap<>();
-//        MultiValueMap<String, String> PortalCookies = new LinkedMultiValueMap<>();
-//        MultiValueMap<String, String> libraryCookies = new LinkedMultiValueMap<>();
         String portalCookieToString="";
 
-        log.info("포털 로그인 시도");
         ResponseEntity<String> portalResponse = tryPortalLogin(studentId, password);
 
         //ssotoken만 필요
@@ -55,11 +52,8 @@ public class SejongPortalAuthenticationService extends SejongPortalRequester {
                 portalCookieToString += cookie;
             }
         }
-        
-        log.info("cookie: {}", portalCookieToString);
-        log.info("login: 도서관 로그인 시도");
-        ResponseEntity<String> libraryResponse = tryLibraryLogin(portalCookieToString);
 
+        ResponseEntity<String> libraryResponse = tryLibraryLogin(portalCookieToString);
         WebUtil.addMappedCookies(cookies, WebUtil.extractCookies(libraryResponse.getHeaders()));
 
         return new SejongAuth(cookies);
@@ -73,13 +67,12 @@ public class SejongPortalAuthenticationService extends SejongPortalRequester {
         if (!response.getStatusCode().equals(HttpStatus.OK)) {
             throw new CustomException(ErrorCode.INVALID_STUDENT_INFO);
         }
-        log.info("response: {}",response);
+
         return response;
     }
 
     private ResponseEntity<String> tryLibraryLogin(String cookieString){
         ResponseEntity<String> response = requestApiByCookie(LIBRARY_LOGIN_URI, cookieString);
-        log.info("도서관 로그인 시도 response: {}",response);
         checkJsessionId(response.getHeaders());
         if (!response.getStatusCode().equals(HttpStatus.OK)) {
             throw new CustomException(ErrorCode.INVALID_STUDENT_INFO);
@@ -98,7 +91,6 @@ public class SejongPortalAuthenticationService extends SejongPortalRequester {
 
     private static void checkJsessionId(HttpHeaders response) {
         List<ResponseCookie> responseCookies = WebUtil.extractCookies(response);
-        log.info("library cookie: {}", responseCookies);
         if(responseCookies.stream()
                 .noneMatch(data -> data.getName().contains("JSESSIONID"))){
             throw new CustomException(ErrorCode.NOT_FOUND_DATA, "JSESSIONID 못 찾음");

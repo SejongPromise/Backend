@@ -32,7 +32,7 @@ public class SejongPortalRequester {
     protected ResponseEntity<String> requestApiByCookie(String uri, String cookieString) {
         ResponseEntity<String> response;
         try{
-            log.info("cookie로 api 생성");
+//            log.info("cookie로 api 생성");
             response = makeRequestApiByCookie(uri, cookieString)
                     .retrieve()
                     .toEntity(String.class)
@@ -54,7 +54,7 @@ public class SejongPortalRequester {
     }
 
     private RequestBodySpec makeRequestApiByCookie(String uri, String cookieString) {
-        log.info("진짜로 post");
+//        log.info("진짜로 post");
         return (RequestBodySpec) webClient.post()
                 .uri(uri)
                 .header("Host", "library.sejong.ac.kr")
