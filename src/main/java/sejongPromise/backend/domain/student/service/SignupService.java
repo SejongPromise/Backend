@@ -23,6 +23,7 @@ import sejongPromise.backend.infra.sejong.model.SejongAuth;
 import sejongPromise.backend.infra.sejong.service.classic.SejongAuthenticationService;
 import sejongPromise.backend.infra.sejong.service.classic.SejongRegisterService;
 import sejongPromise.backend.infra.sejong.service.classic.SejongStudentService;
+import sejongPromise.backend.infra.sejong.service.portal.SejongPortalAuthenticationService;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -41,6 +42,7 @@ public class SignupService {
     private final SejongStudentService sejongStudentService;
     private final SejongRegisterService sejongRegisterService;
     private final PasswordEncoder passwordEncoder;
+    private final SejongPortalAuthenticationService sejongPortalAuthenticationService;
 
     /**
      * 유저 id, pw 로 대양 휴머니티 칼리지 인증 접속을 합니다.
@@ -58,14 +60,17 @@ public class SignupService {
         }
 
         //1. 학생 정보 저장
-        SejongAuth auth = sejongAuthenticationService.login(dto.getStudentId(), dto.getPassword());
-        StudentInfo studentInfo = sejongStudentService.crawlStudentInfo(WebUtil.makeCookieString(auth.cookies));
+        SejongAuth classicAuth = sejongAuthenticationService.login(dto.getStudentId(), dto.getPassword());
+        SejongAuth libraryAuth = sejongPortalAuthenticationService.login(dto.getStudentId(), dto.getPassword());
+
+        StudentInfo studentInfo = sejongStudentService.crawlStudentInfo(WebUtil.makeCookieString(classicAuth.cookies));
         Student student = Student.builder()
                 .name(studentInfo.getName())
                 .major(studentInfo.getMajor())
                 .studentId(Long.parseLong(studentInfo.getStudentId()))
                 .semester(studentInfo.getSemester().replace(" ", ""))
-                .sessionToken(WebUtil.makeCookieString(auth.cookies))
+                .sessionToken(WebUtil.makeCookieString(classicAuth.cookies))
+                .librarySessionToken(WebUtil.makeCookieString(libraryAuth.cookies))
                 .pass(studentInfo.isPass())
                 .encodedPassword(passwordEncoder.encode(dto.getPassword()))
                 .role(Role.STUDENT)
@@ -87,7 +92,7 @@ public class SignupService {
         });
 
         //3.신청내역과 신청 취소 내역 저장
-        List<MyRegisterInfo> myRegisterInfoList = sejongRegisterService.crawlRegisterInfo(WebUtil.makeCookieString(auth.cookies));
+        List<MyRegisterInfo> myRegisterInfoList = sejongRegisterService.crawlRegisterInfo(WebUtil.makeCookieString(classicAuth.cookies));
         myRegisterInfoList.forEach(data -> {
             Register register = Register.builder()
                     .student(saveStudent)
@@ -102,6 +107,8 @@ public class SignupService {
             registerRepository.save(register);
 
         });
+        
+        //todo : 스터디룸 예약 내역 저장
 
     }
 
@@ -112,9 +119,9 @@ public class SignupService {
         );
         if (passwordEncoder.matches(password, student.getPassword())) {
             // 세션 토큰 갱신
-            //todo: 도서관 JSESSIONID 갱신 필요
-            SejongAuth auth = sejongAuthenticationService.login(studentId.toString(), password);
-            student.updateSessionToken(WebUtil.makeCookieString(auth.cookies));
+            SejongAuth classicAuth = sejongAuthenticationService.login(studentId.toString(), password);
+            SejongAuth libraryAuth = sejongPortalAuthenticationService.login(studentId.toString(), password);
+            student.updateSessionToken(WebUtil.makeCookieString(classicAuth.cookies), WebUtil.makeCookieString(libraryAuth.cookies));
 
             // 학생 정보 갱신
             StudentInfo studentInfo = sejongStudentService.crawlStudentInfo(student.getSessionToken());
@@ -129,6 +136,8 @@ public class SignupService {
             List<Register> alreadyRegisterList = registerRepository.findAllByStudentId(student.getId());
             List<MyRegisterInfo> updateRegisterInfoList = sejongRegisterService.crawlRegisterInfo(student.getSessionToken());
             deleteRegister(alreadyRegisterList, updateRegisterInfoList);
+            
+            //todo: 스터디룸 예약현황 갱신
         }else{
             throw new CustomException(ErrorCode.WRONG_PASSWORD);
         }
