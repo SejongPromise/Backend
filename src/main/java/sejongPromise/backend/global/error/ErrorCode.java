@@ -53,9 +53,14 @@ public enum ErrorCode {
      * sejong
      */
     SCRAPPER_ERROR(HttpStatus.BAD_REQUEST, "세종대학교 사이트에서 정보를 가져올 수 없습니다."),
-    REQUEST_API_ERROR(HttpStatus.BAD_REQUEST, "세종대학교 API 에서 정보를 가져올 수 없습니다.");
+    REQUEST_API_ERROR(HttpStatus.BAD_REQUEST, "세종대학교 API 에서 정보를 가져올 수 없습니다."),
 
-
+    /**
+     * friend
+     */
+    NOT_A_FRIEND(HttpStatus.BAD_REQUEST, "해당 학생의 친구가 아닙니다"),
+    DUPLICATED_NICKNAME(HttpStatus.BAD_REQUEST, "친구의 닉네임이 중복되었습니다"),
+    ALREADY_EXIST_FRIEND(HttpStatus.BAD_REQUEST, "이미 존재하는 친구입니다");
 
     private final HttpStatus status;
     private final String message;
