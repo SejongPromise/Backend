@@ -2,21 +2,26 @@ package sejongPromise.backend.domain.student.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import sejongPromise.backend.domain.student.model.dto.request.RequestQuitDto;
 import sejongPromise.backend.domain.student.model.dto.request.RequestRefreshSessionDto;
 import sejongPromise.backend.domain.student.model.dto.request.RequestRefreshTokenDto;
 import sejongPromise.backend.domain.student.model.dto.request.RequestStudentInfoDto;
 import sejongPromise.backend.domain.student.model.dto.response.ResponseLoginDto;
 import sejongPromise.backend.domain.student.model.dto.response.ResponseRefreshToken;
 import sejongPromise.backend.domain.student.model.dto.response.ResponseStudentInfoDto;
+import sejongPromise.backend.domain.student.service.QuitService;
 import sejongPromise.backend.domain.student.service.SignupService;
 import sejongPromise.backend.domain.student.service.StudentService;
 import sejongPromise.backend.global.config.auth.CustomAuthentication;
+import sejongPromise.backend.global.config.qualifier.AdminAuth;
 import sejongPromise.backend.global.config.qualifier.StudentAuth;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 
+import javax.servlet.http.HttpServletRequest;
+
+import javax.validation.Valid;
 /**
  * @ResponseBody : 반환되는 Object 를 Json 형식으로 바꿔주는 것.
  * @Controller : 이 클래스는 API 를 생성하는 클래스 입니다.
@@ -29,6 +34,7 @@ public class StudentController {
 
     private final StudentService studentService;
     private final SignupService signupService;
+    private final QuitService quitService;
 
     /**
      * 회원가입 API
@@ -87,5 +93,18 @@ public class StudentController {
     public void resession(CustomAuthentication auth, @RequestBody @Valid RequestRefreshSessionDto dto){
         Long studentId = auth.getStudentId();
         signupService.refreshSession(studentId, dto.getPassword());
+    }
+
+    @PostMapping("/quit")
+    @StudentAuth
+    public void quit(CustomAuthentication auth, @RequestBody @Valid RequestQuitDto dto){
+        Long studentId = auth.getStudentId();
+        quitService.quit(studentId,dto);
+    }
+
+    @PostMapping("/quit/{studentId}/admin")
+    @AdminAuth
+    public void quitByAdmin(@PathVariable("studentId") Long studentId){
+        quitService.quitByAdmin(studentId);
     }
 }
