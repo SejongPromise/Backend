@@ -8,6 +8,7 @@ import sejongPromise.backend.domain.student.model.Student;
 import sejongPromise.backend.global.model.BaseEntity;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Getter
@@ -15,18 +16,22 @@ import javax.persistence.*;
 public class Friend extends BaseEntity {
     @Id
     @GeneratedValue
+    @Column(name = "friend_id")
     private Long id;
 
-    private Long studentNum;
+    private Long friendStudentId;
     private String name;
     private String nickname;
 
-    @ManyToOne
-    private Student student; //하나의 학생이 여러 친구 가짐, 하나의 친구는 하나의 학생 가짐
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Student student;
 
     @Builder
-    public Friend(Long studentNum, String name, String nickname, Student student) {
-        this.studentNum = studentNum;
+    public Friend(@NotNull Long friendStudentId,
+                  @NotNull String name,
+                  @NotNull String nickname,
+                  @NotNull Student student) {
+        this.friendStudentId = friendStudentId;
         this.name = name;
         this.nickname = nickname;
         this.student = student;

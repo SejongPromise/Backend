@@ -9,9 +9,9 @@ import javax.validation.constraints.NotNull;
 @Schema(description = "친구 생성 request dto")
 @Getter
 @RequiredArgsConstructor
-public class RequestCreateFriendDto {
+public class RequestFriendInfoDto {
     @NotNull
-    private final Long studentNum;
+    private final Long friendStudentId;
     @NotNull
     private final String name;
     @NotNull
