@@ -33,10 +33,9 @@ public class QuitService {
         }
 
         student.quit();
-        studentRepository.save(student);
-
     }
 
+    @Transactional
     public void quitByAdmin(Long studentId) {
         Student student = studentRepository.findById(studentId).orElseThrow(
                 () -> new CustomException(ErrorCode.NOT_FOUND_DATA, "해당 유저를 찾을 수 없습니다.")
