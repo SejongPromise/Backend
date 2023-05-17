@@ -23,7 +23,8 @@ public class Friend extends BaseEntity {
     private String name;
     private String nickname;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "student_id")
     private Student student;
 
     @Builder

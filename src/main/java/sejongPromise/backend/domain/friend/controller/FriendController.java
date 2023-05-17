@@ -3,7 +3,7 @@ package sejongPromise.backend.domain.friend.controller;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import sejongPromise.backend.domain.friend.model.dto.request.RequestFriendInfoDto;
+import sejongPromise.backend.domain.friend.model.dto.request.RequestCreateFriendDto;
 import sejongPromise.backend.domain.friend.model.dto.response.ResponseFriendInfoDto;
 import sejongPromise.backend.domain.friend.service.FriendService;
 import sejongPromise.backend.global.config.auth.CustomAuthentication;
@@ -27,7 +27,7 @@ public class FriendController {
      */
     @PostMapping("")
     @StudentAuth
-    public void createFriend(CustomAuthentication auth, @Valid @RequestBody RequestFriendInfoDto dto) {
+    public void createFriend(CustomAuthentication auth, @Valid @RequestBody RequestCreateFriendDto dto) {
         friendService.createFriend(auth.getStudentId(), dto);
     }
 
@@ -48,11 +48,11 @@ public class FriendController {
      *
      * @param auth Header : Authorization
      * @param nickname
-     * @return 친구 (학번, 이름, 닉네임)
+     * @return 친구 list (학번, 이름, 닉네임)
      */
     @GetMapping("/nickname")
     @StudentAuth
-    public ResponseFriendInfoDto getFriendByNickname(CustomAuthentication auth,
+    public List<ResponseFriendInfoDto> getFriendByNickname(CustomAuthentication auth,
                                                      @RequestParam("nickname") String nickname) {
         return friendService.getFriendByNickname(auth.getStudentId(), nickname);
     }
