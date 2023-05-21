@@ -3,8 +3,11 @@ package sejongPromise.backend.domain.student.model;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.domain.Persistable;
+import sejongPromise.backend.domain.enumerate.RegisterStatus;
 import sejongPromise.backend.domain.enumerate.Role;
 import sejongPromise.backend.domain.enumerate.Semester;
+import sejongPromise.backend.domain.enumerate.StudentStatus;
+import sejongPromise.backend.domain.exam.model.Exam;
 import sejongPromise.backend.global.model.BaseEntity;
 import sejongPromise.backend.infra.sejong.model.StudentInfo;
 
@@ -30,6 +33,8 @@ public class Student extends BaseEntity implements Persistable<Long> {
     private Boolean isPass;
     @Enumerated(EnumType.STRING)
     private Role role;
+    @Enumerated(EnumType.STRING)
+    private StudentStatus studentStatus;
 
     /**
      * Persistable override
@@ -51,7 +56,8 @@ public class Student extends BaseEntity implements Persistable<Long> {
                     @NonNull String semester,
                     @NonNull Boolean pass,
                     @NonNull Role role,
-                    @NonNull String librarySessionToken) {
+                    @NonNull String librarySessionToken,
+                    @NonNull StudentStatus studentStatus) {
         this.id = studentId;
         this.name = name;
         this.major = major;
@@ -61,6 +67,7 @@ public class Student extends BaseEntity implements Persistable<Long> {
         this.isPass = pass;
         this.password = encodedPassword;
         this.role = role;
+        this.studentStatus = studentStatus;
     }
 
     public void updateStudentInfo(StudentInfo studentInfo) {
@@ -77,5 +84,16 @@ public class Student extends BaseEntity implements Persistable<Long> {
     public void updateSessionToken(String classicCookieString, String librarySessionToken) {
         this.sessionToken = classicCookieString;
         this.librarySessionToken = librarySessionToken;
+    }
+    public void quit(){
+        this.studentStatus = StudentStatus.Deleted;
+    }
+
+    public void active() {
+        this.studentStatus = StudentStatus.Active;
+    }
+
+    public void quitByAdmin() {
+        this.studentStatus = StudentStatus.DeletedByAdmin;
     }
 }

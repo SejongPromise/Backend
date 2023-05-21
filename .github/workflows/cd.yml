@@ -34,7 +34,7 @@ jobs:
         run: |
           mkdir -p ./src/test/resources && cd "$_"
           touch ./application.yml
-          echo $PROPERTIES > application.yml
+          echo $PROPERTIES | base64 --decode > application.yml
 
       - name: Build with Gradle
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
@@ -46,7 +46,7 @@ jobs:
           USERNAME: ${{ secrets.DOCKER_USERNAME }}
           REPO: ${{ secrets.DOCKER_REPO }}
         run: |
-          docker build --platform arm64 -t $USERNAME/$REPO:${GITHUB_SHA::7}  -t $USERNAME/$REPO:latest . 
+          docker build -t $USERNAME/$REPO:${GITHUB_SHA::7}  -t $USERNAME/$REPO:latest . 
           
       - name: Docker push
         env:
