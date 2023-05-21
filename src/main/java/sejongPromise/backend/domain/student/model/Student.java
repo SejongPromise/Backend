@@ -12,8 +12,6 @@ import sejongPromise.backend.global.model.BaseEntity;
 import sejongPromise.backend.infra.sejong.model.StudentInfo;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -21,11 +19,13 @@ import java.util.List;
 @DynamicUpdate // 필요한 필드만 업데이트 시킵니다.
 public class Student extends BaseEntity implements Persistable<Long> {
 
+    //todo: 학술정보원 JSESSIONID 추가
     @Id
     @Column(name = "student_id")
     private Long id;
     private String password;
     private String sessionToken;
+    private String librarySessionToken;
     private String name;
     private String major;
     @Enumerated(EnumType.STRING)
@@ -56,11 +56,13 @@ public class Student extends BaseEntity implements Persistable<Long> {
                     @NonNull String semester,
                     @NonNull Boolean pass,
                     @NonNull Role role,
+                    @NonNull String librarySessionToken,
                     @NonNull StudentStatus studentStatus) {
         this.id = studentId;
         this.name = name;
         this.major = major;
         this.sessionToken = sessionToken;
+        this.librarySessionToken = librarySessionToken;
         this.semester = Semester.of(semester);
         this.isPass = pass;
         this.password = encodedPassword;
@@ -79,8 +81,9 @@ public class Student extends BaseEntity implements Persistable<Long> {
         return id.toString();
     }
 
-    public void updateSessionToken(String cookieString) {
-        this.sessionToken = cookieString;
+    public void updateSessionToken(String classicCookieString, String librarySessionToken) {
+        this.sessionToken = classicCookieString;
+        this.librarySessionToken = librarySessionToken;
     }
     public void quit(){
         this.studentStatus = StudentStatus.Deleted;

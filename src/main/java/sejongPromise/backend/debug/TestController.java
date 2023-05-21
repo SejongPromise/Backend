@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import sejongPromise.backend.debug.dto.RequestTestPortalLoginDto;
 import sejongPromise.backend.global.util.WebUtil;
 import sejongPromise.backend.infra.sejong.model.*;
 import sejongPromise.backend.infra.sejong.model.dto.request.RequestTestApplyDto;
@@ -13,6 +14,7 @@ import sejongPromise.backend.debug.dto.RequestTestCancelDto;
 import sejongPromise.backend.infra.sejong.service.classic.SejongAuthenticationService;
 import sejongPromise.backend.infra.sejong.service.classic.SejongBookService;
 import sejongPromise.backend.infra.sejong.service.classic.SejongRegisterService;
+import sejongPromise.backend.infra.sejong.service.portal.SejongPortalAuthenticationService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -25,8 +27,9 @@ import java.util.List;
 public class TestController {
     private final SejongAuthenticationService classicAuthenticationService;
     private final SejongRegisterService registerService;
-    private final SejongBookService bookService;;
+    private final SejongBookService bookService;
 
+    private final SejongPortalAuthenticationService portalAuthenticationService;
 
 
     /**
@@ -78,5 +81,10 @@ public class TestController {
     public void classicRegisterCancel(@RequestParam("JSession") String JSession,
                                       @RequestBody RequestTestCancelDto dto) {
         registerService.cancelRegister(JSession, dto.getCancelData());
+    }
+
+    @PostMapping("portal")
+    public SejongAuth portalLogin(@RequestBody RequestTestPortalLoginDto dto) {
+        return portalAuthenticationService.login(dto.getId(), dto.getPassword());
     }
 }
