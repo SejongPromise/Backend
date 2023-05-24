@@ -57,3 +57,22 @@ jobs:
           docker login -u $USERNAME -p $PASSWORD
           docker push $USERNAME/$REPO:${GITHUB_SHA::7}
           docker push $USERNAME/$REPO:latest
+          
+      - name : SSH Remote Commands
+        uses: appleboy/ssh-action@master
+        env:
+          REPO: ${{ secrets.DOCKER_REPO }}
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ec2-user
+          key: ${{ secrets.PRIVATE_PEM_KEY }}
+          proxy_host: ${{ secrets.BASTION_IP }}
+          proxy_username: ec2-user
+          proxy_key: ${{ secrets.PUBLIC_PEM_KEY }}
+          envs: GITHUB_SHA,REPO
+          script: |
+            docker pull ${{ secrets.DOCKER_USERNAME }}/$REPO:${GITHUB_SHA::7}
+            docker tag ${{ secrets.DOCKER_USERNAME }}/$REPO:${GITHUB_SHA::7} $REPO
+            docker stop $REPO
+            docker rm #REPO
+            docker run -d --name $REPO -p 8080:8080 -v  v ~/logs:/usr/app/logs -e TZ=Asia/Seoul --restart=always $REPO
