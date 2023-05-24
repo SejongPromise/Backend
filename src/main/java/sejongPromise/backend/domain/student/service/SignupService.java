@@ -62,11 +62,11 @@ public class SignupService {
                 throw new CustomException(ErrorCode.ALREADY_USER_EXIST);
             }
             //관리자에 의해 삭제된 계정이 다시 회원가입 하려는 경우-else if
-            else if(student.getStudentStatus()== StudentStatus.DeletedByAdmin){
+            if(student.getStudentStatus() == StudentStatus.DeletedByAdmin){
                 throw new CustomException(ErrorCode.INVALID_ACCESS,"관리자에 의해 삭제된 계쩡입니다.");
             }
             //탈퇴한 계정이 재가입한 경우
-            else {
+            if(student.getStudentStatus() == StudentStatus.Deleted){
                 refreshSession(student.getId(), dto.getPassword());
                 student.active();
             }

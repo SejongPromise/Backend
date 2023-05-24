@@ -39,7 +39,7 @@ public class BookService {
         });
         // #2 새로운 책이 생긴 경우
         bookInfoList.forEach(book -> {
-            if (!alreadyTitleList.contains(book)) {
+            if (!alreadyTitleList.contains(book.getTitle())) {
                 Book newBook = Book.builder()
                         .title(book.getTitle())
                         .field(BookField.of(book.getSection()))
