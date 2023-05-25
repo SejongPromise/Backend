@@ -16,10 +16,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ExamService {
     private final ExamRepository examRepository;
+    //이수 현황 연도별 정렬
     public List<ResponseExamInfoDto> list(Long studentId) {
-        List<Exam> examList = examRepository.findAllByStudentId(studentId);
+        List<Exam> examList = examRepository.findAllByStudentIdOrderByYearDesc(studentId);
         return examList.stream().map(ResponseExamInfoDto::new).collect(Collectors.toList());
     }
+    //이수 현황 영역별 정렬
     public List<ResponseExamFieldInfoDto> fieldList(Long studentId){
         return examRepository.findCountGroupByField(studentId);
     }

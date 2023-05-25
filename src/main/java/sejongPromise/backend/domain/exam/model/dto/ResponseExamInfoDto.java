@@ -24,4 +24,5 @@ public class ResponseExamInfoDto {
         this.isTest = exam.isTest();
         this.isReviewed = exam.isReviewed();
     }
+
 }

@@ -61,4 +61,6 @@ public class Exam extends BaseEntity {
         this.isTest = newExam.isTest();
         this.isReviewed = false;
     }
+
+
 }
