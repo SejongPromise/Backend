@@ -1,6 +1,10 @@
 package sejongPromise.backend.infra.sejong.service.classic;
 
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -15,8 +19,10 @@ import sejongPromise.backend.global.error.ErrorCode;
 import sejongPromise.backend.global.error.exception.CustomException;
 import sejongPromise.backend.infra.sejong.model.BookScheduleInfo;
 import sejongPromise.backend.infra.sejong.model.MyRegisterInfo;
+import sejongPromise.backend.infra.sejong.model.dto.StudentBookInfo;
 import sejongPromise.backend.infra.sejong.model.dto.request.RequestTestApplyDto;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,16 +34,19 @@ public class SejongRegisterService extends SejongRequester{
     private final String REGISTER_BOOK_SCHEDULE_URI;
     private final String REGISTER_URI;
     private final String CANCEL_REGISTER_URI;
+    private final String STUDENT_BOOK_LIST_URI;
     public SejongRegisterService(@ChromeAgentWebClient WebClient webClient,
                                  @Value("${sejong.classic.student.schedule}") String registerScheduleUri,
                                  @Value("${sejong.classic.book.schedule}") String registerBookScheduleUri,
                                  @Value("${sejong.classic.book.test.register}") String registerUri,
-                                 @Value("${sejong.classic.book.test.cancel}") String cancelRegisterUri) {
+                                 @Value("${sejong.classic.book.test.cancel}") String cancelRegisterUri,
+                                 @Value("${sejong.classic.book.student}") String studentBookListUri) {
         super(webClient);
         this.REGISTER_SCHEDULE_URI = registerScheduleUri;
         this.REGISTER_BOOK_SCHEDULE_URI = registerBookScheduleUri;
         this.REGISTER_URI = registerUri;
         this.CANCEL_REGISTER_URI = cancelRegisterUri;
+        this.STUDENT_BOOK_LIST_URI = studentBookListUri;
     }
 
     /**
@@ -94,6 +103,37 @@ public class SejongRegisterService extends SejongRequester{
         log.info("status: {}, header: {}, body: {}", response.getStatusCode(), response.getHeaders(), response.getBody());
 
     }
+
+    /**
+     * 시험 신청 시 해당 학생이 예약 가능한 책 리스트 정보를 받아옵니다.
+     * @param cookieString
+     * @param bkAreaCode
+     * @return StudentBookInfo
+     */
+    public List<StudentBookInfo> crawlStudentBookInfo(String cookieString, Integer bkAreaCode){
+        String param = String.format("opTermId=TERM-00566&bkAreaCode=%s", bkAreaCode);
+        ResponseEntity<String> response = requestApi(cookieString, STUDENT_BOOK_LIST_URI, param);
+        JSONParser jsonParser = new JSONParser();
+        List<StudentBookInfo> studentBookInfoList = new ArrayList<>();
+        try {
+            log.info("response.getBody: {}", response.getBody());
+            log.info("cookieString: {}", cookieString);
+            Object obj = jsonParser.parse(response.getBody());
+            JSONObject json = (JSONObject) obj;
+            JSONArray resultArr = (JSONArray) json.get("results");
+            log.info("resultArr: {}", resultArr);
+            for (Object o : resultArr) {
+                JSONObject bookObj = (JSONObject) o;
+                StudentBookInfo studentBookInfo = new StudentBookInfo((String) bookObj.get("bkName"), (Long) bookObj.get("appCount"));
+                studentBookInfoList.add(studentBookInfo);
+            }
+        } catch (ParseException e) {
+            throw new CustomException(ErrorCode.NOT_FOUND_DATA, "세종대에서 책 코드 정보를 가져올 수 없습니다.");
+        }
+
+        return studentBookInfoList;
+    }
+
     private List<BookScheduleInfo> parseBookScheduleInfo(String html) {
         Document doc =Jsoup.parse(html);
         Elements tableList = doc.select("table[class=listA]").select("tbody");
