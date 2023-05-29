@@ -137,7 +137,7 @@ public class SignupService {
         dest.forEach(register -> {
             //날짜 비교 해당 날짜 데이터가 없으면 Register 에서 삭제한다.
             if (src.stream().noneMatch(myRegisterInfo -> myRegisterInfo.getDate().equals(register.getDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))))) {
-                register.delete();
+                registerRepository.delete(register);
             }
         });
     }
