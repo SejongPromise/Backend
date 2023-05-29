@@ -53,9 +53,5 @@ public class Register extends BaseEntity{
         this.cancelOPAP = cancelOPAP;
         this.status = RegisterStatus.ACTIVE;
     }
-
-    public void delete(){
-        this.status = RegisterStatus.DELETED;
-    }
 }
 
