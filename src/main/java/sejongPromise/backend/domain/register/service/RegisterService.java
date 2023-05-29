@@ -16,7 +16,9 @@ import sejongPromise.backend.global.error.ErrorCode;
 import sejongPromise.backend.global.error.exception.CustomException;
 import sejongPromise.backend.infra.sejong.model.BookScheduleInfo;
 import sejongPromise.backend.infra.sejong.model.MyRegisterInfo;
+import sejongPromise.backend.infra.sejong.model.dto.StudentBookInfo;
 import sejongPromise.backend.infra.sejong.model.dto.request.RequestTestApplyDto;
+import sejongPromise.backend.infra.sejong.service.classic.SejongBookService;
 import sejongPromise.backend.infra.sejong.service.classic.SejongRegisterService;
 
 import javax.transaction.Transactional;
@@ -35,6 +37,7 @@ public class RegisterService {
     private final BookRepository bookRepository;
     private final StudentRepository studentRepository;
     private final SejongRegisterService sejongRegisterService;
+    private final SejongBookService sejongBookService;
 
     /**
      * 시험 신청 서비스
@@ -102,6 +105,20 @@ public class RegisterService {
     public List<ResponseMyRegisterDto> getMyRegister(Long studentId) {
         List<Register> allByStudentId = registerRepository.findAllByStudentId(studentId);
         return allByStudentId.stream().map(ResponseMyRegisterDto::new).collect(Collectors.toList());
+    }
+
+    public String isAvailableBook(Long studentId, String title) {
+        Student student = studentRepository.findById(studentId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA, "해당 유저를 찾을 수 없습니다."));
+        Book book = bookRepository.findByTitle(title).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA, "해당 도서를 찾을 수 없습니다."));
+        List<StudentBookInfo> bookList = sejongRegisterService.crawlStudentBookInfo(student.getSessionToken(), book.getField().getCode());
+
+        StudentBookInfo findBook = bookList.stream().filter(bookCodeInfo -> bookCodeInfo.getTitle().equals(title)).findAny()
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA, "해당 도서를 찾을 수 없습니다."));
+        log.debug("appCount: {}", findBook.getAppCount());
+        if(findBook.getAppCount() < 2){
+            return "true";
+        }
+        return "false";
     }
 
     private void applyExceptionHandling(LocalDate date, Student student) {

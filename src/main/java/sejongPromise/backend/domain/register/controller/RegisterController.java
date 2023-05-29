@@ -25,6 +25,7 @@ public class RegisterController {
 
     /**
      * 나의 시험 신청 현황을 조회합니다.
+     *
      * @param auth
      * @return 나의 신청시험 현황
      */
@@ -37,6 +38,7 @@ public class RegisterController {
 
     /**
      * 시험 예약 API
+     *
      * @param dto 시험 예약 정보 일자, 시간, 년도, 학기, 제목, 신청버튼 값
      */
     @PostMapping("/apply")
@@ -48,6 +50,7 @@ public class RegisterController {
 
     /**
      * 시험 일정 API - 일자의 시험 정보를 가져옵니다, 시험신청 버튼 값을 활용해야 합니다.
+     *
      * @param date 요청파마리터 yyyy-mm-dd 형식
      * @return
      */
@@ -61,14 +64,25 @@ public class RegisterController {
 
     /**
      * 시험 예약 취소 API
+     *
      * @param registerId 예약 id
      */
     @DeleteMapping("/{id}")
     @StudentAuth
     public void testRegisterCancel(CustomAuthentication auth,
-                                @PathVariable("id") Long registerId) {
+                                   @PathVariable("id") Long registerId) {
         Long studentId = auth.getStudentId();
         registerService.testCancel(studentId, registerId);
     }
 
+    /**
+     * 시험 신청 가능 여부 조회 API
+     */
+    @GetMapping("/")
+    @StudentAuth
+    public String isAvailableBook(CustomAuthentication auth,
+                                  @RequestParam("title") String title) {
+        Long studentId = auth.getStudentId();
+        return registerService.isAvailableBook(studentId, title);
+    }
 }
