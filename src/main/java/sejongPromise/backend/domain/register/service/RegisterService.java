@@ -14,7 +14,6 @@ import sejongPromise.backend.domain.student.model.Student;
 import sejongPromise.backend.domain.student.repository.StudentRepository;
 import sejongPromise.backend.global.error.ErrorCode;
 import sejongPromise.backend.global.error.exception.CustomException;
-import sejongPromise.backend.infra.sejong.model.BookCodeInfo;
 import sejongPromise.backend.infra.sejong.model.BookScheduleInfo;
 import sejongPromise.backend.infra.sejong.model.MyRegisterInfo;
 import sejongPromise.backend.infra.sejong.model.dto.StudentBookInfo;

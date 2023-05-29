@@ -22,7 +22,6 @@ import sejongPromise.backend.infra.sejong.model.MyRegisterInfo;
 import sejongPromise.backend.infra.sejong.model.dto.StudentBookInfo;
 import sejongPromise.backend.infra.sejong.model.dto.request.RequestTestApplyDto;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
