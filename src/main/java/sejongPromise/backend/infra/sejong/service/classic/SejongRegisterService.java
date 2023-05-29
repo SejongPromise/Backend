@@ -79,7 +79,6 @@ public class SejongRegisterService extends SejongRequester{
         String param = String.format("shInfoId=%s&opTermId=%s&bkAreaCode=%s&bkCode=%s", dto.getShInfoId(), dto.getOpTermId(), dto.getBkAreaCode(), dto.getBkCode());
         ResponseEntity<String> response = requestApi(cookieString, REGISTER_URI, param);
 
-        log.info("status: {}, header: {}, body: {}", response.getStatusCode(), response.getHeaders(), response.getBody());
         /**
          * todo : response 값을 활용하여 에러처리하기.
          */
@@ -99,8 +98,6 @@ public class SejongRegisterService extends SejongRequester{
         /**
          * todo : response 값을 활용하여 에러처리하기.
          */
-        log.info("status: {}, header: {}, body: {}", response.getStatusCode(), response.getHeaders(), response.getBody());
-
     }
 
     /**
@@ -115,12 +112,9 @@ public class SejongRegisterService extends SejongRequester{
         JSONParser jsonParser = new JSONParser();
         List<StudentBookInfo> studentBookInfoList = new ArrayList<>();
         try {
-            log.info("response.getBody: {}", response.getBody());
-            log.info("cookieString: {}", cookieString);
             Object obj = jsonParser.parse(response.getBody());
             JSONObject json = (JSONObject) obj;
             JSONArray resultArr = (JSONArray) json.get("results");
-            log.info("resultArr: {}", resultArr);
             for (Object o : resultArr) {
                 JSONObject bookObj = (JSONObject) o;
                 StudentBookInfo studentBookInfo = new StudentBookInfo((String) bookObj.get("bkName"), (Long) bookObj.get("appCount"));

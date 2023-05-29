@@ -114,7 +114,7 @@ public class RegisterService {
 
         StudentBookInfo findBook = bookList.stream().filter(bookCodeInfo -> bookCodeInfo.getTitle().equals(title)).findAny()
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA, "해당 도서를 찾을 수 없습니다."));
-        log.info("appCount: {}", findBook.getAppCount());
+        log.debug("appCount: {}", findBook.getAppCount());
         if(findBook.getAppCount() < 2){
             return "true";
         }
