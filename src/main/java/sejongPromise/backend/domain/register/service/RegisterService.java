@@ -24,6 +24,7 @@ import sejongPromise.backend.infra.sejong.service.classic.SejongRegisterService;
 import javax.transaction.Transactional;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,6 +49,12 @@ public class RegisterService {
         Student student = studentRepository.findById(studentId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA, "해당 유저가 존재하지 않습니다."));
 
         applyExceptionHandling(dto.getDate(), student);
+
+        //당일 예약 지난 시간 예외처리
+        if (dto.getTime().isBefore(LocalTime.now())) {
+            throw new CustomException(ErrorCode.INVALID_DATE, "신청하려는 시간이 이미 지난 시간입니다.");
+        }
+
         //todo : date, time 에 맞는 shInfo 값인지 확인 필요
 
         Book book = bookRepository.findByTitle(dto.getBookTitle()).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA, "해당 도서를 찾을 수 없습니다."));
