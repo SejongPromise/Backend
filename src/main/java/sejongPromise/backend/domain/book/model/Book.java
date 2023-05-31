@@ -6,6 +6,7 @@ import sejongPromise.backend.domain.enumerate.BookStatus;
 import sejongPromise.backend.domain.review.model.Review;
 import sejongPromise.backend.global.model.BaseEntity;
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Getter
@@ -23,28 +24,20 @@ public class Book extends BaseEntity {
     private Long code;
     @Enumerated(EnumType.STRING)
     private BookStatus status;
-    @OneToOne(mappedBy = "book", fetch = FetchType.LAZY)
-    private Review review;
-    public float getScore(){
-        if(review != null){
-            return review.getScore();
-        } else {
-            return 0.0f;}
-    }
+    private Float averageScore;
+
     @Builder
     private Book(@NonNull String title,
                  @NonNull BookField field,
                  @NonNull String writer,
                  @NonNull String com,
-                 @NonNull String imageUrl,
-                 Review review) {
+                 @NonNull String imageUrl) {
         this.title = title;
         this.field = field;
         this.writer = writer;
         this.com = com;
         this.imageUrl = imageUrl;
         this.status = BookStatus.ACTIVE;
-        this.review = review;
     }
 
     public void deprecated() {
@@ -53,5 +46,9 @@ public class Book extends BaseEntity {
 
     public void updateCode(Long code) {
         this.code = code;
+    }
+
+    public void setAverageScore(float averageScore){
+        this.averageScore = averageScore;
     }
 }

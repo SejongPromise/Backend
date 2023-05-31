@@ -2,7 +2,6 @@ package sejongPromise.backend.domain.exam.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import sejongPromise.backend.domain.enumerate.BookField;
 import sejongPromise.backend.domain.exam.model.Exam;
 import sejongPromise.backend.domain.exam.model.dto.ResponseExamFieldInfoDto;
 

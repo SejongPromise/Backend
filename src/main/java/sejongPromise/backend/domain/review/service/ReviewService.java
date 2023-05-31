@@ -13,12 +13,18 @@ import sejongPromise.backend.domain.enumerate.Role;
 import sejongPromise.backend.domain.exam.model.Exam;
 import sejongPromise.backend.domain.exam.repository.ExamRepository;
 import sejongPromise.backend.domain.review.model.Review;
+import sejongPromise.backend.domain.review.model.dto.Response.ResponseReviewDto;
 import sejongPromise.backend.domain.review.model.dto.ReviewDto;
 import sejongPromise.backend.domain.review.repository.ReviewRepository;
 import sejongPromise.backend.domain.student.model.Student;
 import sejongPromise.backend.domain.student.repository.StudentRepository;
 import sejongPromise.backend.global.error.ErrorCode;
 import sejongPromise.backend.global.error.exception.CustomException;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -41,17 +47,17 @@ public class ReviewService {
         return reviewRepository.findAllByBookId(bookId, pageable).map(ReviewDto::new);
     }
 
-    /**
-     * 리뷰 작성
-     * @param studentId 학생 ID
-     * @param bookId    책 ID
-     * @param score     별점 ( 1 ~ 5 )
-     * @param volume    몇회독
-     * @param ratioIdx  도움이 된 부분
-     * @param comment   리뷰 내용
-     * @return
-     */
-    public Long create(Long studentId, Long bookId, Integer score, Integer volume, Integer ratioIdx, String comment) {
+        /**
+         * 리뷰 작성
+         * @param studentId 학생 ID
+         * @param bookId    책 ID
+         * @param score     별점 ( 1 ~ 5 )
+         * @param volume    몇회독
+         * @param ratioIdx  도움이 된 부분
+         * @param comment   리뷰 내용
+         * @return
+         */
+    public Long create(Long studentId, Long bookId, Float score, Integer volume, Integer ratioIdx, String comment) {
         Student student = studentRepository.findById(studentId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA, "해당 유저를 찾을 수 없습니다"));
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA, "해당 책을 찾을 수 없습니다"));
 
@@ -67,12 +73,12 @@ public class ReviewService {
                 .build();
 
         Review save = reviewRepository.save(review);
+        bookRepository.save(book);
 
         checkReviewed(student, book);
 
         return save.getId();
     }
-
 
     /**
      * 해당 검증 로직은 학생 정보를 update 할 경우, 기존 미인증 시험 -> 인증 시험으로 바뀐다는 전제하에 적용됩니다.
@@ -103,7 +109,7 @@ public class ReviewService {
      * @param ratioIdx  도움이 된 부분
      * @param comment   리뷰 내용
      */
-    public Long edit(Long studentId, Long reviewId, Integer score, Integer volume, Integer ratioIdx, String comment) {
+    public Long edit(Long studentId, Long reviewId, Float score, Integer volume, Integer ratioIdx, String comment) {
         Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA, "해당 리뷰를 찾을 수 없습니다"));
         if (!review.getStudent().getId().equals(studentId)) {
             throw new CustomException(ErrorCode.NOT_GRANTED);
@@ -129,6 +135,40 @@ public class ReviewService {
             throw new CustomException(ErrorCode.NOT_GRANTED);
         }
 
+    }
+
+
+    public float calculateAverageScoreByBookId(Long bookId) {
+        List<Review> reviews = reviewRepository.findByBookId(bookId);
+        if (reviews.isEmpty()) {
+            return 0.0f;
+        }
+
+        float totalScore = 0.0f;
+        for (Review review : reviews) {
+            totalScore += review.getScore();
+        }
+
+        return totalScore / reviews.size();
+    }
+
+    public float calculateAverageVolumeByBookId(Long bookId) {
+        List<Review> reviews = reviewRepository.findByBookId(bookId);
+        if (reviews.isEmpty()) {
+            return 0.0f;
+        }
+
+        float totalVolume = 0.0f;
+        for (Review review : reviews) {
+            totalVolume += review.getVolume();
+        }
+
+        return totalVolume / reviews.size();
+    }
+    public Map<BookRatio, Long> countReviewsByRatio() {
+        List<Review> reviews = reviewRepository.findAll();
+        return reviews.stream()
+                .collect(Collectors.groupingBy(Review::getRatio, Collectors.counting()));
     }
 
 }

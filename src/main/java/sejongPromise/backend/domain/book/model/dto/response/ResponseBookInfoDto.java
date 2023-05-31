@@ -13,7 +13,7 @@ public class ResponseBookInfoDto {
     private final String writer;
     private final String com;
     private final String imageUrl;
-    private final float score;
+    private final Float averageScore;
 
     public ResponseBookInfoDto(Book book){
         this.bookId = book.getId();
@@ -22,6 +22,6 @@ public class ResponseBookInfoDto {
         this.writer = book.getWriter();
         this.com = book.getCom();
         this.imageUrl = book.getImageUrl();
-        this.score = book.getScore();
+        this.averageScore = book.getAverageScore();
     }
 }
