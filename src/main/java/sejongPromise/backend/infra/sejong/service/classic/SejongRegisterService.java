@@ -56,7 +56,7 @@ public class SejongRegisterService extends SejongRequester{
      * @param date 날짜
      * @return
      */
-    public List<BookScheduleInfo> crawlBookScheduleInfo(String cookieString, LocalDate date){
+    public List<BookScheduleInfo>  crawlBookScheduleInfo(String cookieString, LocalDate date){
         String param = String.format("shDate=%s", date.toString());
         String html = requestWebInfo(cookieString, REGISTER_BOOK_SCHEDULE_URI, param);
         return parseBookScheduleInfo(html);

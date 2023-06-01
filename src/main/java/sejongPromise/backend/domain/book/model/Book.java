@@ -1,6 +1,5 @@
 package sejongPromise.backend.domain.book.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import sejongPromise.backend.domain.enumerate.BookField;
 import sejongPromise.backend.domain.enumerate.BookStatus;
