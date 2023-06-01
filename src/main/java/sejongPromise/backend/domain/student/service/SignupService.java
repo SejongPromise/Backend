@@ -62,11 +62,11 @@ public class SignupService {
                 throw new CustomException(ErrorCode.ALREADY_USER_EXIST);
             }
             //관리자에 의해 삭제된 계정이 다시 회원가입 하려는 경우-else if
-            else if(student.getStudentStatus()== StudentStatus.DeletedByAdmin){
+            if(student.getStudentStatus() == StudentStatus.DeletedByAdmin){
                 throw new CustomException(ErrorCode.INVALID_ACCESS,"관리자에 의해 삭제된 계쩡입니다.");
             }
             //탈퇴한 계정이 재가입한 경우
-            else {
+            if(student.getStudentStatus() == StudentStatus.Deleted){
                 refreshSession(student.getId(), dto.getPassword());
                 student.active();
             }
@@ -157,7 +157,7 @@ public class SignupService {
         dest.forEach(register -> {
             //날짜 비교 해당 날짜 데이터가 없으면 Register 에서 삭제한다.
             if (src.stream().noneMatch(myRegisterInfo -> myRegisterInfo.getDate().equals(register.getDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))))) {
-                register.delete();
+                registerRepository.delete(register);
             }
         });
     }

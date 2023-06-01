@@ -12,6 +12,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(uniqueConstraints = { @UniqueConstraint(name = "UniqueStudentAndTitle", columnNames = { "student_id", "title" }) })
 public class Exam extends BaseEntity {
     @Id @GeneratedValue
     @Column(name = "exam_id")
@@ -24,7 +25,6 @@ public class Exam extends BaseEntity {
     private Semester semester;
     @Enumerated(EnumType.STRING)
     private BookField field;
-    @Column(unique = true)
     private String title; // todo : 1:1 맵핑. -> 불가능 deprecated 된 시험 목록이 존재함.
     private boolean isPass;
     private boolean isTest;
@@ -61,4 +61,6 @@ public class Exam extends BaseEntity {
         this.isTest = newExam.isTest();
         this.isReviewed = false;
     }
+
+
 }

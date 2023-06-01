@@ -32,9 +32,10 @@ public class ReviewService {
 
     /**
      * 리뷰 목록을 가져옵니다. 작성자는 해당 시험을 수강한 학기로 채워집니다.
-     * @param bookId    책 ID
-     * @param pageable  페이징 정보
-     * @return          페이징 된 리뷰 목록
+     *
+     * @param bookId   책 ID
+     * @param pageable 페이징 정보
+     * @return 페이징 된 리뷰 목록
      */
     public Slice<ReviewDto> list(Long bookId, Pageable pageable) {
         bookRepository.findById(bookId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA, "해당 책을 찾을 수 없습니다"));

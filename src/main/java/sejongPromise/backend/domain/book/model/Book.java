@@ -3,8 +3,8 @@ package sejongPromise.backend.domain.book.model;
 import lombok.*;
 import sejongPromise.backend.domain.enumerate.BookField;
 import sejongPromise.backend.domain.enumerate.BookStatus;
+import sejongPromise.backend.domain.review.model.Review;
 import sejongPromise.backend.global.model.BaseEntity;
-
 import javax.persistence.*;
 
 @Entity
@@ -23,19 +23,28 @@ public class Book extends BaseEntity {
     private Long code;
     @Enumerated(EnumType.STRING)
     private BookStatus status;
-
+    @OneToOne(mappedBy = "book", fetch = FetchType.LAZY)
+    private Review review;
+    public float getScore(){
+        if(review != null){
+            return review.getScore();
+        } else {
+            return 0.0f;}
+    }
     @Builder
     private Book(@NonNull String title,
                  @NonNull BookField field,
                  @NonNull String writer,
                  @NonNull String com,
-                 @NonNull String imageUrl){
+                 @NonNull String imageUrl,
+                 Review review) {
         this.title = title;
         this.field = field;
         this.writer = writer;
         this.com = com;
         this.imageUrl = imageUrl;
         this.status = BookStatus.ACTIVE;
+        this.review = review;
     }
 
     public void deprecated() {
