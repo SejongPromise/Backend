@@ -38,6 +38,9 @@ public class StudentService {
         if(student.getStudentStatus()==StudentStatus.Deleted){
             throw new CustomException(ErrorCode.NOT_FOUND_DATA);
         }
+        if(student.getStudentStatus()==StudentStatus.DeletedByAdmin){
+            throw new CustomException(ErrorCode.INVALID_STUDENT_INFO);
+        }
         if (passwordEncoder.matches(dto.getPassword(), student.getPassword())) {
             AuthenticationToken token = jwtProvider.issue(student);
             return new ResponseLoginDto(student, token);
