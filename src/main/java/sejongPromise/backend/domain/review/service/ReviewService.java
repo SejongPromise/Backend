@@ -13,18 +13,12 @@ import sejongPromise.backend.domain.enumerate.Role;
 import sejongPromise.backend.domain.exam.model.Exam;
 import sejongPromise.backend.domain.exam.repository.ExamRepository;
 import sejongPromise.backend.domain.review.model.Review;
-import sejongPromise.backend.domain.review.model.dto.Response.ResponseReviewDto;
 import sejongPromise.backend.domain.review.model.dto.ReviewDto;
 import sejongPromise.backend.domain.review.repository.ReviewRepository;
 import sejongPromise.backend.domain.student.model.Student;
 import sejongPromise.backend.domain.student.repository.StudentRepository;
 import sejongPromise.backend.global.error.ErrorCode;
 import sejongPromise.backend.global.error.exception.CustomException;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -38,9 +32,10 @@ public class ReviewService {
 
     /**
      * 리뷰 목록을 가져옵니다. 작성자는 해당 시험을 수강한 학기로 채워집니다.
-     * @param bookId    책 ID
-     * @param pageable  페이징 정보
-     * @return          페이징 된 리뷰 목록
+     *
+     * @param bookId   책 ID
+     * @param pageable 페이징 정보
+     * @return 페이징 된 리뷰 목록
      */
     public Slice<ReviewDto> list(Long bookId, Pageable pageable) {
         bookRepository.findById(bookId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DATA, "해당 책을 찾을 수 없습니다"));
@@ -137,38 +132,5 @@ public class ReviewService {
 
     }
 
-
-    public float calculateAverageScoreByBookId(Long bookId) {
-        List<Review> reviews = reviewRepository.findByBookId(bookId);
-        if (reviews.isEmpty()) {
-            return 0.0f;
-        }
-
-        float totalScore = 0.0f;
-        for (Review review : reviews) {
-            totalScore += review.getScore();
-        }
-
-        return totalScore / reviews.size();
-    }
-
-    public float calculateAverageVolumeByBookId(Long bookId) {
-        List<Review> reviews = reviewRepository.findByBookId(bookId);
-        if (reviews.isEmpty()) {
-            return 0.0f;
-        }
-
-        float totalVolume = 0.0f;
-        for (Review review : reviews) {
-            totalVolume += review.getVolume();
-        }
-
-        return totalVolume / reviews.size();
-    }
-    public Map<BookRatio, Long> countReviewsByRatio() {
-        List<Review> reviews = reviewRepository.findAll();
-        return reviews.stream()
-                .collect(Collectors.groupingBy(Review::getRatio, Collectors.counting()));
-    }
 
 }

@@ -33,6 +33,7 @@ public enum ErrorCode {
     WRONG_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다"),
     ALREADY_USER_EXIST(HttpStatus.BAD_REQUEST, "이미 존재하는 회원입니다."),
     NOT_STUDENT_MATCH(HttpStatus.NOT_FOUND, "학생 정보가 올바르지 않습니다."),
+    INVALID_ACCESS(HttpStatus.BAD_REQUEST, "회원가입할 수 없습니다."),
 
     /**
      * register
@@ -46,7 +47,10 @@ public enum ErrorCode {
      * review
      */
     ALREADY_REVIEWED(HttpStatus.CONFLICT, "이미 리뷰를 작성한 시험입니다."),
-
+    /**
+     * reserve
+     */
+    NOT_FOUND_TITLE(HttpStatus.NOT_FOUND, "도서명을 잘못 입력하셨습니다."),
 
     /**
      * sejong

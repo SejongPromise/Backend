@@ -6,11 +6,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sejongPromise.backend.domain.enumerate.Role;
 import sejongPromise.backend.domain.enumerate.Semester;
+import sejongPromise.backend.domain.enumerate.StudentStatus;
 import sejongPromise.backend.domain.exam.model.Exam;
 import sejongPromise.backend.domain.exam.repository.ExamRepository;
 import sejongPromise.backend.domain.register.repository.RegisterRepository;
 import sejongPromise.backend.domain.register.model.Register;
 import sejongPromise.backend.domain.student.model.Student;
+import sejongPromise.backend.domain.student.model.dto.request.RequestQuitDto;
 import sejongPromise.backend.domain.student.model.dto.request.RequestStudentInfoDto;
 import sejongPromise.backend.domain.student.repository.StudentRepository;
 import sejongPromise.backend.global.error.ErrorCode;
@@ -54,56 +56,74 @@ public class SignupService {
         //todo: 비밀번호 변경 가능하게 할지 말지
         Optional<Student> optionalStudent = studentRepository.findById(Long.parseLong(dto.getStudentId()));
         if(optionalStudent.isPresent()){
-            throw new CustomException(ErrorCode.ALREADY_USER_EXIST);
+            Student student = optionalStudent.get();
+            //존재하는 계정인 경우
+            if(student.getStudentStatus() == StudentStatus.Active){
+                throw new CustomException(ErrorCode.ALREADY_USER_EXIST);
+            }
+            //관리자에 의해 삭제된 계정이 다시 회원가입 하려는 경우-else if
+            if(student.getStudentStatus() == StudentStatus.DeletedByAdmin){
+                throw new CustomException(ErrorCode.INVALID_ACCESS, "관리자에 의해 삭제된 계정입니다.");
+            }
+            //탈퇴한 계정이 재가입한 경우
+            if(student.getStudentStatus() == StudentStatus.Deleted){
+                refreshSession(student.getId(), dto.getPassword());
+                student.active();
+            }
         }
 
-        //1. 학생 정보 저장
-        SejongAuth auth = sejongAuthenticationService.login(dto.getStudentId(), dto.getPassword());
-        StudentInfo studentInfo = sejongStudentService.crawlStudentInfo(WebUtil.makeCookieString(auth.cookies));
-        Student student = Student.builder()
-                .name(studentInfo.getName())
-                .major(studentInfo.getMajor())
-                .studentId(Long.parseLong(studentInfo.getStudentId()))
-                .semester(studentInfo.getSemester().replace(" ", ""))
-                .sessionToken(WebUtil.makeCookieString(auth.cookies))
-                .pass(studentInfo.isPass())
-                .encodedPassword(passwordEncoder.encode(dto.getPassword()))
-                .role(Role.STUDENT)
-                .build();
-        Student saveStudent = studentRepository.save(student);
-
-        //2.시험 정보 저장
-        List<ExamInfo> examInfoList = studentInfo.getExamInfoList();
-        examInfoList.forEach(data -> {
-            Exam exam = Exam.builder().title(data.getTitle())
-                    .year(data.getYear())
-                    .semester(data.getSemester().replace(" ", ""))
-                    .isPass(data.isPass())
-                    .field(data.getField())
-                    .student(saveStudent)
-                    .isTest(data.isTest())
+        //처음 가입하는 경우
+        else {
+            //1. 학생 정보 저장
+            SejongAuth auth = sejongAuthenticationService.login(dto.getStudentId(), dto.getPassword());
+            StudentInfo studentInfo = sejongStudentService.crawlStudentInfo(WebUtil.makeCookieString(auth.cookies));
+            Student student = Student.builder()
+                    .name(studentInfo.getName())
+                    .major(studentInfo.getMajor())
+                    .studentId(Long.parseLong(studentInfo.getStudentId()))
+                    .semester(studentInfo.getSemester().replace(" ", ""))
+                    .sessionToken(WebUtil.makeCookieString(auth.cookies))
+                    .pass(studentInfo.isPass())
+                    .encodedPassword(passwordEncoder.encode(dto.getPassword()))
+                    .role(Role.STUDENT)
+                    .studentStatus(StudentStatus.Active)
                     .build();
-            examRepository.save(exam);
-        });
+            Student saveStudent = studentRepository.save(student);
 
-        //3.신청내역과 신청 취소 내역 저장
-        List<MyRegisterInfo> myRegisterInfoList = sejongRegisterService.crawlRegisterInfo(WebUtil.makeCookieString(auth.cookies));
-        myRegisterInfoList.forEach(data -> {
-            Register register = Register.builder()
-                    .student(saveStudent)
-                    .year(Integer.parseInt(data.getYear()))
-                    .semester(Semester.of(data.getSemester()))
-                    .date(LocalDate.parse(data.getDate(), DateTimeFormatter.ISO_DATE))
-                    .startTime(LocalTime.parse(data.getStartTime(), DateTimeFormatter.ISO_TIME))
-                    .endTime(LocalTime.parse(data.getEndTime(), DateTimeFormatter.ISO_TIME))
-                    .bookTitle(data.getBookTitle())
-                    .cancelOPAP(data.getCancelOPAP())
-                    .build();
-            registerRepository.save(register);
+            //2.시험 정보 저장
+            List<ExamInfo> examInfoList = studentInfo.getExamInfoList();
+            examInfoList.forEach(data -> {
+                Exam exam = Exam.builder().title(data.getTitle())
+                        .year(data.getYear())
+                        .semester(data.getSemester().replace(" ", ""))
+                        .isPass(data.isPass())
+                        .field(data.getField())
+                        .student(saveStudent)
+                        .isTest(data.isTest())
+                        .build();
+                examRepository.save(exam);
+            });
 
-        });
+            //3.신청내역과 신청 취소 내역 저장
+            List<MyRegisterInfo> myRegisterInfoList = sejongRegisterService.crawlRegisterInfo(WebUtil.makeCookieString(auth.cookies));
+            myRegisterInfoList.forEach(data -> {
+                Register register = Register.builder()
+                        .student(saveStudent)
+                        .year(Integer.parseInt(data.getYear()))
+                        .semester(Semester.of(data.getSemester()))
+                        .date(LocalDate.parse(data.getDate(), DateTimeFormatter.ISO_DATE))
+                        .startTime(LocalTime.parse(data.getStartTime(), DateTimeFormatter.ISO_TIME))
+                        .endTime(LocalTime.parse(data.getEndTime(), DateTimeFormatter.ISO_TIME))
+                        .bookTitle(data.getBookTitle())
+                        .cancelOPAP(data.getCancelOPAP())
+                        .build();
+                registerRepository.save(register);
+
+            });
+        }
 
     }
+
 
     @Transactional
     public void refreshSession(Long studentId, String password) {
@@ -137,7 +157,7 @@ public class SignupService {
         dest.forEach(register -> {
             //날짜 비교 해당 날짜 데이터가 없으면 Register 에서 삭제한다.
             if (src.stream().noneMatch(myRegisterInfo -> myRegisterInfo.getDate().equals(register.getDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))))) {
-                register.delete();
+                registerRepository.delete(register);
             }
         });
     }
@@ -165,5 +185,6 @@ public class SignupService {
             });
         });
     }
+
 
 }

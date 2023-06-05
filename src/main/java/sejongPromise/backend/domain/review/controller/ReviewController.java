@@ -13,6 +13,7 @@ import sejongPromise.backend.domain.review.model.dto.request.RequestCreateReview
 import sejongPromise.backend.domain.review.service.ReviewService;
 import sejongPromise.backend.global.config.auth.CustomAuthentication;
 import sejongPromise.backend.global.config.qualifier.StudentAuth;
+import sejongPromise.backend.global.model.ResponseSlice;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -26,10 +27,10 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @GetMapping("/{bookId}")
-    public Slice<ReviewDto> getReviewList(@PathVariable Long bookId,
-                                          @PageableDefault(size = 20, sort = "create_at", direction = Sort.Direction.DESC) Pageable pageable){
-
-        return reviewService.list(bookId, pageable);
+    public ResponseSlice<ReviewDto> getReviewList(@PathVariable Long bookId,
+                                               @PageableDefault(size = 20, sort = "create_at", direction = Sort.Direction.DESC) Pageable pageable){
+        Slice<ReviewDto> list = reviewService.list(bookId, pageable);
+        return new ResponseSlice<>(list);
     }
 //    @GetMapping("/field")
 //    @StudentAuth

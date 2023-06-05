@@ -6,7 +6,7 @@ import sejongPromise.backend.domain.enumerate.BookStatus;
 import sejongPromise.backend.domain.review.model.Review;
 import sejongPromise.backend.global.model.BaseEntity;
 import javax.persistence.*;
-import java.util.List;
+
 
 @Entity
 @Getter
@@ -24,7 +24,7 @@ public class Book extends BaseEntity {
     private Long code;
     @Enumerated(EnumType.STRING)
     private BookStatus status;
-    private Float averageScore;
+
 
     @Builder
     private Book(@NonNull String title,
@@ -48,7 +48,4 @@ public class Book extends BaseEntity {
         this.code = code;
     }
 
-    public void setAverageScore(float averageScore){
-        this.averageScore = averageScore;
-    }
 }

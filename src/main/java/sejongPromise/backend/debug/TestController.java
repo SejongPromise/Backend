@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import sejongPromise.backend.domain.enumerate.ReserveStatus;
+import sejongPromise.backend.global.config.qualifier.StudentAuth;
 import sejongPromise.backend.global.util.WebUtil;
 import sejongPromise.backend.infra.sejong.model.*;
 import sejongPromise.backend.infra.sejong.model.dto.request.RequestTestApplyDto;
@@ -13,6 +15,7 @@ import sejongPromise.backend.debug.dto.RequestTestCancelDto;
 import sejongPromise.backend.infra.sejong.service.classic.SejongAuthenticationService;
 import sejongPromise.backend.infra.sejong.service.classic.SejongBookService;
 import sejongPromise.backend.infra.sejong.service.classic.SejongRegisterService;
+import sejongPromise.backend.infra.sejong.service.portal.ReservingBookService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -27,6 +30,7 @@ public class TestController {
     private final SejongRegisterService registerService;
     private final SejongBookService bookService;;
 
+    private final ReservingBookService reservingBookService;
 
 
     /**
@@ -72,6 +76,11 @@ public class TestController {
     public List<BookCodeInfo> classicBookCode(@RequestParam("areaCode") String areaCode) {
 
         return bookService.crawlBookCode(areaCode);
+    }
+
+    @GetMapping("/reserve")
+    public ReserveStatus checkStatus(@RequestParam("title") String title) {
+        return reservingBookService.crawlReserveStatusInfo(title);
     }
 
     @PostMapping("classic/book/cancel")

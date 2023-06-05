@@ -5,13 +5,11 @@ import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.domain.Persistable;
 import sejongPromise.backend.domain.enumerate.Role;
 import sejongPromise.backend.domain.enumerate.Semester;
-import sejongPromise.backend.domain.exam.model.Exam;
+import sejongPromise.backend.domain.enumerate.StudentStatus;
 import sejongPromise.backend.global.model.BaseEntity;
 import sejongPromise.backend.infra.sejong.model.StudentInfo;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -31,6 +29,8 @@ public class Student extends BaseEntity implements Persistable<Long> {
     private Boolean isPass;
     @Enumerated(EnumType.STRING)
     private Role role;
+    @Enumerated(EnumType.STRING)
+    private StudentStatus studentStatus;
 
     /**
      * Persistable override
@@ -51,7 +51,8 @@ public class Student extends BaseEntity implements Persistable<Long> {
                     @NonNull String sessionToken,
                     @NonNull String semester,
                     @NonNull Boolean pass,
-                    @NonNull Role role) {
+                    @NonNull Role role,
+                    @NonNull StudentStatus studentStatus) {
         this.id = studentId;
         this.name = name;
         this.major = major;
@@ -60,6 +61,7 @@ public class Student extends BaseEntity implements Persistable<Long> {
         this.isPass = pass;
         this.password = encodedPassword;
         this.role = role;
+        this.studentStatus = studentStatus;
     }
 
     public void updateStudentInfo(StudentInfo studentInfo) {
@@ -75,5 +77,16 @@ public class Student extends BaseEntity implements Persistable<Long> {
 
     public void updateSessionToken(String cookieString) {
         this.sessionToken = cookieString;
+    }
+    public void quit(){
+        this.studentStatus = StudentStatus.Deleted;
+    }
+
+    public void active() {
+        this.studentStatus = StudentStatus.Active;
+    }
+
+    public void quitByAdmin() {
+        this.studentStatus = StudentStatus.DeletedByAdmin;
     }
 }
