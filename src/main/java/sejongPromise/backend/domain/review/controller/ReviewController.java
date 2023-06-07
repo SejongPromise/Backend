@@ -32,11 +32,7 @@ public class ReviewController {
         Slice<ReviewDto> list = reviewService.list(bookId, pageable);
         return new ResponseSlice<>(list);
     }
-//    @GetMapping("/field")
-//    @StudentAuth
-//    public List<ResponseExamFieldInfoDto> getListByField(CustomAuthentication auth){
-//        return examService.fieldList(auth.getStudentId());
-//    }
+
     @PostMapping("/{bookId}")
     @StudentAuth
     public Long createReview(CustomAuthentication auth,
