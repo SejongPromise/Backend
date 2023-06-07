@@ -5,9 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import sejongPromise.backend.domain.reserve.model.dto.response.ResponseReserveDto;
-import sejongPromise.backend.domain.reserve.service.ReserveService;
-import sejongPromise.backend.global.config.auth.CustomAuthentication;
+
 import sejongPromise.backend.global.config.qualifier.StudentAuth;
 import sejongPromise.backend.global.util.WebUtil;
 import sejongPromise.backend.infra.sejong.model.*;
@@ -17,6 +15,7 @@ import sejongPromise.backend.debug.dto.RequestTestCancelDto;
 import sejongPromise.backend.infra.sejong.service.classic.SejongAuthenticationService;
 import sejongPromise.backend.infra.sejong.service.classic.SejongBookService;
 import sejongPromise.backend.infra.sejong.service.classic.SejongRegisterService;
+import sejongPromise.backend.infra.sejong.service.portal.ReservingBookService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -32,6 +31,7 @@ public class TestController {
     private final SejongBookService bookService;
     private final ReserveService reserveService;
 
+    private final ReservingBookService reservingBookService;
 
 
     /**
@@ -79,7 +79,6 @@ public class TestController {
         return bookService.crawlBookCode(areaCode);
     }
 
-    @PostMapping("/classic/book/cancel")
     public void classicRegisterCancel(@RequestParam("JSession") String JSession,
                                       @RequestBody RequestTestCancelDto dto) {
         registerService.cancelRegister(JSession, dto.getCancelData());

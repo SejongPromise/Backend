@@ -7,6 +7,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
+import sejongPromise.backend.domain.exam.model.dto.ResponseExamFieldInfoDto;
 import sejongPromise.backend.domain.review.model.dto.ReviewDto;
 import sejongPromise.backend.domain.review.model.dto.request.RequestCreateReviewDto;
 import sejongPromise.backend.domain.review.service.ReviewService;
@@ -15,6 +16,7 @@ import sejongPromise.backend.global.config.qualifier.StudentAuth;
 import sejongPromise.backend.global.model.ResponseSlice;
 
 import javax.validation.Valid;
+import java.util.List;
 
 
 @Tag(name = "REVIEW", description = "REVIEW API 모음")

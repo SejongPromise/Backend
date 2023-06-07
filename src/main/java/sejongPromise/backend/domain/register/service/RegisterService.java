@@ -18,7 +18,6 @@ import sejongPromise.backend.infra.sejong.model.BookScheduleInfo;
 import sejongPromise.backend.infra.sejong.model.MyRegisterInfo;
 import sejongPromise.backend.infra.sejong.model.dto.StudentBookInfo;
 import sejongPromise.backend.infra.sejong.model.dto.request.RequestTestApplyDto;
-import sejongPromise.backend.infra.sejong.service.classic.SejongBookService;
 import sejongPromise.backend.infra.sejong.service.classic.SejongRegisterService;
 
 import javax.transaction.Transactional;
@@ -38,7 +37,6 @@ public class RegisterService {
     private final BookRepository bookRepository;
     private final StudentRepository studentRepository;
     private final SejongRegisterService sejongRegisterService;
-    private final SejongBookService sejongBookService;
 
     /**
      * 시험 신청 서비스

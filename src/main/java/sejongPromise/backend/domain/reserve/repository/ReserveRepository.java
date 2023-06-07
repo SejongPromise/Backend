@@ -7,10 +7,7 @@ import sejongPromise.backend.domain.student.model.Student;
 import java.util.List;
 import java.util.Optional;
 
+
+
 public interface ReserveRepository extends JpaRepository<Reserve, Long>{
-    Optional<Reserve> findByIdAndStudentId(Long reserveId, Long studentId);
-    Optional<Reserve> findByStudentIdAndTitle(Long reserveId, String title);
-
-    List<Reserve> findAllByStudentId(Long studentId);
-
 }

@@ -1,12 +1,12 @@
 package sejongPromise.backend.domain.book.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import sejongPromise.backend.domain.enumerate.BookField;
 import sejongPromise.backend.domain.enumerate.BookStatus;
+import sejongPromise.backend.domain.review.model.Review;
 import sejongPromise.backend.global.model.BaseEntity;
-
 import javax.persistence.*;
+
 
 @Entity
 @Getter
@@ -25,12 +25,13 @@ public class Book extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private BookStatus status;
 
+
     @Builder
     private Book(@NonNull String title,
                  @NonNull BookField field,
                  @NonNull String writer,
                  @NonNull String com,
-                 @NonNull String imageUrl){
+                 @NonNull String imageUrl) {
         this.title = title;
         this.field = field;
         this.writer = writer;
@@ -46,4 +47,5 @@ public class Book extends BaseEntity {
     public void updateCode(Long code) {
         this.code = code;
     }
+
 }

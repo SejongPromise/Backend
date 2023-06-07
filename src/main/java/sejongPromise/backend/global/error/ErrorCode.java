@@ -47,7 +47,10 @@ public enum ErrorCode {
      * review
      */
     ALREADY_REVIEWED(HttpStatus.CONFLICT, "이미 리뷰를 작성한 시험입니다."),
-
+    /**
+     * reserve
+     */
+    NOT_FOUND_TITLE(HttpStatus.NOT_FOUND, "도서명을 잘못 입력하셨습니다."),
 
     /**
      * sejong

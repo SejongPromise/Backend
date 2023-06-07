@@ -2,19 +2,13 @@ package sejongPromise.backend.domain.reserve.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
-import sejongPromise.backend.domain.register.model.dto.request.RequestCreateRegisterDto;
-import sejongPromise.backend.domain.register.model.dto.response.ResponseMyRegisterDto;
-import sejongPromise.backend.domain.register.service.RegisterService;
 import sejongPromise.backend.domain.reserve.model.dto.response.ResponseReserveDto;
 import sejongPromise.backend.domain.reserve.service.ReserveService;
 import sejongPromise.backend.global.config.auth.CustomAuthentication;
 import sejongPromise.backend.global.config.qualifier.StudentAuth;
-import sejongPromise.backend.infra.sejong.model.BookScheduleInfo;
 
-import javax.validation.Valid;
-import java.time.LocalDate;
+
 import java.util.List;
 
 @Tag(name = "도서 예약 API", description = "도서 예약 API 모음")
@@ -56,7 +50,7 @@ public class ReserveController {
     @PostMapping
     @StudentAuth
     public void getTestSchedule(CustomAuthentication auth,
-                                                  @RequestParam("title") String title){
+                                @RequestParam("title") String title){
         Long studentId = auth.getStudentId();
         reserveService.reserve(studentId, title);
     }

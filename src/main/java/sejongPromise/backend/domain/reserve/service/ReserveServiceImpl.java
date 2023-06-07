@@ -1,10 +1,10 @@
 package sejongPromise.backend.domain.reserve.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sejongPromise.backend.domain.enumerate.ReserveStatus;
-import sejongPromise.backend.domain.reserve.model.Reserve;
+
 import sejongPromise.backend.domain.reserve.model.dto.response.ResponseReserveDto;
 import sejongPromise.backend.domain.reserve.repository.ReserveRepository;
 import sejongPromise.backend.domain.student.model.Student;
@@ -12,16 +12,20 @@ import sejongPromise.backend.domain.student.repository.StudentRepository;
 import sejongPromise.backend.global.error.ErrorCode;
 import sejongPromise.backend.global.error.exception.CustomException;
 
+import sejongPromise.backend.infra.sejong.service.portal.ReservingBookService;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+
+@Repository
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ReserveServiceImpl implements ReserveService{
     private final ReserveRepository reserveRepository;
-    private final StudentRepository studentRepository;
 
     @Override
     public void reserve(Long studentId, String title) {
@@ -53,11 +57,11 @@ public class ReserveServiceImpl implements ReserveService{
     public List<ResponseReserveDto> list(Long studentId) {
         return reserveRepository.findAllByStudentId(studentId).stream().map(ResponseReserveDto::new).collect(Collectors.toList());
     }
-
     @Override
     public String checkStatus(String title) {
         if(title.equals("한비자")) return ReserveStatus.AVAILABLE.toString();
         if(title.equals("한비자2")) return ReserveStatus.RESERVED.toString();
         return ReserveStatus.UNAVAILABLE.toString();
     }
+
 }

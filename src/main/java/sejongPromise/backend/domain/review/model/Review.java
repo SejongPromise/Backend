@@ -31,7 +31,7 @@ public class Review extends BaseEntity {
     private Book book;
     @ManyToOne(fetch = FetchType.LAZY)
     private Student student;
-    private Integer score;
+    private Float score;
     private Integer volume;
     @Enumerated(EnumType.STRING)
     private BookRatio ratio;
@@ -40,7 +40,6 @@ public class Review extends BaseEntity {
     private ReviewStatus status;
     @Enumerated(EnumType.STRING)
     private Semester passSemester;
-
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Report> reports = new ArrayList<>();
 
@@ -48,7 +47,7 @@ public class Review extends BaseEntity {
     @Builder
     private Review(@NonNull Book book,
                    @NonNull Student student,
-                   @NonNull Integer score,
+                   @NonNull Float score,
                    @NonNull Integer volume,
                    @NonNull BookRatio ratio,
                    String comment) {
@@ -62,7 +61,7 @@ public class Review extends BaseEntity {
         this.passSemester = student.getSemester();
     }
 
-    public void updateReview(Integer score, Integer volume, BookRatio ratio, String comment) {
+    public void updateReview(Float score, Integer volume, BookRatio ratio, String comment) {
         this.score = score;
         this.volume = volume;
         this.ratio = ratio;

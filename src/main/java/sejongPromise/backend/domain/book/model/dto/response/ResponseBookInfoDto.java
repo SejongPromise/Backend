@@ -13,7 +13,6 @@ public class ResponseBookInfoDto {
     private final String writer;
     private final String com;
     private final String imageUrl;
-
     public ResponseBookInfoDto(Book book){
         this.bookId = book.getId();
         this.title = book.getTitle();
