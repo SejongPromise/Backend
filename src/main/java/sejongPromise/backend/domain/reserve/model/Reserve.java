@@ -1,13 +1,11 @@
 package sejongPromise.backend.domain.reserve.model;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import sejongPromise.backend.domain.enumerate.ReserveStatus;
 import sejongPromise.backend.domain.student.model.Student;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Entity
@@ -35,7 +33,10 @@ public class Reserve {
      * @param status 대출가능, 대출불가능, 예약가능
      */
     @Builder
-    private Reserve(Student student, String title, Integer reserveCount, ReserveStatus status) {
+    private Reserve(@NonNull Student student,
+                    @NotNull String title,
+                    Integer reserveCount,
+                    @NotNull ReserveStatus status) {
         this.student = student;
         this.title = title;
         this.reserveDate = LocalDate.now();
